@@ -3,7 +3,6 @@ defmodule HayaiLedger.Accounts.Account do
   import Ecto.Changeset
 
   alias HayaiLedger.Accounts.AccountType
-  alias HayaiLedger.Ledger.Transaction
 
   schema "accounts" do
     field :meta_data, :map
@@ -12,7 +11,7 @@ defmodule HayaiLedger.Accounts.Account do
     field :object_uid, :string
     field :uid, :string
     belongs_to :type, AccountType
-    has_many :transactions, Transaction 
+    has_many :transactions, HayaiLedger.Ledgers.Transaction 
 
     timestamps()
   end

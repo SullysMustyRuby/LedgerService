@@ -2,7 +2,7 @@ defmodule HayaiLedger.Ledgers.Entry do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias HayaiLedger.Ledger.Transaction
+  alias HayaiLedger.Ledgers.Transaction
 
   schema "entries" do
     field :description, :string

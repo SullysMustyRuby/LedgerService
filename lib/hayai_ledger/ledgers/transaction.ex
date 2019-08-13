@@ -2,8 +2,7 @@ defmodule HayaiLedger.Ledgers.Transaction do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias HayaiLedger.Accounts.Account
-  alias HayaiLedger.Ledger.Entry
+  alias HayaiLedger.Ledgers.Entry
 
   schema "transactions" do
     field :amount_currency, :string
@@ -11,7 +10,7 @@ defmodule HayaiLedger.Ledgers.Transaction do
     field :description, :string
     field :type, :string
     field :uid, :string
-    belongs_to :account, Account
+    belongs_to :account, HayaiLedger.Accounts.Account
     belongs_to :entry, Entry
 
     timestamps()

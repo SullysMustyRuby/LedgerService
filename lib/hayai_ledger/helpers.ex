@@ -1,7 +1,7 @@
 defmodule HayaiLedger.Helpers do
   
-  @spec generate_uid(non_neg_integer) :: binary
-  def generate_uid(length \\ 32) when length > 0 and length < 100 do
-    :crypto.strong_rand_bytes(length) |> Base.encode64
+  @spec generate_uid() :: binary
+  def generate_uid() do
+    Ecto.UUID.generate
   end
 end

@@ -2,9 +2,9 @@ defmodule HayaiLedger.LedgersTest do
   use HayaiLedger.DataCase
 
   alias HayaiLedger.Ledgers
+  alias HayaiLedger.Ledgers.{Entry, Transaction}
 
   describe "entries" do
-    alias HayaiLedger.Ledgers.Entry
 
     @valid_attrs %{description: "some description", object_type: "some object_type", object_uid: "some object_uid", uid: "some uid"}
     @update_attrs %{description: "some updated description", object_type: "some updated object_type", object_uid: "some updated object_uid", uid: "some updated uid"}
@@ -69,7 +69,6 @@ defmodule HayaiLedger.LedgersTest do
   end
 
   describe "transactions" do
-    alias HayaiLedger.Ledgers.Transaction
 
     @valid_attrs %{amount_currency: "some amount_currency", amount_subunits: 42, description: "some description", type: "some type", uid: "some uid"}
     @update_attrs %{amount_currency: "some updated amount_currency", amount_subunits: 43, description: "some updated description", type: "some updated type", uid: "some updated uid"}
