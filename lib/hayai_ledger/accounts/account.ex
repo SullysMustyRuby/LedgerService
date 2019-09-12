@@ -19,7 +19,7 @@ defmodule HayaiLedger.Accounts.Account do
   @doc false
   def changeset(account, attrs) do
     account
-    |> cast(attrs, [:meta_data, :name, :object_type, :object_uid, :uid])
-    |> validate_required([:meta_data, :name, :object_type, :object_uid, :uid])
+    |> cast(attrs, [:meta_data, :name, :object_type, :object_uid])
+    |> validate_required([:name])
   end
 end

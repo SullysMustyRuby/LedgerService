@@ -1,4 +1,5 @@
 defmodule HayaiLedger.DataCase do
+
   @moduledoc """
   This module defines the setup for tests requiring
   access to the application's data layer.
@@ -22,6 +23,7 @@ defmodule HayaiLedger.DataCase do
       import Ecto.Changeset
       import Ecto.Query
       import HayaiLedger.DataCase
+      require IEx
     end
   end
 

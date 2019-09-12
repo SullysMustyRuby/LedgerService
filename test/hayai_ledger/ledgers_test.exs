@@ -1,6 +1,7 @@
 defmodule HayaiLedger.LedgersTest do
   use HayaiLedger.DataCase
 
+  alias HayaiLedger.Accounts
   alias HayaiLedger.Ledgers
   alias HayaiLedger.Ledgers.{Entry, Transaction}
 
@@ -9,6 +10,15 @@ defmodule HayaiLedger.LedgersTest do
     @valid_attrs %{description: "some description", object_type: "some object_type", object_uid: "some object_uid", uid: "some uid"}
     @update_attrs %{description: "some updated description", object_type: "some updated object_type", object_uid: "some updated object_uid", uid: "some updated uid"}
     @invalid_attrs %{description: nil, object_type: nil, object_uid: nil, uid: nil}
+
+    setup do
+      {:ok, account_1} = Accounts.create_account(%{ name: "One"})
+      {:ok, account_2} = Accounts.create_account(%{ name: "Two"})
+      %{
+        account_1: account_1,
+        account_2: account_2
+      }
+    end
 
     def entry_fixture(attrs \\ %{}) do
       {:ok, entry} =
@@ -41,31 +51,79 @@ defmodule HayaiLedger.LedgersTest do
       assert {:error, %Ecto.Changeset{}} = Ledgers.create_entry(@invalid_attrs)
     end
 
-    test "update_entry/2 with valid data updates the entry" do
-      entry = entry_fixture()
-      assert {:ok, %Entry{} = entry} = Ledgers.update_entry(entry, @update_attrs)
-      assert entry.description == "some updated description"
-      assert entry.object_type == "some updated object_type"
-      assert entry.object_uid == "some updated object_uid"
-      assert entry.uid == "some updated uid"
+    test "create_bookkeeping_entry/1 returns error tuple if the transactions currency are different", %{ account_1: account_1, account_2: account_2 } do
+      thb_transaction_1 = %{amount_currency: "THB", amount_subunits: 100, type: "credit", account_id: account_1.id}
+      thb_transaction_2 = %{amount_currency: "THB", amount_subunits: 50, type: "debit", account_id: account_2.id}
+      jpy_transaction = %{amount_currency: "JPY", amount_subunits: 50, type: "debit", account_id: account_2.id}
+      transactions = [thb_transaction_1, thb_transaction_2, jpy_transaction]
+      assert {:error, "currencies do not match"} == Ledgers.create_bookkeeping_entry(transactions)
     end
 
-    test "update_entry/2 with invalid data returns error changeset" do
-      entry = entry_fixture()
-      assert {:error, %Ecto.Changeset{}} = Ledgers.update_entry(entry, @invalid_attrs)
-      assert entry == Ledgers.get_entry!(entry.id)
+    test "create_bookkeeping_entry/1 returns :ok if the transactions currency are all the same", %{ account_1: account_1, account_2: account_2 } do
+      thb_transaction_1 = %{ amount_currency: "THB", amount_subunits: 100, type: "credit", account_id: account_1.id }
+      thb_transaction_2 = %{ amount_currency: "THB", amount_subunits: 50, type: "debit", account_id: account_2.id }
+      thb_transaction_3 = %{ amount_currency: "THB", amount_subunits: 50, type: "debit", account_id: account_2.id }
+      transactions = [thb_transaction_1, thb_transaction_2, thb_transaction_3]
+      assert :ok == Ledgers.create_bookkeeping_entry(transactions)
     end
 
-    test "delete_entry/1 deletes the entry" do
-      entry = entry_fixture()
-      assert {:ok, %Entry{}} = Ledgers.delete_entry(entry)
-      assert_raise Ecto.NoResultsError, fn -> Ledgers.get_entry!(entry.id) end
+    test "create_bookkeeping_entry/1 returns error tuple if the transactions credits and debits do not balance", %{ account_1: account_1, account_2: account_2 } do
+      transaction_1 = %{ amount_currency: "THB", amount_subunits: 100, type: "credit", account_id: account_1.id }
+      transaction_2 = %{ amount_currency: "THB", amount_subunits: 100, type: "debit", account_id: account_2.id }
+      transaction_3 = %{ amount_currency: "THB", amount_subunits: 50, type: "debit", account_id: account_2.id }
+      transactions = [transaction_1, transaction_2, transaction_3]
+      assert {:error, "credits and debits do not balance"} == Ledgers.create_bookkeeping_entry(transactions)
     end
 
-    test "change_entry/1 returns a entry changeset" do
-      entry = entry_fixture()
-      assert %Ecto.Changeset{} = Ledgers.change_entry(entry)
+    test "create_bookkeeping_entry/1 returns :ok if the transactions credits and debits balance", %{ account_1: account_1, account_2: account_2 } do
+      transaction_1 = %{ amount_currency: "THB", amount_subunits: 150, type: "credit", account_id: account_1.id }
+      transaction_2 = %{ amount_currency: "THB", amount_subunits: 100, type: "debit", account_id: account_2.id }
+      transaction_3 = %{ amount_currency: "THB", amount_subunits: 50, type: "debit", account_id: account_2.id }
+      transactions = [transaction_1, transaction_2, transaction_3]
+      assert :ok == Ledgers.create_bookkeeping_entry(transactions)
     end
+ 
+    test "create_bookeeping_entry/1 retuns error tuple if less than 2 transactions are included", %{ account_1: account_1 } do
+      transaction = %{ amount_currency: "THB", amount_subunits: 150, type: "credit", account_id: account_1.id}
+      bad_transactions = [nil, "", %{}, transaction, [transaction]]
+      for bad_transaction <- bad_transactions do
+        assert {:error, "must include transactions that balance"} == Ledgers.create_bookkeeping_entry(bad_transaction)
+      end
+    end
+
+    test "create_bookeeping_entry/1 returns error tuple if accounts are invalid", %{ account_1: account_1 } do
+      transaction_1 = %{ amount_currency: "THB", amount_subunits: 150, type: "credit", account_id: account_1.id }
+      transaction_2 = %{ amount_currency: "THB", amount_subunits: 100, type: "debit", account_id: account_1.id }
+      transaction_3 = %{ amount_currency: "THB", amount_subunits: 50, type: "debit", account_id: 555 }
+      transactions = [transaction_1, transaction_2, transaction_3]
+      assert {:error, "invalid account id: 555"} == Ledgers.create_bookkeeping_entry(transactions)
+    end
+
+    # test "update_entry/2 with valid data updates the entry" do
+    #   entry = entry_fixture()
+    #   assert {:ok, %Entry{} = entry} = Ledgers.update_entry(entry, @update_attrs)
+    #   assert entry.description == "some updated description"
+    #   assert entry.object_type == "some updated object_type"
+    #   assert entry.object_uid == "some updated object_uid"
+    #   assert entry.uid == "some updated uid"
+    # end
+
+    # test "update_entry/2 with invalid data returns error changeset" do
+    #   entry = entry_fixture()
+    #   assert {:error, %Ecto.Changeset{}} = Ledgers.update_entry(entry, @invalid_attrs)
+    #   assert entry == Ledgers.get_entry!(entry.id)
+    # end
+
+    # test "delete_entry/1 deletes the entry" do
+    #   entry = entry_fixture()
+    #   assert {:ok, %Entry{}} = Ledgers.delete_entry(entry)
+    #   assert_raise Ecto.NoResultsError, fn -> Ledgers.get_entry!(entry.id) end
+    # end
+
+    # test "change_entry/1 returns a entry changeset" do
+    #   entry = entry_fixture()
+    #   assert %Ecto.Changeset{} = Ledgers.change_entry(entry)
+    # end
   end
 
   describe "transactions" do

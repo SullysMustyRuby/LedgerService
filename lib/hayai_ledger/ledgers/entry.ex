@@ -1,6 +1,7 @@
 defmodule HayaiLedger.Ledgers.Entry do
   use Ecto.Schema
   import Ecto.Changeset
+  import HayaiLedger.Helpers, only: [{:generate_uid, 0}]
 
   alias HayaiLedger.Ledgers.Transaction
 
@@ -17,7 +18,8 @@ defmodule HayaiLedger.Ledgers.Entry do
   @doc false
   def changeset(entry, attrs) do
     entry
-    |> cast(attrs, [:description, :object_type, :object_uid, :uid])
-    |> validate_required([:description, :object_type, :object_uid, :uid])
+    |> cast(attrs, [:description, :object_type, :object_uid])
+    |> put_change(:uid, generate_uid())
+    |> validate_required([:uid])
   end
 end
