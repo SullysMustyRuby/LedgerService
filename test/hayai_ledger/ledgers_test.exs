@@ -64,7 +64,12 @@ defmodule HayaiLedger.LedgersTest do
       thb_transaction_2 = %{ amount_currency: "THB", amount_subunits: 50, type: "debit", account_id: account_2.id, description: "description" }
       thb_transaction_3 = %{ amount_currency: "THB", amount_subunits: 50, type: "debit", account_id: account_2.id, description: "description" }
       transactions = [thb_transaction_1, thb_transaction_2, thb_transaction_3]
-      # assert :ok == Ledgers.create_bookkeeping_entry(@valid_attrs, transactions)
+      {:ok, entry} = Ledgers.create_bookkeeping_entry(@valid_attrs, transactions)
+      assert @valid_attrs[:description] == entry.description 
+      assert @valid_attrs[:object_type] == entry.object_type 
+      assert @valid_attrs[:object_uid] == entry.object_uid
+      full_entry = Ledgers.get_entry_with_transactions(entry.id)
+      assert 3 == length(full_entry.transactions)
     end
 
     test "create_bookkeeping_entry/1 returns error tuple if the transactions credits and debits do not balance", %{ account_1: account_1, account_2: account_2 } do

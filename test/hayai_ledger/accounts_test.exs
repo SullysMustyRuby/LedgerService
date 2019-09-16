@@ -96,7 +96,7 @@ defmodule HayaiLedger.AccountsTest do
       assert account.name == "some name"
       assert account.object_type == "some object_type"
       assert account.object_uid == "some object_uid"
-      assert account.uid == "some uid"
+      assert account.uid != nil
     end
 
     test "create_account/1 with invalid data returns error changeset" do
@@ -110,7 +110,7 @@ defmodule HayaiLedger.AccountsTest do
       assert account.name == "some updated name"
       assert account.object_type == "some updated object_type"
       assert account.object_uid == "some updated object_uid"
-      assert account.uid == "some updated uid"
+      assert account.uid != nil
     end
 
     test "update_account/2 with invalid data returns error changeset" do
