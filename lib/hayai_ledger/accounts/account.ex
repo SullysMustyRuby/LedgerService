@@ -1,6 +1,7 @@
 defmodule HayaiLedger.Accounts.Account do
   use Ecto.Schema
   import Ecto.Changeset
+  import HayaiLedger.Helpers, only: [{:generate_uid, 0}]
 
   alias HayaiLedger.Accounts.AccountType
 
@@ -20,6 +21,7 @@ defmodule HayaiLedger.Accounts.Account do
   def changeset(account, attrs) do
     account
     |> cast(attrs, [:meta_data, :name, :object_type, :object_uid])
+    |> put_change(:uid, generate_uid())
     |> validate_required([:name])
   end
 end

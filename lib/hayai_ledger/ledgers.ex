@@ -6,7 +6,7 @@ defmodule HayaiLedger.Ledgers do
   import Ecto.Query, warn: false
 
   alias HayaiLedger.Accounts.Account
-  alias HayaiLedger.Ledgers.Entry
+  alias HayaiLedger.Ledgers.{Entry, Transaction}
   alias HayaiLedger.Repo
 
   @doc """
@@ -38,6 +38,11 @@ defmodule HayaiLedger.Ledgers do
   """
   def get_entry!(id), do: Repo.get!(Entry, id)
 
+  def get_entry_with_transactions(id) do
+    Repo.get!(Entry, id)
+    |> Repo.preload(:transactions)
+  end
+
   @doc """
   Creates a entry.
 
@@ -57,15 +62,15 @@ defmodule HayaiLedger.Ledgers do
   end
 
   def create_bookkeeping_entry(entry_attrs, transactions) when is_list(transactions) do
-    with :ok <- validate_transactions(transactions) do
-      entry = create_entry(entry_attrs)
-      Ecto.Multi.new()
-      |> Ecto.Multi.insert(:entry, entry)
-      |> Ecto.Multi.insert_all(:transactions, Transaction, transactions)
+    with :ok <- validate_transactions(transactions),
+      {:ok, %Entry{ id: id } = entry } <- create_entry(entry_attrs),
+      :ok <- create_transactions_with_entry(transactions, id)
+    do
+      {:ok, entry}
     end
   end
 
-  def create_bookkeeping_entry(_), do: {:error, "must include transactions that balance"}
+  def create_bookkeeping_entry(_, _), do: {:error, "must include transactions that balance"}
 
   # need to build constraints on this and only allow safe mods
   # @doc """
@@ -210,6 +215,18 @@ defmodule HayaiLedger.Ledgers do
   """
   def change_transaction(%Transaction{} = transaction) do
     Transaction.changeset(transaction, %{})
+  end
+
+  defp create_transactions_with_entry([], _id), do: :ok
+
+  defp create_transactions_with_entry([head | tail], id) do
+    with transaction when is_map(transaction) <- Map.put(head, :entry_id, id),
+      {:ok, _new_transaction} <- create_transaction(transaction)
+    do
+      create_transactions_with_entry(tail, id)
+    else
+      _ -> :error
+    end
   end
 
   defp validate_transactions(transactions) do
