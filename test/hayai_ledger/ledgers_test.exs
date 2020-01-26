@@ -95,8 +95,17 @@ defmodule HayaiLedger.LedgersTest do
   end
 
   defp create_account() do
-    {:ok, account} = HayaiLedger.Accounts.create_account(%{ name: "Yuko Cash"})
+    {:ok, account} = HayaiLedger.Accounts.create_account(%{
+                        currency: "JPY",
+                        name: "Yuko Cash",
+                        type_id: create_account_type().id
+                      })
     account
+  end
+
+  defp create_account_type() do
+    {:ok, type} = HayaiLedger.Accounts.create_account_type(%{ name: "cash" })
+    type
   end
 
   def entry_fixture(attrs \\ %{}) do
