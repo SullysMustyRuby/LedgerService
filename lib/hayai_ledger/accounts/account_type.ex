@@ -16,6 +16,6 @@ defmodule HayaiLedger.Accounts.AccountType do
   def changeset(account_type, attrs) do
     account_type
     |> cast(attrs, [:name, :description])
-    |> validate_required([:name, :description])
+    |> validate_required([:name])
   end
 end

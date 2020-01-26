@@ -20,9 +20,27 @@ defmodule HayaiLedger.LedgersTest do
     end
   end
 
-  describe "create_empty_entry/1" do
+  describe "create_bookeeping_entry/2" do
+    test "returns error if transaction amounts do not balance" do
+      
+    end
+
+    test "returns error if the transaction currency does not match the account currency" do
+      
+    end
+
+    test "returns error if the transactions fail" do
+      
+    end
+
+    test "returns entry upon success" do
+      
+    end
+  end
+
+  describe "create_entry/1" do
     test "with valid data creates a entry" do
-      assert {:ok, %Entry{} = entry} = Ledgers.create_empty_entry(@valid_entry_attrs)
+      assert {:ok, %Entry{} = entry} = Ledgers.create_entry(@valid_entry_attrs)
       assert entry.description == "some description"
       assert entry.object_type == "some object_type"
       assert entry.object_uid == "some object_uid"
@@ -85,7 +103,7 @@ defmodule HayaiLedger.LedgersTest do
     {:ok, entry} =
       attrs
       |> Enum.into(valid_transaction_attrs())
-      |> Ledgers.create_empty_entry()
+      |> Ledgers.create_entry()
 
     entry
   end

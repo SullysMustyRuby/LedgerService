@@ -20,8 +20,9 @@ defmodule HayaiLedger.Accounts.Account do
   @doc false
   def changeset(account, attrs) do
     account
-    |> cast(attrs, [:meta_data, :name, :object_type, :object_uid])
+    |> cast(attrs, [:meta_data, :name, :type_id, :object_type, :object_uid])
     |> put_change(:uid, generate_uid())
-    |> validate_required([:name])
+    |> validate_required([:name, :type_id])
+    |> foreign_key_constraint(:type_id)
   end
 end

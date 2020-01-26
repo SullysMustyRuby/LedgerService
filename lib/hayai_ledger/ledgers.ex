@@ -13,19 +13,35 @@ defmodule HayaiLedger.Ledgers do
       |> Transaction.changeset(attrs)
   end
 
+  def create_bookeeping_entry(attrs, transactions) do
+    # validate transaction amounts balance
+    # validate transaction currency == account currency
+    #   sort by currrency
+    #     sort by type
+    #     sum credits - sum debits == 0
+    # create entry
+    # save transactions
+    #   lock account
+    #     sum debit account credits
+    #     sum debit account debits
+    #      credits - debits > amount
+    #     save debit account
+    #   save credits
+  end
+
   @doc """
   Creates a transactionless entry.
 
   ## Examples
 
-      iex> create_empty_entry(%{field: value})
+      iex> create_entry(%{field: value})
       {:ok, %Entry{}}
 
-      iex> create_empty_entry(%{field: bad_value})
+      iex> create_entry(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_empty_entry(attrs \\ %{}) do
+  def create_entry(attrs \\ %{}) do
     %Entry{}
       |> Entry.changeset(attrs)
       |> Repo.insert()
