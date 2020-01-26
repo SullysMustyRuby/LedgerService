@@ -4,6 +4,7 @@ defmodule HayaiLedger.Ledgers.Transaction do
   import HayaiLedger.Helpers, only: [{:generate_uid, 0}]
 
   alias HayaiLedger.Ledgers.Entry
+  alias HayaiLedger.Accounts.Account
 
   schema "transactions" do
     field :amount_currency, :string
@@ -11,7 +12,7 @@ defmodule HayaiLedger.Ledgers.Transaction do
     field :description, :string
     field :type, :string
     field :uid, :string
-    belongs_to :account, HayaiLedger.Accounts.Account
+    belongs_to :account, Account
     belongs_to :entry, Entry
 
     timestamps()
@@ -20,8 +21,9 @@ defmodule HayaiLedger.Ledgers.Transaction do
   @doc false
   def changeset(transaction, attrs) do
     transaction
-    |> cast(attrs, [:amount_currency, :amount_subunits, :description, :entry_id, :type, :uid])
+    |> cast(attrs, [:account_id, :amount_currency, :amount_subunits, :description, :entry_id, :type, :uid])
     |> put_change(:uid, generate_uid())
-    |> validate_required([:amount_currency, :amount_subunits, :description, :type, :uid])
+    |> validate_required([:account_id, :amount_currency, :amount_subunits, :description, :type, :uid])
+    |> foreign_key_constraint(:account_id)
   end
 end

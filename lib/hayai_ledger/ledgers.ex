@@ -5,21 +5,48 @@ defmodule HayaiLedger.Ledgers do
 
   import Ecto.Query, warn: false
 
-  alias HayaiLedger.Accounts.Account
   alias HayaiLedger.Ledgers.{Entry, Transaction}
   alias HayaiLedger.Repo
 
+  def build_transaction(attrs \\ %{}) do
+    %Transaction{}
+      |> Transaction.changeset(attrs)
+  end
+
   @doc """
-  Returns the list of entries.
+  Creates a transactionless entry.
 
   ## Examples
 
-      iex> list_entries()
-      [%Entry{}, ...]
+      iex> create_empty_entry(%{field: value})
+      {:ok, %Entry{}}
+
+      iex> create_empty_entry(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
 
   """
-  def list_entries do
-    Repo.all(Entry)
+  def create_empty_entry(attrs \\ %{}) do
+    %Entry{}
+      |> Entry.changeset(attrs)
+      |> Repo.insert()
+  end
+
+  @doc """
+  Creates a transaction.
+
+  ## Examples
+
+      iex> create_transaction(%{field: value})
+      {:ok, %Transaction{}}
+
+      iex> create_transaction(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_transaction(attrs \\ %{}) do
+    %Transaction{}
+      |> Transaction.changeset(attrs)
+      |> Repo.insert()
   end
 
   @doc """
@@ -40,37 +67,51 @@ defmodule HayaiLedger.Ledgers do
 
   def get_entry_with_transactions(id) do
     Repo.get!(Entry, id)
-    |> Repo.preload(:transactions)
+      |> Repo.preload(:transactions)
   end
 
   @doc """
-  Creates a entry.
+  Gets a single transaction.
+
+  Raises `Ecto.NoResultsError` if the Transaction does not exist.
 
   ## Examples
 
-      iex> create_entry(%{field: value})
-      {:ok, %Entry{}}
+      iex> get_transaction!(123)
+      %Transaction{}
 
-      iex> create_entry(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
+      iex> get_transaction!(456)
+      ** (Ecto.NoResultsError)
 
   """
-  def create_entry(attrs \\ %{}) do
-    %Entry{}
-    |> Entry.changeset(attrs)
-    |> Repo.insert()
+  def get_transaction!(id), do: Repo.get!(Transaction, id)
+
+  @doc """
+  Returns the list of entries.
+
+  ## Examples
+
+      iex> list_entries()
+      [%Entry{}, ...]
+
+  """
+  def list_entries do
+    Repo.all(Entry)
   end
 
-  def create_bookkeeping_entry(entry_attrs, transactions) when is_list(transactions) do
-    with :ok <- validate_transactions(transactions),
-      {:ok, %Entry{ id: id } = entry } <- create_entry(entry_attrs),
-      :ok <- create_transactions_with_entry(transactions, id)
-    do
-      {:ok, entry}
-    end
-  end
+  @doc """
+  Returns the list of transactions.
 
-  def create_bookkeeping_entry(_, _), do: {:error, "must include transactions that balance"}
+  ## Examples
+
+      iex> list_transactions()
+      [%Transaction{}, ...]
+
+  """
+  def list_transactions do
+    Repo.all(Transaction)
+  end
+end
 
   # need to build constraints on this and only allow safe mods
   # @doc """
@@ -121,170 +162,119 @@ defmodule HayaiLedger.Ledgers do
   #   Entry.changeset(entry, %{})
   # end
 
-  alias HayaiLedger.Ledgers.Transaction
 
-  @doc """
-  Returns the list of transactions.
+  # @doc """
+  # Updates a transaction.
 
-  ## Examples
+  # ## Examples
 
-      iex> list_transactions()
-      [%Transaction{}, ...]
+  #     iex> update_transaction(transaction, %{field: new_value})
+  #     {:ok, %Transaction{}}
 
-  """
-  def list_transactions do
-    Repo.all(Transaction)
-  end
+  #     iex> update_transaction(transaction, %{field: bad_value})
+  #     {:error, %Ecto.Changeset{}}
 
-  @doc """
-  Gets a single transaction.
+  # """
+  # def update_transaction(%Transaction{} = transaction, attrs) do
+  #   transaction
+  #   |> Transaction.changeset(attrs)
+  #   |> Repo.update()
+  # end
 
-  Raises `Ecto.NoResultsError` if the Transaction does not exist.
+  # @doc """
+  # Deletes a Transaction.
 
-  ## Examples
+  # ## Examples
 
-      iex> get_transaction!(123)
-      %Transaction{}
+  #     iex> delete_transaction(transaction)
+  #     {:ok, %Transaction{}}
 
-      iex> get_transaction!(456)
-      ** (Ecto.NoResultsError)
+  #     iex> delete_transaction(transaction)
+  #     {:error, %Ecto.Changeset{}}
 
-  """
-  def get_transaction!(id), do: Repo.get!(Transaction, id)
+  # """
+  # def delete_transaction(%Transaction{} = transaction) do
+  #   Repo.delete(transaction)
+  # end
 
-  @doc """
-  Creates a transaction.
+  # @doc """
+  # Returns an `%Ecto.Changeset{}` for tracking transaction changes.
 
-  ## Examples
+  # ## Examples
 
-      iex> create_transaction(%{field: value})
-      {:ok, %Transaction{}}
+  #     iex> change_transaction(transaction)
+  #     %Ecto.Changeset{source: %Transaction{}}
 
-      iex> create_transaction(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
+  # """
+  # def change_transaction(%Transaction{} = transaction) do
+  #   Transaction.changeset(transaction, %{})
+  # end
 
-  """
-  def create_transaction(attrs \\ %{}) do
-    %Transaction{}
-    |> Transaction.changeset(attrs)
-    |> Repo.insert()
-  end
+  # defp create_transactions_with_entry([], _id), do: :ok
 
-  @doc """
-  Updates a transaction.
+  # defp create_transactions_with_entry([head | tail], id) do
+  #   with transaction when is_map(transaction) <- Map.put(head, :entry_id, id),
+  #     {:ok, _new_transaction} <- create_transaction(transaction)
+  #   do
+  #     create_transactions_with_entry(tail, id)
+  #   else
+  #     _ -> :error
+  #   end
+  # end
 
-  ## Examples
+  # def async_validate_transactions(transactions) do
+  #   with :ok <- async_validate_accounts(transactions),
+  #     :ok <- validate_transaction_amount(transactions),
+  #     :ok <- async_validate_transaction_currency(transactions)
+  #   do
+  #     :ok
+  #   else
+  #     {:error, message} -> {:error, message}
+  #   end
+  # end
 
-      iex> update_transaction(transaction, %{field: new_value})
-      {:ok, %Transaction{}}
 
-      iex> update_transaction(transaction, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
+  # defp async_validate_accounts(transactions) do
+  #   if length(transactions) <= 1, do: {:error, "must include transactions that balance"}
+  #   Task.async_stream(transactions, &validate_account/1)
+  #     |> Enum.all?(fn(_task) -> {:ok, nil} end)
+  # end
 
-  """
-  def update_transaction(%Transaction{} = transaction, attrs) do
-    transaction
-    |> Transaction.changeset(attrs)
-    |> Repo.update()
-  end
+  # defp validate_account(%{ account_id: account_id }) do
+  #   Repo.exists?(from a in Account, where: a.id == ^account_id)
+  # end
 
-  @doc """
-  Deletes a Transaction.
+  #   defp async_validate_transaction_currency([%{ amount_currency: currency } | _tail] = transactions) do
+  #   try do
+  #     Task.async_stream(transactions, fn transaction -> same_currency(transaction, currency) end)
+  #     |> Enum.all?(fn task -> {:ok, nil} end)
+  #     :ok
+  #   rescue
+  #     message -> {:error, message}
+  #   end
+  # end
 
-  ## Examples
+  # defp same_currency(%{ amount_currency: currency }, default_currency) do
+  #   if currency != default_currency do
+  #     raise("currencies do not match")
+  #   end
+  # end
 
-      iex> delete_transaction(transaction)
-      {:ok, %Transaction{}}
+  # defp validate_transaction_amount(transactions, total_credits \\ 0, total_debits \\ 0)
 
-      iex> delete_transaction(transaction)
-      {:error, %Ecto.Changeset{}}
+  # defp validate_transaction_amount([], 0, 0), do: {:error, "there are no credits or debits"}
 
-  """
-  def delete_transaction(%Transaction{} = transaction) do
-    Repo.delete(transaction)
-  end
+  # defp validate_transaction_amount([], total_credits, total_debits) do
+  #   case total_credits - total_debits do
+  #     0 -> :ok
+  #     _ -> {:error, "credits and debits do not balance"}
+  #   end
+  # end
 
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking transaction changes.
+  # defp validate_transaction_amount([%{ type: "credit", amount_subunits: amount} | tail], total_credits, total_debits) do
+  #   validate_transaction_amount(tail, (total_credits + amount), total_debits)
+  # end
 
-  ## Examples
-
-      iex> change_transaction(transaction)
-      %Ecto.Changeset{source: %Transaction{}}
-
-  """
-  def change_transaction(%Transaction{} = transaction) do
-    Transaction.changeset(transaction, %{})
-  end
-
-  defp create_transactions_with_entry([], _id), do: :ok
-
-  defp create_transactions_with_entry([head | tail], id) do
-    with transaction when is_map(transaction) <- Map.put(head, :entry_id, id),
-      {:ok, _new_transaction} <- create_transaction(transaction)
-    do
-      create_transactions_with_entry(tail, id)
-    else
-      _ -> :error
-    end
-  end
-
-  defp validate_transactions(transactions) do
-    with true <- 1 < length(transactions),
-      :ok <- validate_transaction_currency(transactions),
-      :ok <- validate_transaction_amount(transactions),
-      :ok <- validate_transaction_account(transactions)
-    do
-      :ok
-    else
-      false -> {:error, "must include transactions that balance"}
-      {:error, message} -> {:error, message}
-    end
-  end
-
-  defp validate_transaction_account([]), do: :ok
-
-  defp validate_transaction_account([%{ account_id: account_id } | tail]) do
-    case Repo.exists?(from a in Account, where: a.id == ^account_id) do
-      true -> validate_transaction_account(tail)
-      false -> {:error, "invalid account id: #{account_id}"}
-    end
-  end
-
-  defp validate_transaction_account(_), do: {:error, "invalid accounts in transactions"}
-
-  defp validate_transaction_amount(transactions, total_credits \\ 0, total_debits \\ 0)
-
-  defp validate_transaction_amount([], 0, 0), do: {:error, "there are no credits or debits"}
-
-  defp validate_transaction_amount([], total_credits, total_debits) do
-    case total_credits - total_debits do
-      0 -> :ok
-      _ -> {:error, "credits and debits do not balance"}
-    end
-  end
-
-  defp validate_transaction_amount([%{ type: "credit", amount_subunits: amount} | tail], total_credits, total_debits) do
-    validate_transaction_amount(tail, (total_credits + amount), total_debits)
-  end
-
-  defp validate_transaction_amount([%{ type: "debit", amount_subunits: amount} | tail], total_credits, total_debits) do
-    validate_transaction_amount(tail, total_credits, (total_debits + amount))
-  end
-
-  defp validate_transaction_currency(transactions,  default_currency \\ nil)
-
-  defp validate_transaction_currency([], _default_currency), do: :ok
-
-  defp validate_transaction_currency([%{ amount_currency: currency } | _tail] = transactions, nil) do
-    validate_transaction_currency(transactions, currency)
-  end
-
-  defp validate_transaction_currency([%{ amount_currency: default_currency } | tail], default_currency) do
-    validate_transaction_currency(tail, default_currency)
-  end
-
-  defp validate_transaction_currency([%{ amount_currency: other_currency } | _tail], default_currency) when other_currency != default_currency do
-    {:error, "currencies do not match"}
-  end
-end
+  # defp validate_transaction_amount([%{ type: "debit", amount_subunits: amount} | tail], total_credits, total_debits) do
+  #   validate_transaction_amount(tail, total_credits, (total_debits + amount))
+  # end
