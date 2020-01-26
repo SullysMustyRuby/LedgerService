@@ -5,6 +5,13 @@ defmodule HayaiLedger.Accounts.AccountTest do
   alias HayaiLedger.Repo
 
   describe "validations" do
+  	test "returns error if no currency" do
+  		bad_name = Map.delete(valid_attrs(), :currency)
+  		changeset = Account.changeset(%Account{}, bad_name)
+  		assert changeset.valid? == false
+  		assert changeset.errors[:currency] == {"can't be blank", [validation: :required]}
+  	end
+
   	test "returns error if no name" do
   		bad_name = Map.delete(valid_attrs(), :name)
   		changeset = Account.changeset(%Account{}, bad_name)
@@ -37,6 +44,7 @@ defmodule HayaiLedger.Accounts.AccountTest do
 
   defp valid_attrs() do
   	%{
+  		currency: "JPY",
   		description: "some description", 
   		name: "some name",
   		type_id: create_account_type().id

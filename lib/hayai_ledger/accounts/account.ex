@@ -6,6 +6,7 @@ defmodule HayaiLedger.Accounts.Account do
   alias HayaiLedger.Accounts.AccountType
 
   schema "accounts" do
+    field :currency, :string
     field :meta_data, :map
     field :name, :string
     field :object_type, :string
@@ -20,9 +21,9 @@ defmodule HayaiLedger.Accounts.Account do
   @doc false
   def changeset(account, attrs) do
     account
-    |> cast(attrs, [:meta_data, :name, :type_id, :object_type, :object_uid])
+    |> cast(attrs, [:currency, :meta_data, :name, :type_id, :object_type, :object_uid])
     |> put_change(:uid, generate_uid())
-    |> validate_required([:name, :type_id])
+    |> validate_required([:currency, :name, :type_id])
     |> foreign_key_constraint(:type_id)
   end
 end
