@@ -20,7 +20,7 @@ defmodule HayaiLedger.MixProject do
   def application do
     [
       mod: {HayaiLedger.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:crypto, :logger, :runtime_tools]
     ]
   end
 
@@ -33,11 +33,11 @@ defmodule HayaiLedger.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.4.9"},
+      {:phoenix, "~> 1.4.12"},
       {:phoenix_pubsub, "~> 1.1"},
       {:phoenix_ecto, "~> 4.0"},
-      {:ecto_sql, "~> 3.1"},
-      {:postgrex, ">= 0.0.0"},
+      {:ecto_sql, "~> 3.3.2"},
+      {:postgrex, ">= 0.15.3"},
       {:phoenix_html, "~> 2.11"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:gettext, "~> 0.11"},
