@@ -122,6 +122,10 @@ defmodule HayaiLedger.Accounts do
 
   def get_account(id), do: Repo.get(Account, id)
 
+  def get_account_by_uid(uid) do
+    Repo.get_by(Account, uid: uid)
+  end
+
   @doc """
   Gets a single account_type.
 

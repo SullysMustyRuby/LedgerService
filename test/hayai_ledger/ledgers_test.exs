@@ -2,11 +2,23 @@ defmodule HayaiLedger.LedgersTest do
   use HayaiLedger.DataCase
 
   alias HayaiLedger.Ledgers
-  alias HayaiLedger.Ledgers.{Entry, Transaction}
+  alias HayaiLedger.Ledgers.{Balance, Entry, Transaction}
   alias HayaiLedger.Repo
 
+
+  @valid_balance_attrs %{amount_subunits: 42}
+  @update_balance_attrs %{amount_subunits: 43}
+  @invalid_balance_attrs %{amount_subunits: nil}
   @valid_entry_attrs %{description: "some description", object_type: "some object_type", object_uid: "some object_uid"}
   @invalid_transaction_attrs %{amount_currency: nil, amount_subunits: nil, description: nil, type: nil, uid: nil}
+
+  describe "build_entry/1" do
+    test "returns a entry chageset" do
+      changeset = Ledgers.build_entry(@valid_entry_attrs)
+      assert [] == changeset.errors
+      assert changeset.valid?
+    end
+  end
 
   describe "build_transaction/1" do
     test "returns a transaction chageset" do
@@ -18,6 +30,17 @@ defmodule HayaiLedger.LedgersTest do
     test "returns an error with invalid attributes" do
       changeset = Ledgers.build_transaction(@invalid_transaction_attrs)
       assert false == changeset.valid?
+    end
+  end
+
+  describe "create_balance/1 " do
+    test "with valid data creates a balance" do
+      assert {:ok, %Balance{} = balance} = Ledgers.create_balance(@valid_balance_attrs)
+      assert balance.amount_subunits == 42
+    end
+
+    test "with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Ledgers.create_balance(@invalid_balance_attrs)
     end
   end
 
@@ -93,6 +116,13 @@ defmodule HayaiLedger.LedgersTest do
     end
   end
 
+  describe "get_balance!/1 " do
+    test "returns the balance with given id" do
+      balance = balance_fixture()
+      assert Ledgers.get_balance!(balance.id) == balance
+    end
+  end
+
   describe "get_entry/1" do
     test "returns the entry with given id" do
       entry = entry_fixture()
@@ -107,6 +137,13 @@ defmodule HayaiLedger.LedgersTest do
     test "returns the transaction with given id" do
       transaction = transaction_fixture()
       assert Ledgers.get_transaction!(transaction.id) == transaction
+    end
+  end
+
+  describe "list_balances/0" do
+    test "returns all balances" do
+      balance = balance_fixture()
+      assert Ledgers.list_balances() == [balance]
     end
   end
 
@@ -151,6 +188,29 @@ defmodule HayaiLedger.LedgersTest do
       Ledgers.create_transaction(valid_transaction_attrs(%{ account_id: account.id, amount_subunits: 1000, kind: "debit" }))
       assert -2000 == Ledgers.sum_credits_and_debits_for_account(account.id)
     end
+  end
+
+  describe "update_balance/2" do
+    test "with valid data updates the balance" do
+      balance = balance_fixture()
+      assert {:ok, %Balance{} = balance} = Ledgers.update_balance(balance, @update_balance_attrs)
+      assert balance.amount_subunits == 43
+    end
+
+    test "with invalid data returns error changeset" do
+      balance = balance_fixture()
+      assert {:error, %Ecto.Changeset{}} = Ledgers.update_balance(balance, @invalid_balance_attrs)
+      assert balance == Ledgers.get_balance!(balance.id)
+    end
+  end
+
+  defp balance_fixture(attrs \\ %{}) do
+    {:ok, balance} =
+      attrs
+      |> Enum.into(@valid_balance_attrs)
+      |> Ledgers.create_balance()
+
+    balance
   end
 
   defp create_account(attrs \\ %{}) do

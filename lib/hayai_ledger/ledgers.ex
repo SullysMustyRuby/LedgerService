@@ -6,7 +6,7 @@ defmodule HayaiLedger.Ledgers do
   import Ecto.Multi
   import Ecto.Query, warn: false
 
-  alias HayaiLedger.Ledgers.{Entry, Transaction}
+  alias HayaiLedger.Ledgers.{Balance, Entry, Transaction}
   alias HayaiLedger.Repo
 
   def build_entry(attrs \\ %{}) do
@@ -19,13 +19,22 @@ defmodule HayaiLedger.Ledgers do
       |> Transaction.changeset(attrs)
   end
 
-  def sum_credits_and_debits_for_account(account_id) do
-    Repo.all(from t in Transaction,
-      where: t.account_id == ^account_id,
-      group_by: t.kind,
-      select: {t.kind, sum(t.amount_subunits)}
-    )
-    |> sum_totals()
+  @doc """
+  Creates a balance.
+
+  ## Examples
+
+      iex> create_balance(%{field: value})
+      {:ok, %Balance{}}
+
+      iex> create_balance(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_balance(attrs \\ %{}) do
+    %Balance{}
+    |> Balance.changeset(attrs)
+    |> Repo.insert()
   end
 
   def create_bookeeping_entry(_attrs, []), do: {:error, "must have transactions that balance"}
@@ -39,15 +48,6 @@ defmodule HayaiLedger.Ledgers do
       {:ok, entry}
     end
   end
-
-  # defp associate_entry([], _entry_id), do: {:ok, "transactions all saved"}
-
-  # defp associate_entry([changeset | tail], entry_id) do
-  #   case create_transaction(changeset, entry_id) do
-  #     {:error, _} -> {:error, "transactions save failure"}
-  #     {:ok, _} -> associate_entry(tail, entry_id)
-  #   end
-  # end
 
   @doc """
   Creates a transactionless entry.
@@ -85,10 +85,21 @@ defmodule HayaiLedger.Ledgers do
       |> Repo.insert()
   end
 
-  def create_transaction(%Ecto.Changeset{ data: %HayaiLedger.Ledgers.Transaction{} } = changeset, entry_id) do
-    Ecto.Changeset.put_change(changeset, :entry_id, entry_id)
-      |> Repo.insert()
-  end
+  @doc """
+  Gets a single balance.
+
+  Raises `Ecto.NoResultsError` if the Balance does not exist.
+
+  ## Examples
+
+      iex> get_balance!(123)
+      %Balance{}
+
+      iex> get_balance!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_balance!(id), do: Repo.get!(Balance, id)
 
   @doc """
   Gets a single entry.
@@ -128,6 +139,19 @@ defmodule HayaiLedger.Ledgers do
   def get_transaction!(id), do: Repo.get!(Transaction, id)
 
   @doc """
+  Returns the list of balances.
+
+  ## Examples
+
+      iex> list_balances()
+      [%Balance{}, ...]
+
+  """
+  def list_balances do
+    Repo.all(Balance)
+  end
+
+  @doc """
   Returns the list of entries.
 
   ## Examples
@@ -151,6 +175,33 @@ defmodule HayaiLedger.Ledgers do
   """
   def list_transactions do
     Repo.all(Transaction)
+  end
+
+  def sum_credits_and_debits_for_account(account_id) do
+    Repo.all(from t in Transaction,
+      where: t.account_id == ^account_id,
+      group_by: t.kind,
+      select: {t.kind, sum(t.amount_subunits)}
+    )
+    |> sum_totals()
+  end
+
+  @doc """
+  Updates a balance.
+
+  ## Examples
+
+      iex> update_balance(balance, %{field: new_value})
+      {:ok, %Balance{}}
+
+      iex> update_balance(balance, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_balance(%Balance{} = balance, attrs) do
+    balance
+    |> Balance.changeset(attrs)
+    |> Repo.update()
   end
 
   defp group_currencies(transactions) do
@@ -263,5 +314,5 @@ end
   #   if currency != default_currency do
   #     raise("currencies do not match")
   #   end
-  # end
+  # 
 

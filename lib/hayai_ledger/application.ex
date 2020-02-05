@@ -11,9 +11,10 @@ defmodule HayaiLedger.Application do
       # Start the Ecto repository
       HayaiLedger.Repo,
       # Start the endpoint when the application starts
-      HayaiLedgerWeb.Endpoint
+      HayaiLedgerWeb.Endpoint,
       # Starts a worker by calling: HayaiLedger.Worker.start_link(arg)
       # {HayaiLedger.Worker, arg},
+      HayaiLedger.LockServer
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
