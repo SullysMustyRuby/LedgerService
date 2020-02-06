@@ -3,6 +3,7 @@ defmodule HayaiLedger.LedgersTest do
 
   alias HayaiLedger.Ledgers
   alias HayaiLedger.Ledgers.{Balance, Entry, Transaction}
+  alias HayaiLedger.LockServer
   alias HayaiLedger.Repo
 
 
@@ -44,28 +45,28 @@ defmodule HayaiLedger.LedgersTest do
     end
   end
 
-  describe "create_bookeeping_entry/2" do
+  describe "journal_entry/2" do
     test "returns error if no transactions" do
-      assert {:error, "must have transactions that balance"} == Ledgers.create_bookeeping_entry(@valid_entry_attrs, [])
+      assert {:error, "must have transactions that balance"} == Ledgers.journal_entry(@valid_entry_attrs, [])
     end
 
     test "returns error if transaction amounts do not balance" do
       transaction_1 = Ledgers.build_transaction(valid_transaction_attrs(%{ amount_subunits: 1000, kind: "credit" }))
       transaction_2 = Ledgers.build_transaction(valid_transaction_attrs(%{ amount_subunits: 1000, kind: "debit" }))
       transaction_3 = Ledgers.build_transaction(valid_transaction_attrs(%{ amount_subunits: 1000, kind: "credit" }))
-      assert {:error, "credits and debits do not balance"} == Ledgers.create_bookeeping_entry(@valid_entry_attrs, [transaction_1, transaction_2, transaction_3])
+      assert {:error, "credits and debits do not balance"} == Ledgers.journal_entry(@valid_entry_attrs, [transaction_1, transaction_2, transaction_3])
 
       thai_account = create_account(%{ currency: "THB" })
       transaction_1 = Ledgers.build_transaction(valid_transaction_attrs(%{ amount_subunits: 1000, kind: "credit" }))
       transaction_2 = Ledgers.build_transaction(valid_transaction_attrs(%{ account_id: thai_account.id, amount_currency: "THB", amount_subunits: 1000, kind: "debit" }))
       transaction_3 = Ledgers.build_transaction(valid_transaction_attrs(%{ account_id: thai_account.id, amount_currency: "THB", amount_subunits: 1000, kind: "credit" }))
-      assert {:error, "credits and debits do not balance"} == Ledgers.create_bookeeping_entry(@valid_entry_attrs, [transaction_1, transaction_2, transaction_3])
+      assert {:error, "credits and debits do not balance"} == Ledgers.journal_entry(@valid_entry_attrs, [transaction_1, transaction_2, transaction_3])
     end
 
     test "returns error if transactions are invalid" do
       transaction_1 = Ledgers.build_transaction(valid_transaction_attrs(%{ amount_currency: "THB", amount_subunits: 1000, kind: "credit" }))
       transaction_2 = Ledgers.build_transaction(valid_transaction_attrs(%{ amount_currency: "THB", amount_subunits: 1000, kind: "debit" }))
-      assert {:error, "transactions must be valid"} == Ledgers.create_bookeeping_entry(@valid_entry_attrs, [transaction_1, transaction_2])
+      assert {:error, "transactions must be valid"} == Ledgers.journal_entry(@valid_entry_attrs, [transaction_1, transaction_2])
     end
 
     test "returns error if the transactions fail" do
@@ -74,7 +75,7 @@ defmodule HayaiLedger.LedgersTest do
       transaction_3 = Ledgers.build_transaction(valid_transaction_attrs(%{ amount_currency: "JPY",  amount_subunits: 500, kind: "credit" }))
       transaction_4 = Ledgers.build_transaction(valid_transaction_attrs(%{ account_id: 555, amount_currency: "THB", amount_subunits: 1000, kind: "debit" }))
       transaction_5 = Ledgers.build_transaction(valid_transaction_attrs(%{ account_id: 555, amount_currency: "THB", amount_subunits: 1000, kind: "credit" }))
-      assert {:error, "database error"} = Ledgers.create_bookeeping_entry(@valid_entry_attrs, [transaction_1, transaction_2, transaction_3, transaction_4, transaction_5])
+      assert {:error, "database error"} = Ledgers.journal_entry(@valid_entry_attrs, [transaction_1, transaction_2, transaction_3, transaction_4, transaction_5])
       assert 0 == Repo.one(from t in "transactions", select: count(t.id))
       assert 0 == Repo.one(from e in "entries", select: count(e.id))
     end
@@ -86,7 +87,7 @@ defmodule HayaiLedger.LedgersTest do
       transaction_3 = Ledgers.build_transaction(valid_transaction_attrs(%{ amount_currency: "JPY",  amount_subunits: 500, kind: "credit" }))
       transaction_4 = Ledgers.build_transaction(valid_transaction_attrs(%{ account_id: thai_account.id, amount_currency: "THB", amount_subunits: 1000, kind: "debit" }))
       transaction_5 = Ledgers.build_transaction(valid_transaction_attrs(%{ account_id: thai_account.id, amount_currency: "THB", amount_subunits: 1000, kind: "credit" }))
-      {:ok, entry} = Ledgers.create_bookeeping_entry(@valid_entry_attrs, [transaction_1, transaction_2, transaction_3, transaction_4, transaction_5])
+      {:ok, entry} = Ledgers.journal_entry(@valid_entry_attrs, [transaction_1, transaction_2, transaction_3, transaction_4, transaction_5])
       full_entry = Ledgers.get_entry_with_transactions(entry.id)
       assert 5 == length(full_entry.transactions)
     end
@@ -161,32 +162,83 @@ defmodule HayaiLedger.LedgersTest do
     end
   end
 
-  describe "sum_credits_and_debits_for_account" do
-    test "returns the difference of the credits and debits" do
+  describe "safe_journal_entry/3" do
+    setup do
       account = create_account()
       Ledgers.create_transaction(valid_transaction_attrs(%{ account_id: account.id, amount_subunits: 1000, kind: "credit" }))
       Ledgers.create_transaction(valid_transaction_attrs(%{ account_id: account.id, amount_subunits: 1000, kind: "debit" }))
       Ledgers.create_transaction(valid_transaction_attrs(%{ account_id: account.id, amount_subunits: 1000, kind: "credit" }))
-      assert 1000 == Ledgers.sum_credits_and_debits_for_account(account.id)
+      %{
+        account: account,
+        transaction_1: Ledgers.build_transaction(valid_transaction_attrs(%{ amount_currency: "JPY",  amount_subunits: 500, kind: "credit" })),
+        transaction_2: Ledgers.build_transaction(valid_transaction_attrs(%{ account_id: account.id, amount_currency: "JPY",  amount_subunits: 1000, kind: "debit" })),
+        transaction_3: Ledgers.build_transaction(valid_transaction_attrs(%{ amount_currency: "JPY",  amount_subunits: 500, kind: "credit" })),
+      }
     end
 
-    test "returns 0 if no credits or debits" do
-      account = create_account()
-      assert 0 == Ledgers.sum_credits_and_debits_for_account(account.id)
+    test "returns error if account is locked", context do
+      LockServer.account_lock(context.account.uid)
+      check_options = %{ account: context.account.uid, minimum: "non_negative" }
+      transactions = [context.transaction_1, context.transaction_2, context.transaction_3]
+      assert {:error, "account locked" } == Ledgers.safe_journal_entry(@valid_entry_attrs, transactions, check_options)
     end
 
-    test "returns the credits balance if no debits" do
-      account = create_account()
+    test "returns error when balance will be negative", context do
+      transaction_3 = Ledgers.build_transaction(valid_transaction_attrs(%{ account_id: context.account.id, amount_currency: "JPY",  amount_subunits: 1001, kind: "debit" }))
+      transactions = [context.transaction_1, context.transaction_2, transaction_3]
+      check_options = %{ account: context.account.uid, minimum: "non_negative" }
+      assert {:error, "transactions fail balance check"} == Ledgers.safe_journal_entry(@valid_entry_attrs, transactions, check_options)
+    end
+
+    test "returns error when balance will be below minimum", context do
+      assert 1000 == Ledgers.transactions_sum_by_account(context.account.id)
+      transaction_3 = Ledgers.build_transaction(valid_transaction_attrs(%{ account_id: context.account.id, amount_currency: "JPY",  amount_subunits: 600, kind: "debit" }))
+      transactions = [context.transaction_1, context.transaction_2, transaction_3]
+      check_options = %{ account: context.account.uid, minimum: "500" }
+      assert {:error, "transactions fail balance check"} == Ledgers.safe_journal_entry(@valid_entry_attrs, transactions, check_options)
+    end
+
+    test "returns ok entry when success", context do
+      transactions = [context.transaction_1, context.transaction_2, context.transaction_3]
+      check_options = %{ account: context.account.uid, minimum: "non_negative" }
+      {:ok, entry} = Ledgers.safe_journal_entry(@valid_entry_attrs, transactions, check_options)
+      full_entry = Ledgers.get_entry_with_transactions(entry.id)
+      assert 3 == length(full_entry.transactions)
+    end
+  end
+
+  describe "transactions_sum_by_account/1" do
+    setup do
+      %{
+        account: create_account()
+      }
+    end
+
+    test "returns the difference of the credits and debits", %{ account: account } do
+      Ledgers.create_transaction(valid_transaction_attrs(%{ account_id: account.id, amount_subunits: 1000, kind: "credit" }))
+      Ledgers.create_transaction(valid_transaction_attrs(%{ account_id: account.id, amount_subunits: 1000, kind: "debit" }))
+      Ledgers.create_transaction(valid_transaction_attrs(%{ account_id: account.id, amount_subunits: 1000, kind: "credit" }))
+      assert 1000 == Ledgers.transactions_sum_by_account(account.id)
+    end
+
+    test "returns 0 if no account" do
+      assert 0 == Ledgers.transactions_sum_by_account("555")
+    end
+
+    test "returns 0 if no credits or debits", %{ account: account } do
+      assert 0 == Ledgers.transactions_sum_by_account(account.id)
+    end
+
+    test "returns the credits balance if no debits", %{ account: account } do
       Ledgers.create_transaction(valid_transaction_attrs(%{ account_id: account.id, amount_subunits: 1000, kind: "credit" }))
       Ledgers.create_transaction(valid_transaction_attrs(%{ account_id: account.id, amount_subunits: 1000, kind: "credit" }))
-      assert 2000 == Ledgers.sum_credits_and_debits_for_account(account.id)
+      assert 2000 == Ledgers.transactions_sum_by_account(account.id)
     end
 
-    test "returns the debits balance if no credits" do
-      account = create_account()
+    test "returns the debits balance if no credits", %{ account: account } do
       Ledgers.create_transaction(valid_transaction_attrs(%{ account_id: account.id, amount_subunits: 1000, kind: "debit" }))
       Ledgers.create_transaction(valid_transaction_attrs(%{ account_id: account.id, amount_subunits: 1000, kind: "debit" }))
-      assert -2000 == Ledgers.sum_credits_and_debits_for_account(account.id)
+      assert -2000 == Ledgers.transactions_sum_by_account(account.id)
     end
   end
 

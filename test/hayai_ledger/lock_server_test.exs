@@ -17,76 +17,75 @@ defmodule HayaiLedger.LockServerTest do
   	end
 
   	test "returns timeout if account does not unlock in time", %{ account: account } do
-      LockServer.lock(account.uid)
-      assert {:error, "account lock timeout"} == LockServer.await(account.uid, {Ledgers, :sum_credits_and_debits_for_account, [account.id]})
+      LockServer.account_lock(account.uid)
+      assert {:error, "account lock timeout"} == LockServer.await(account.uid, {Ledgers, :transactions_sum_by_account, [account.id]})
   	end
 
   	test "returns method results if account is not locked", %{ account: account } do
-      assert 1000 == LockServer.await(account.uid, {Ledgers, :sum_credits_and_debits_for_account, [account.id]})
+      assert 1000 == LockServer.await(account.uid, {Ledgers, :transactions_sum_by_account, [account.id]})
   	end
 
   	test "returns method results if account is locked, and unlocked in time", %{ account: account } do
-      LockServer.lock(account.uid)
+      LockServer.account_lock(account.uid)
       Task.start(fn -> sleep_unlock(account.uid, 500) end)
-      assert 1000 == LockServer.await(account.uid, {Ledgers, :sum_credits_and_debits_for_account, [account.id]})
+      assert 1000 == LockServer.await(account.uid, {Ledgers, :transactions_sum_by_account, [account.id]})
     end
 
     test "timeout is adjustable", %{ account: account} do
-    	LockServer.lock(account.uid)
+    	LockServer.account_lock(account.uid)
     	Task.start(fn -> sleep_unlock(account.uid, 100) end)
-    	assert 1000 == LockServer.await(account.uid, {Ledgers, :sum_credits_and_debits_for_account, [account.id]}, 110)
+    	assert 1000 == LockServer.await(account.uid, {Ledgers, :transactions_sum_by_account, [account.id]}, 110)
     end
   end
 
-	describe "lock/1" do
+	describe "account_lock/1" do
 		test "stores the uid and the pid of the caller" do
 			{:ok, account} = create_account()
-			assert account.uid == LockServer.lock(account.uid)
+			assert account.uid == LockServer.account_lock(account.uid)
 			assert [{account.uid, self()}] == :ets.lookup(:account_locks, account.uid)
 		end
 
 		test "returns error if account uid does not exist" do
-			assert {:error, "account does not exist"} == LockServer.lock("555")
+			assert {:error, "account does not exist"} == LockServer.account_lock("555")
 		end
 
 		test "Does not save multiple locks" do
 			{:ok, account} = create_account()
-			assert account.uid == LockServer.lock(account.uid)
-			assert [{account.uid, self()}] == :ets.lookup(:account_locks, account.uid)
-			assert account.uid == LockServer.lock(account.uid)
-			assert LockServer.unlock(account.uid)
+			assert account.uid == LockServer.account_lock(account.uid)
+			assert {:error, "account lock timeout"} == LockServer.account_lock(account.uid)
+			assert LockServer.account_unlock(account.uid)
 			assert [] == :ets.lookup(:account_locks, account.uid)
 		end
 	end
 
-	describe "locked?/1" do
+	describe "account_locked?/1" do
 		test "returns true if account has been locked" do
 			{:ok, account} = create_account()
-			assert account.uid == LockServer.lock(account.uid)
-			assert LockServer.locked?(account.uid)
+			assert account.uid == LockServer.account_lock(account.uid)
+			assert LockServer.account_locked?(account.uid)
 		end
 
 		test "returns false if account is not locked" do
 			{:ok, account} = create_account()
-			assert false == LockServer.locked?(account.uid)
+			assert false == LockServer.account_locked?(account.uid)
 		end
 
 		test "returns false if account does not exist" do
-			assert false == LockServer.locked?(555)
+			assert false == LockServer.account_locked?(555)
 		end
 	end
 
-	describe "unlock/1" do
+	describe "account_unlock/1" do
 		test "it returns true if the account has been unlocked" do
 			{:ok, account} = create_account()
-			assert account.uid == LockServer.lock(account.uid)
-			assert LockServer.locked?(account.uid)
-			assert LockServer.unlock(account.uid)
-			assert false == LockServer.locked?(account.uid) 
+			assert account.uid == LockServer.account_lock(account.uid)
+			assert LockServer.account_locked?(account.uid)
+			assert LockServer.account_unlock(account.uid)
+			assert false == LockServer.account_locked?(account.uid) 
 		end
 
 		test "it returns true if the account was not locked" do
-			assert LockServer.unlock(555)
+			assert LockServer.account_unlock(555)
 		end
 	end
 
@@ -109,7 +108,7 @@ defmodule HayaiLedger.LockServerTest do
 
   defp sleep_unlock(account_uid, milisec) do
   	:timer.sleep(milisec)
-  	LockServer.unlock(account_uid)
+  	LockServer.account_unlock(account_uid)
   end
 
   defp valid_transaction_attrs(attrs) do

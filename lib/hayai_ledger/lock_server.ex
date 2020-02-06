@@ -16,25 +16,37 @@ defmodule HayaiLedger.LockServer do
   end
 
   def await(account_uid, {module, function_name, args}, timeout \\ @await_timeout) do
-    case locked?(account_uid) do
+    case account_locked?(account_uid) do
       false -> apply(module, function_name, args)
       true -> retry_lock(account_uid, {module, function_name, args}, timeout)
     end
   end
 
-  def lock(account_uid) do
+  def account_lock(account_uid) do
     case HayaiLedger.Accounts.get_account_by_uid(account_uid) do
-      %HayaiLedger.Accounts.Account{} -> GenServer.call(__MODULE__, {:lock, account_uid})
+      %HayaiLedger.Accounts.Account{} -> await(account_uid, {__MODULE__, :lock, [account_uid]})
       _ -> {:error, "account does not exist"}
     end
   end
 
-  def locked?(account_uid) do
-    GenServer.call(__MODULE__, {:locked?, account_uid})
+  def account_locked?(account_uid) do
+    case GenServer.call(__MODULE__, {:locked?, account_uid}) do
+      true -> true
+      false -> false
+      _ -> {:error, "locked? check failure"}
+    end
   end
 
-  def unlock(account_uid) do
-    GenServer.call(__MODULE__, {:unlock, account_uid})
+  def account_unlock(account_uid) do
+    case GenServer.call(__MODULE__, {:unlock, account_uid}) do
+      true -> true
+      false -> false
+      _ -> {:error, "unlock failure"}
+    end
+  end
+
+  def lock(account_uid) do
+    GenServer.call(__MODULE__, {:lock, account_uid})
   end
 
   # Ets methods
@@ -68,7 +80,7 @@ defmodule HayaiLedger.LockServer do
   end
 
   defp sleep_check(account_uid) do
-    case locked?(account_uid) do
+    case account_locked?(account_uid) do
       true -> :timer.sleep(@retry_sleep); sleep_check(account_uid)
       false -> :unlocked
     end

@@ -5,7 +5,10 @@ defmodule HayaiLedger.Ledgers do
 
   import Ecto.Multi
   import Ecto.Query, warn: false
+  import HayaiLedger.LockServer
 
+  alias HayaiLedger.Accounts
+  alias HayaiLedger.Accounts.Account
   alias HayaiLedger.Ledgers.{Balance, Entry, Transaction}
   alias HayaiLedger.Repo
 
@@ -37,9 +40,9 @@ defmodule HayaiLedger.Ledgers do
     |> Repo.insert()
   end
 
-  def create_bookeeping_entry(_attrs, []), do: {:error, "must have transactions that balance"}
+  def journal_entry(_attrs, []), do: {:error, "must have transactions that balance"}
 
-  def create_bookeeping_entry(attrs, transactions) do
+  def journal_entry(attrs, transactions) do
     with :ok <- transactions_all_valid?(transactions),
       :ok <- validate_transactions_balance(transactions),
       %Ecto.Changeset{ valid?: true } = entry <- build_entry(attrs),
@@ -177,7 +180,21 @@ defmodule HayaiLedger.Ledgers do
     Repo.all(Transaction)
   end
 
-  def sum_credits_and_debits_for_account(account_id) do
+  def safe_journal_entry(attrs, transactions, %{ account: account_uid, minimum: minimum } = check_options) do
+    with false <- account_locked?(account_uid),
+      account_uid <- account_lock(account_uid),
+      :ok <- balance_check(transactions, check_options),
+      {:ok, entry} <- journal_entry(attrs, transactions),
+      true <- account_unlock(account_uid)
+    do
+      {:ok, entry}
+    else
+      true -> {:error, "account locked"}
+      {:error, message} -> {:error, message}
+    end
+  end
+
+  def transactions_sum_by_account(account_id) do
     Repo.all(from t in Transaction,
       where: t.account_id == ^account_id,
       group_by: t.kind,
@@ -202,6 +219,36 @@ defmodule HayaiLedger.Ledgers do
     balance
     |> Balance.changeset(attrs)
     |> Repo.update()
+  end
+
+  defp balance_check(transactions, %{ account: account_uid, minimum: "non_negative" }) do
+    balance_check(transactions, %{ account: account_uid, minimum: 0 })
+  end
+
+  defp balance_check(transactions, %{ account: account_uid, minimum: minimum }) when is_binary(minimum) do
+    {int_min, _} = Integer.parse(minimum)
+    balance_check(transactions, %{ account: account_uid, minimum: int_min })
+  end
+
+  defp balance_check(transactions, %{ account: account_uid, minimum: minimum }) when is_integer(minimum) do
+    {balance_amount, transactions_amount} = Accounts.get_account_by_uid(account_uid)
+                                              |> balance_check_totals(transactions)
+    case balance_amount + transactions_amount do
+      total when total >= minimum -> :ok
+      _ -> {:error, "transactions fail balance check"}
+    end
+  end
+
+  defp balance_check_totals(%Account{ id: id }, transactions) do
+    balance_amount = Task.async(fn -> transactions_sum_by_account(id) end)
+    transactions_amount = Task.async(fn -> total_transactions(transactions, id) end)
+    {Task.await(balance_amount), Task.await(transactions_amount)}
+  end
+
+  defp total_transactions(transactions, account_id) do
+    Enum.filter(transactions, fn(transaction) -> Ecto.Changeset.fetch_change!(transaction, :account_id) == account_id end)
+      |> total_credits_and_debits()
+      |> sum_totals()
   end
 
   defp group_currencies(transactions) do
@@ -263,56 +310,23 @@ defmodule HayaiLedger.Ledgers do
     end
   end
 
-  defp validate_amounts_balance(transactions, total_credits \\ 0, total_debits \\ 0)
-
-  defp validate_amounts_balance([], total_credits, total_debits) do
+  defp validate_amounts_balance(transactions) do
+    [{"credit", total_credits}, {"debit", total_debits}] = total_credits_and_debits(transactions)
     case total_credits - total_debits do
       0 -> :ok
       _ -> :error
     end
   end
 
-  defp validate_amounts_balance([%Ecto.Changeset{ changes: %{ kind: "credit", amount_subunits: amount }, data: %HayaiLedger.Ledgers.Transaction{} } | tail], total_credits, total_debits) do
-    validate_amounts_balance(tail, (total_credits + amount), total_debits)
+  defp total_credits_and_debits(transactions, total_credits \\ 0, total_debits \\ 0)
+
+  defp total_credits_and_debits([], total_credits, total_debits), do: [{"credit", total_credits}, {"debit", total_debits}]
+
+  defp total_credits_and_debits([%Ecto.Changeset{ changes: %{ kind: "credit", amount_subunits: amount }, data: %HayaiLedger.Ledgers.Transaction{} } | tail], total_credits, total_debits) do
+    total_credits_and_debits(tail, (total_credits + amount), total_debits)
   end
 
-  defp validate_amounts_balance([%Ecto.Changeset{ changes: %{ kind: "debit", amount_subunits: amount }, data: %HayaiLedger.Ledgers.Transaction{} } | tail], total_credits, total_debits) do
-    validate_amounts_balance(tail, total_credits, (total_debits + amount))
+  defp total_credits_and_debits([%Ecto.Changeset{ changes: %{ kind: "debit", amount_subunits: amount }, data: %HayaiLedger.Ledgers.Transaction{} } | tail], total_credits, total_debits) do
+    total_credits_and_debits(tail, total_credits, (total_debits + amount))
   end
 end
-
-  # need to build constraints on this and only allow safe mods
-  # @doc """
-  # Updates a entry.
-
-  # ## Examples
-
-  #     iex> update_entry(entry, %{field: new_value})
-  #     {:ok, %Entry{}}
-
-  #     iex> update_entry(entry, %{field: bad_value})
-  #     {:error, %Ecto.Changeset{}}
-
-  # """
-  # def update_entry(%Entry{} = entry, attrs) do
-  #   entry
-  #   |> Entry.changeset(attrs)
-  #   |> Repo.update()
-  # end
-
-  #   defp async_validate_transaction_currency([%{ amount_currency: currency } | _tail] = transactions) do
-  #   try do
-  #     Task.async_stream(transactions, fn transaction -> same_currency(transaction, currency) end)
-  #     |> Enum.all?(fn task -> {:ok, nil} end)
-  #     :ok
-  #   rescue
-  #     message -> {:error, message}
-  #   end
-  # end
-
-  # defp same_currency(%{ amount_currency: currency }, default_currency) do
-  #   if currency != default_currency do
-  #     raise("currencies do not match")
-  #   end
-  # 
-
