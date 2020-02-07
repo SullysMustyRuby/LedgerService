@@ -4,8 +4,8 @@ defmodule HayaiLedger.AccountsTest do
   alias HayaiLedger.Accounts
   alias HayaiLedger.Accounts.{Account, AccountType}
 
-  @update_account_attrs %{ meta_data: %{}, name: "some updated name", object_type: "some updated object_type", object_uid: "some updated object_uid", uid: "some updated uid" }
-  @invalid_account_attrs %{ currency: nil, name: nil, type_id: nil }
+  @update_account_attrs %{ meta_data: %{}, kind: "asset", name: "some updated name", object_type: "some updated object_type", object_uid: "some updated object_uid", uid: "some updated uid" }
+  @invalid_account_attrs %{ currency: nil, kind: nil, name: nil, type_id: nil }
 
   @valid_type_attrs %{ description: "some description", name: "some name", currency: "JPY" }
   @update_type_attrs %{ description: "some updated description", name: "some updated name" }
@@ -155,7 +155,8 @@ defmodule HayaiLedger.AccountsTest do
   defp valid_account_attrs() do
     %{
       currency: "JPY",
-      meta_data: %{}, 
+      meta_data: %{},
+      kind: "asset",
       name: "some name", 
       object_type: "some object_type", 
       object_uid: "some object_uid",

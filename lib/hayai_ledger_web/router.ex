@@ -19,6 +19,12 @@ defmodule HayaiLedgerWeb.Router do
     get "/", PageController, :index
   end
 
+  scope "/", HayaiLedgerWeb do
+    pipe_through :api
+
+    post "entries/create", EntryController, :create
+  end
+
   # Other scopes may use custom stacks.
   # scope "/api", HayaiLedgerWeb do
   #   pipe_through :api

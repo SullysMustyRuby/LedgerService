@@ -97,7 +97,8 @@ defmodule HayaiLedger.LockServerTest do
 	defp create_account() do
     Accounts.create_account(%{
       currency: "JPY",
-      meta_data: %{}, 
+      meta_data: %{},
+      kind: "asset",
       name: "some name", 
       object_type: "some object_type", 
       object_uid: "some object_uid",

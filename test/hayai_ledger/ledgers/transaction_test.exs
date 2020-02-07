@@ -95,6 +95,7 @@ defmodule HayaiLedger.Ledgers.TransactionTest do
   defp create_account() do
     {:ok, account} = HayaiLedger.Accounts.create_account(%{
                         currency: "JPY",
+                        kind: "asset",
                         name: "Yuko Cash",
                         type_id: create_account_type().id
                       })

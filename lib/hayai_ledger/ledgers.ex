@@ -2,8 +2,6 @@ defmodule HayaiLedger.Ledgers do
   @moduledoc """
   The Ledgers context.
   """
-
-  import Ecto.Multi
   import Ecto.Query, warn: false
   import HayaiLedger.LockServer
 
@@ -38,18 +36,6 @@ defmodule HayaiLedger.Ledgers do
     %Balance{}
     |> Balance.changeset(attrs)
     |> Repo.insert()
-  end
-
-  def journal_entry(_attrs, []), do: {:error, "must have transactions that balance"}
-
-  def journal_entry(attrs, transactions) do
-    with :ok <- transactions_all_valid?(transactions),
-      :ok <- validate_transactions_balance(transactions),
-      %Ecto.Changeset{ valid?: true } = entry <- build_entry(attrs),
-      {:ok, %{ entry: entry } } <- save_all(entry, transactions)
-    do
-      {:ok, entry}
-    end
   end
 
   @doc """
@@ -141,6 +127,18 @@ defmodule HayaiLedger.Ledgers do
   """
   def get_transaction!(id), do: Repo.get!(Transaction, id)
 
+  def journal_entry(_attrs, []), do: {:error, "must have transactions that balance"}
+
+  def journal_entry(attrs, transactions) do
+    with :ok <- transactions_all_valid?(transactions),
+      :ok <- validate_transactions_balance(transactions),
+      %Ecto.Changeset{ valid?: true } = entry <- build_entry(attrs),
+      {:ok, %{ entry: entry } } <- save_journal_entry(entry, transactions)
+    do
+      {:ok, entry}
+    end
+  end
+
   @doc """
   Returns the list of balances.
 
@@ -180,17 +178,21 @@ defmodule HayaiLedger.Ledgers do
     Repo.all(Transaction)
   end
 
-  def safe_journal_entry(attrs, transactions, %{ account: account_uid, minimum: minimum } = check_options) do
+  def safe_journal_entry(attrs, transactions, %{ account: account_uid } = check_options) do
     with false <- account_locked?(account_uid),
       account_uid <- account_lock(account_uid),
+      :ok <- transactions_all_valid?(transactions),
       :ok <- balance_check(transactions, check_options),
-      {:ok, entry} <- journal_entry(attrs, transactions),
+      :ok <- validate_transactions_balance(transactions),
+      %Ecto.Changeset{ valid?: true } = entry <- build_entry(attrs),
+      {:ok, %{ entry: entry } } <- save_journal_entry(entry, transactions),
       true <- account_unlock(account_uid)
     do
       {:ok, entry}
     else
       true -> {:error, "account locked"}
       {:error, message} -> {:error, message}
+      
     end
   end
 
@@ -255,6 +257,17 @@ defmodule HayaiLedger.Ledgers do
     Enum.group_by(transactions, fn(changeset) -> Ecto.Changeset.fetch_change!(changeset, :amount_currency) end)
   end
 
+  defp group_by_account_kind(transactions) do
+    Enum.group_by(transactions, fn(changeset) -> get_account_kind(changeset) end)
+  end
+
+  defp get_account_kind(%Ecto.Changeset{ changes: %{ account_id: account_uid} }) do
+    case Accounts.get_account(account_uid) do
+      %Account{ kind: "asset" } -> "asset"
+      %Account{} -> "other"
+    end
+  end
+
   defp insert_all_transactions(transactions, entry) do
     changesets = Enum.map(transactions, fn %Ecto.Changeset{ changes: changes } -> Map.merge(changes, 
       %{ 
@@ -267,7 +280,7 @@ defmodule HayaiLedger.Ledgers do
     |> Ecto.Multi.insert_all(:transactions, Transaction, changesets)
   end
 
-  defp save_all(entry_changeset, transactions) do
+  defp save_journal_entry(entry_changeset, transactions) do
     try do
       Ecto.Multi.new()
         |> Ecto.Multi.insert(:entry, entry_changeset)
@@ -292,11 +305,39 @@ defmodule HayaiLedger.Ledgers do
 
   defp sum_totals(_), do: 0
 
+  defp total_credits_and_debits(transactions, total_credits \\ 0, total_debits \\ 0)
+
+  defp total_credits_and_debits(nil, _total_credits, _total_debits), do: [{"credit", 0}, {"debit", 0}]
+
+  defp total_credits_and_debits([], total_credits, total_debits), do: [{"credit", total_credits}, {"debit", total_debits}]
+
+  defp total_credits_and_debits([%Ecto.Changeset{ changes: %{ kind: "credit", amount_subunits: amount }, data: %HayaiLedger.Ledgers.Transaction{} } | tail], total_credits, total_debits) do
+    total_credits_and_debits(tail, (total_credits + amount), total_debits)
+  end
+
+  defp total_credits_and_debits([%Ecto.Changeset{ changes: %{ kind: "debit", amount_subunits: amount }, data: %HayaiLedger.Ledgers.Transaction{} } | tail], total_credits, total_debits) do
+    total_credits_and_debits(tail, total_credits, (total_debits + amount))
+  end
+
   defp transactions_all_valid?([]), do: :ok
 
   defp transactions_all_valid?([%Ecto.Changeset{ valid?: false } | _tail ]), do: {:error, "transactions must be valid"}
 
   defp transactions_all_valid?([%Ecto.Changeset{ valid?: true } | tail ]), do: transactions_all_valid?(tail)
+
+  defp validate_amounts_balance(transactions) do
+    with grouped <- group_by_account_kind(transactions),
+      [{"credit", asset_credits}, {"debit", asset_debits}] <- total_credits_and_debits(grouped["assets"]),
+      [{"credit", other_credits}, {"debit", other_debits}] <- total_credits_and_debits(grouped["other"]),
+      true <- (asset_credits - asset_debits ) == (other_credits - other_debits)
+    do
+      :ok
+    else
+      {:error, message} -> {:error, message}
+      false -> {:error, "transactions are not consistent"}
+      _ -> {:error, "validate amounts balance failure"}
+    end
+  end
 
   defp validate_transactions_balance(transactions) when is_list(transactions) do 
     group_currencies(transactions)
@@ -308,25 +349,5 @@ defmodule HayaiLedger.Ledgers do
       true -> :ok
       _ -> {:error, "credits and debits do not balance"}
     end
-  end
-
-  defp validate_amounts_balance(transactions) do
-    [{"credit", total_credits}, {"debit", total_debits}] = total_credits_and_debits(transactions)
-    case total_credits - total_debits do
-      0 -> :ok
-      _ -> :error
-    end
-  end
-
-  defp total_credits_and_debits(transactions, total_credits \\ 0, total_debits \\ 0)
-
-  defp total_credits_and_debits([], total_credits, total_debits), do: [{"credit", total_credits}, {"debit", total_debits}]
-
-  defp total_credits_and_debits([%Ecto.Changeset{ changes: %{ kind: "credit", amount_subunits: amount }, data: %HayaiLedger.Ledgers.Transaction{} } | tail], total_credits, total_debits) do
-    total_credits_and_debits(tail, (total_credits + amount), total_debits)
-  end
-
-  defp total_credits_and_debits([%Ecto.Changeset{ changes: %{ kind: "debit", amount_subunits: amount }, data: %HayaiLedger.Ledgers.Transaction{} } | tail], total_credits, total_debits) do
-    total_credits_and_debits(tail, total_credits, (total_debits + amount))
   end
 end
