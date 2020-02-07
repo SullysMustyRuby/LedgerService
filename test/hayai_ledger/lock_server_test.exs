@@ -8,9 +8,9 @@ defmodule HayaiLedger.LockServerTest do
   describe "await/2" do
   	setup do
   		{:ok, account} = create_account()
-  		Ledgers.create_transaction(valid_transaction_attrs(%{ account_id: account.id, amount_subunits: 1000, kind: "credit" }))
-      Ledgers.create_transaction(valid_transaction_attrs(%{ account_id: account.id, amount_subunits: 1000, kind: "debit" }))
-      Ledgers.create_transaction(valid_transaction_attrs(%{ account_id: account.id, amount_subunits: 1000, kind: "credit" }))
+  		Ledgers.create_transaction(valid_transaction_attrs(%{ account_uid: account.uid, amount_subunits: 1000, kind: "credit" }))
+      Ledgers.create_transaction(valid_transaction_attrs(%{ account_uid: account.uid, amount_subunits: 1000, kind: "debit" }))
+      Ledgers.create_transaction(valid_transaction_attrs(%{ account_uid: account.uid, amount_subunits: 1000, kind: "credit" }))
       %{
       	account: account
       }

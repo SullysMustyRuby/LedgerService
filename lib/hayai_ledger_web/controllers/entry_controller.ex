@@ -5,8 +5,6 @@ defmodule HayaiLedgerWeb.EntryController do
   	require IEx; IEx.pry
   end
 end
-
-# ledger/entries/create
 # {
 #   "journal_entry":
 #   {

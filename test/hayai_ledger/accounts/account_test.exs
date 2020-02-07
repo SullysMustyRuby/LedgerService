@@ -33,21 +33,21 @@ defmodule HayaiLedger.Accounts.AccountTest do
   		assert changeset.errors[:name] == {"can't be blank", [validation: :required]}
   	end
 
-  	test "returns error if no type" do
-  		bad_type = Map.delete(valid_attrs(), :type_id)
-  		changeset = Account.changeset(%Account{}, bad_type)
-  		assert changeset.valid? == false
-  		assert changeset.errors[:type_id] == {"can't be blank", [validation: :required]}
-  	end
+  	# test "returns error if no type" do
+  	# 	bad_type = Map.delete(valid_attrs(), :type_id)
+  	# 	changeset = Account.changeset(%Account{}, bad_type)
+  	# 	assert changeset.valid? == false
+  	# 	assert changeset.errors[:type_id] == {"can't be blank", [validation: :required]}
+  	# end
 
-  	test "returns error if type does not exist" do
-  		bad_type = Map.put(valid_attrs(), :type_id, 555)
-  		changeset = Account.changeset(%Account{}, bad_type)
-  		{result, account} = Repo.insert(changeset)
-  		assert :error == result
-  		assert account.valid? == false
-  		assert account.errors[:type_id] == {"does not exist", [constraint: :foreign, constraint_name: "accounts_type_id_fkey"]}
-  	end
+  	# test "returns error if type does not exist" do
+  	# 	bad_type = Map.put(valid_attrs(), :type_id, 555)
+  	# 	changeset = Account.changeset(%Account{}, bad_type)
+  	# 	{result, account} = Repo.insert(changeset)
+  	# 	assert :error == result
+  	# 	assert account.valid? == false
+  	# 	assert account.errors[:type_id] == {"does not exist", [constraint: :foreign, constraint_name: "accounts_type_id_fkey"]}
+  	# end
 
   	test "returns an account when sucessful" do
   		changeset = Account.changeset(%Account{}, valid_attrs())

@@ -233,7 +233,7 @@ defmodule HayaiLedger.Ledgers do
   end
 
   defp balance_check(transactions, %{ account: account_uid, minimum: minimum }) when is_integer(minimum) do
-    {balance_amount, transactions_amount} = Accounts.get_account_by_uid(account_uid)
+    {balance_amount, transactions_amount} = Accounts.get_account_by_uid!(account_uid)
                                               |> balance_check_totals(transactions)
     case balance_amount + transactions_amount do
       total when total >= minimum -> :ok

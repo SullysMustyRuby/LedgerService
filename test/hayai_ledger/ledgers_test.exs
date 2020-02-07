@@ -3,8 +3,8 @@ defmodule HayaiLedger.LedgersTest do
 
   alias HayaiLedger.Ledgers
   alias HayaiLedger.Ledgers.{Balance, Entry, Transaction}
-  alias HayaiLedger.LockServer
-  alias HayaiLedger.Repo
+  # alias HayaiLedger.LockServer
+  # alias HayaiLedger.Repo
 
 
   @valid_balance_attrs %{amount_subunits: 42}
@@ -88,8 +88,8 @@ defmodule HayaiLedger.LedgersTest do
   
   describe "get_transaction!/1" do
     test "returns the transaction with given id" do
-      transaction = transaction_fixture()
-      assert Ledgers.get_transaction!(transaction.id) == transaction
+      transaction = transaction_fixture() |> Map.delete(:account_uid)
+      assert transaction == Ledgers.get_transaction!(transaction.id) |> Map.delete(:account_uid)
     end
   end
 
@@ -106,8 +106,8 @@ defmodule HayaiLedger.LedgersTest do
 
       thai_account = create_account(%{ currency: "THB" })
       transaction_1 = Ledgers.build_transaction(valid_transaction_attrs(%{ amount_subunits: 1000, kind: "credit" }))
-      transaction_2 = Ledgers.build_transaction(valid_transaction_attrs(%{ account_id: thai_account.id, amount_currency: "THB", amount_subunits: 1000, kind: "debit" }))
-      transaction_3 = Ledgers.build_transaction(valid_transaction_attrs(%{ account_id: thai_account.id, amount_currency: "THB", amount_subunits: 1000, kind: "credit" }))
+      transaction_2 = Ledgers.build_transaction(valid_transaction_attrs(%{ account_uid: thai_account.uid, amount_currency: "THB", amount_subunits: 1000, kind: "debit" }))
+      transaction_3 = Ledgers.build_transaction(valid_transaction_attrs(%{ account_uid: thai_account.uid, amount_currency: "THB", amount_subunits: 1000, kind: "credit" }))
       assert {:error, "credits and debits do not balance"} == Ledgers.journal_entry(@valid_entry_attrs, [transaction_1, transaction_2, transaction_3])
     end
 
@@ -133,8 +133,8 @@ defmodule HayaiLedger.LedgersTest do
       transaction_1 = Ledgers.build_transaction(valid_transaction_attrs(%{ amount_currency: "JPY",  amount_subunits: 500, kind: "credit" }))
       transaction_2 = Ledgers.build_transaction(valid_transaction_attrs(%{ amount_currency: "JPY",  amount_subunits: 1000, kind: "debit" }))
       transaction_3 = Ledgers.build_transaction(valid_transaction_attrs(%{ amount_currency: "JPY",  amount_subunits: 500, kind: "credit" }))
-      transaction_4 = Ledgers.build_transaction(valid_transaction_attrs(%{ account_id: thai_account.id, amount_currency: "THB", amount_subunits: 1000, kind: "debit" }))
-      transaction_5 = Ledgers.build_transaction(valid_transaction_attrs(%{ account_id: thai_account.id, amount_currency: "THB", amount_subunits: 1000, kind: "credit" }))
+      transaction_4 = Ledgers.build_transaction(valid_transaction_attrs(%{ account_uid: thai_account.uid, amount_currency: "THB", amount_subunits: 1000, kind: "debit" }))
+      transaction_5 = Ledgers.build_transaction(valid_transaction_attrs(%{ account_uid: thai_account.uid, amount_currency: "THB", amount_subunits: 1000, kind: "credit" }))
       {:ok, entry} = Ledgers.journal_entry(@valid_entry_attrs, [transaction_1, transaction_2, transaction_3, transaction_4, transaction_5])
       full_entry = Ledgers.get_entry_with_transactions(entry.id)
       assert 5 == length(full_entry.transactions)
@@ -157,8 +157,8 @@ defmodule HayaiLedger.LedgersTest do
 
   describe "list_transactions/0" do
     test "returns all transactions" do
-      transaction = transaction_fixture()
-      assert Ledgers.list_transactions() == [transaction]
+      transaction = transaction_fixture() |> Map.delete(:account_uid)
+      assert transaction == Ledgers.list_transactions() |> hd() |> Map.delete(:account_uid)
     end
   end
 
@@ -215,9 +215,9 @@ defmodule HayaiLedger.LedgersTest do
     end
 
     test "returns the difference of the credits and debits", %{ account: account } do
-      Ledgers.create_transaction(valid_transaction_attrs(%{ account_id: account.id, amount_subunits: 1000, kind: "credit" }))
-      Ledgers.create_transaction(valid_transaction_attrs(%{ account_id: account.id, amount_subunits: 1000, kind: "debit" }))
-      Ledgers.create_transaction(valid_transaction_attrs(%{ account_id: account.id, amount_subunits: 1000, kind: "credit" }))
+      Ledgers.create_transaction(valid_transaction_attrs(%{ account_uid: account.uid, amount_subunits: 1000, kind: "credit" }))
+      Ledgers.create_transaction(valid_transaction_attrs(%{ account_uid: account.uid, amount_subunits: 1000, kind: "debit" }))
+      Ledgers.create_transaction(valid_transaction_attrs(%{ account_uid: account.uid, amount_subunits: 1000, kind: "credit" }))
       assert 1000 == Ledgers.transactions_sum_by_account(account.id)
     end
 
@@ -230,14 +230,14 @@ defmodule HayaiLedger.LedgersTest do
     end
 
     test "returns the credits balance if no debits", %{ account: account } do
-      Ledgers.create_transaction(valid_transaction_attrs(%{ account_id: account.id, amount_subunits: 1000, kind: "credit" }))
-      Ledgers.create_transaction(valid_transaction_attrs(%{ account_id: account.id, amount_subunits: 1000, kind: "credit" }))
+      Ledgers.create_transaction(valid_transaction_attrs(%{ account_uid: account.uid, amount_subunits: 1000, kind: "credit" }))
+      Ledgers.create_transaction(valid_transaction_attrs(%{ account_uid: account.uid, amount_subunits: 1000, kind: "credit" }))
       assert 2000 == Ledgers.transactions_sum_by_account(account.id)
     end
 
     test "returns the debits balance if no credits", %{ account: account } do
-      Ledgers.create_transaction(valid_transaction_attrs(%{ account_id: account.id, amount_subunits: 1000, kind: "debit" }))
-      Ledgers.create_transaction(valid_transaction_attrs(%{ account_id: account.id, amount_subunits: 1000, kind: "debit" }))
+      Ledgers.create_transaction(valid_transaction_attrs(%{ account_uid: account.uid, amount_subunits: 1000, kind: "debit" }))
+      Ledgers.create_transaction(valid_transaction_attrs(%{ account_uid: account.uid, amount_subunits: 1000, kind: "debit" }))
       assert -2000 == Ledgers.transactions_sum_by_account(account.id)
     end
   end
@@ -308,7 +308,7 @@ defmodule HayaiLedger.LedgersTest do
 
   defp valid_transaction_attrs(attrs \\ %{}) do
     Enum.into(attrs, %{
-      account_id: create_account().id, 
+      account_uid: create_account().uid,
       amount_currency: "JPY", 
       amount_subunits: 42, 
       kind: "credit"

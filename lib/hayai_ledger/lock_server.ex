@@ -23,7 +23,7 @@ defmodule HayaiLedger.LockServer do
   end
 
   def account_lock(account_uid) do
-    case HayaiLedger.Accounts.get_account_by_uid(account_uid) do
+    case HayaiLedger.Accounts.get_account_by_uid!(account_uid) do
       %HayaiLedger.Accounts.Account{} -> await(account_uid, {__MODULE__, :lock, [account_uid]})
       _ -> {:error, "account does not exist"}
     end

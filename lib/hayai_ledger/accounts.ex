@@ -122,8 +122,16 @@ defmodule HayaiLedger.Accounts do
 
   def get_account(id), do: Repo.get(Account, id)
 
-  def get_account_by_uid(uid) do
+  def get_account_by_uid!(uid) do
     Repo.get_by(Account, uid: uid)
+      |> Repo.preload(:type)
+  end
+
+  def get_account_by_uid(uid) do
+    case get_account_by_uid!(uid) do
+      %Account{} = account -> {:ok, account}
+      _ -> {:error, "account not found for uid: #{uid}"}
+    end
   end
 
   @doc """

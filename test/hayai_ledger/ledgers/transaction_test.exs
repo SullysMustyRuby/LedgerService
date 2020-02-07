@@ -10,23 +10,22 @@ defmodule HayaiLedger.Ledgers.TransactionTest do
       account = create_account()
       %{
         account: account,
-        valid_attrs: %{account_id: account.id, amount_currency: "JPY", amount_subunits: 42, kind: "credit" }
+        valid_attrs: %{ account_uid: account.uid, amount_currency: "JPY", amount_subunits: 42, kind: "credit" }
       }
     end
 
   	test "returns invalid with error if no account_id", %{ valid_attrs: valid_attrs } do
-      no_account = Map.delete(valid_attrs, :account_id)
+      no_account = Map.delete(valid_attrs, :account_uid)
   		changeset = Transaction.changeset(%Transaction{}, no_account)
   		assert false == changeset.valid?
-  		assert changeset.errors[:account_id] == {"can't be blank", [validation: :required]}
+  		assert changeset.errors[:account_uid] == {"can't be blank", [validation: :required]}
   	end
 
   	test "returns invalid with error if the account does not exist", %{ valid_attrs: valid_attrs } do
-  		bad_account = Map.put(valid_attrs, :account_id, 555)
+  		bad_account = Map.put(valid_attrs, :account_uid, "555")
   		changeset = Transaction.changeset(%Transaction{}, bad_account)
-			{result, transaction} = Repo.insert(changeset)
-			assert :error == result
-			assert transaction.errors[:account_id] == {"does not exist",[constraint: :foreign, constraint_name: "transactions_account_id_fkey"]}
+      assert false == changeset.valid?
+      assert changeset.errors[:account_uid] == {"account not found for uid: 555", [validation: :required]}
   	end
 
   	test "returns valid changeset when account exists", %{ valid_attrs: valid_attrs } do
@@ -48,7 +47,7 @@ defmodule HayaiLedger.Ledgers.TransactionTest do
       bad_currency = Map.put(valid_attrs, :amount_currency, "THB")
       changeset = Transaction.changeset(%Transaction{}, bad_currency)
       assert false == changeset.valid?
-      assert changeset.errors == [amount_currency: {"currency must match accounts currency", []}]
+      assert changeset.errors[:amount_currency] == {"currency must match accounts currency", [validation: :required]}
     end
 
     test "returns error if invalid amount_currency", %{ valid_attrs: valid_attrs } do

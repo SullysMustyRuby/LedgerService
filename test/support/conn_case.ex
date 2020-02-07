@@ -20,6 +20,7 @@ defmodule HayaiLedgerWeb.ConnCase do
       # Import conveniences for testing with connections
       use Phoenix.ConnTest
       alias HayaiLedgerWeb.Router.Helpers, as: Routes
+      require IEx
 
       # The default endpoint for testing
       @endpoint HayaiLedgerWeb.Endpoint
