@@ -82,6 +82,17 @@ defmodule HayaiLedger.AccountsTest do
     end
   end
 
+  describe "get_account_uid/1" do
+    test "returns the uid for the account id" do
+      account = account_fixture()
+      assert account.uid == Accounts.get_account_uid(account.id)
+    end
+
+    test "returns nil if account not found" do
+      assert nil == Accounts.get_account_uid(555)
+    end
+  end
+
   describe "list_accounts/0" do
     test "returns all accounts" do
       account = account_fixture()

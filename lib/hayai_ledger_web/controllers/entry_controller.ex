@@ -1,49 +1,41 @@
 defmodule HayaiLedgerWeb.EntryController do
   use HayaiLedgerWeb, :controller
 
-  def create(conn, %{ "journal_entry" => journal_entry }) do
-  	require IEx; IEx.pry
+  alias HayaiLedger.Ledgers
+
+  action_fallback HayaiLedgerWeb.FallbackController
+
+  # GET
+  def show(conn, %{ "uid" => uid }) do
+  	with {:ok, entry} <- Ledgers.get_entry_by_uid(uid) do
+	  	render(conn, "show.json", %{ entry: entry })
+	  end
+  end
+
+  # GET
+  def transactions_show(conn, %{ "uid" => uid }) do
+  	with {:ok, entry} <- Ledgers.get_entry_by_uid(uid),
+  		full_entry <- Ledgers.get_entry_with_transactions(entry.id)
+  	do
+	  	render(conn, "show.json", %{ entry: full_entry })
+	  end
+  end
+
+	# POST
+  def create(conn, %{ "journal_entry" => %{ "entry" => entry_attrs, "transactions" => transactions } }) do
+  	with transaction_changesets <- Enum.map(transactions, fn(transaction) -> Ledgers.build_transaction(transaction) end),
+  		{:ok, entry} <- Ledgers.journal_entry(entry_attrs, transaction_changesets) 
+  	do
+  		render(conn, "show.json", %{ entry: entry })
+  	end
+  end
+
+	# POST
+  def create(conn, %{ "journal_entry" => %{ "entry" => entry_attrs, "transactions" => transactions, "options" => options } }) do
+  	with transaction_changesets <- Enum.map(transactions, fn(transaction) -> Ledgers.build_transaction(transaction) end),
+  		{:ok, entry} <- Ledgers.safe_journal_entry(entry_attrs, transaction_changesets, options) 
+  	do
+  		render(conn, "show.json", %{ entry: entry })
+  	end
   end
 end
-# {
-#   "journal_entry":
-#   {
-#     "options":
-#     {
-#       "balance_verify": {
-#         "account": "account_uid",
-#         "minimum": "1000" or "non_negative"
-#       }
-#     }
-#     "entry": 
-#     {
-#       "description": "product purchase",
-#       "object_type": "Sale",
-#       "object_uid": "sale_id"
-#     }
-#     "credits": 
-#     [
-#       {
-#         "account_uid": "uid_company",
-#         "amount_subunits": 1000,
-#         "description": "product purchase balance",
-#         "type": "type_uid"
-#       },
-#       {
-#         "account_uid": "uid_company_tax",
-#         "amount_subunits": 150,
-#         "description": "product purchase tax",
-#         "type": "type_uid"
-#       }
-#     ],
-#     "debits": 
-#     [
-#       {
-#         "account_uid": "uid_customer",
-#         "amount_subunits": 1150
-#         "description": "product purchase",
-#         "type": "type_uid"
-#       }
-#     ]
-#   }
-# }

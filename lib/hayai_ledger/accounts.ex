@@ -134,6 +134,14 @@ defmodule HayaiLedger.Accounts do
     end
   end
 
+  def get_account_uid(nil), do: {:error, "no account id"}
+
+  def get_account_uid(id) do
+    Repo.one(from a in Account,
+    where: a.id == ^id,
+    select: a.uid)
+  end
+
   @doc """
   Gets a single account_type.
 

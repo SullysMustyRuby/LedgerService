@@ -13,7 +13,7 @@ defmodule HayaiLedgerWeb.AccountControllerTest do
   	"object_uid" => "some updated object_uid"
   }
 
-  describe "GET /balance/:uid" do
+  describe "GET /accounts/balance/:uid" do
   	test "returns the balance json", %{conn: conn} do
   		account = create_account()
       Ledgers.create_transaction(valid_transaction_attrs(%{ account_uid: account.uid, amount_subunits: 1000, kind: "credit" }))
@@ -41,7 +41,7 @@ defmodule HayaiLedgerWeb.AccountControllerTest do
     							|> Map.delete("uid")
     							|> Map.delete("type")
 
-    	assert @valid_account_params == response
+    	assert Map.put(@valid_account_params, "object", "Account") == response
 	  end
 
 	  test "returns an error if invalid data", %{conn: conn} do
@@ -50,7 +50,7 @@ defmodule HayaiLedgerWeb.AccountControllerTest do
 	  end
   end
 
-  describe "GET /show/:uid" do
+  describe "GET /accounts/:uid" do
   	test "returns the found account", %{conn: conn} do
   		{:ok, account} = Accounts.create_account(@valid_account_params)
   		response = get(conn, Routes.account_path(conn, :show, account.uid))
@@ -58,7 +58,7 @@ defmodule HayaiLedgerWeb.AccountControllerTest do
     							|> Map.delete("uid")
     							|> Map.delete("type")
 
-    	assert @valid_account_params == response
+    	assert Map.put(@valid_account_params, "object", "Account") == response
   	end
 
 	  test "returns the error if invalid uid", %{conn: conn} do

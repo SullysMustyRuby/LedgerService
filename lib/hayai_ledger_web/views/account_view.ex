@@ -3,6 +3,7 @@ defmodule HayaiLedgerWeb.AccountView do
 
   def render("balance.json", %{ account: %{ uid: uid, currency: currency }, balance: balance }) do
   	%{
+  		"object" => "AccountBalance",
 		  "account_uid": uid,
 		  "amount_subunits": balance,
 		  "amount_currency": currency,
@@ -12,6 +13,7 @@ defmodule HayaiLedgerWeb.AccountView do
 
   def render("new.json", %{ account: account }) when is_map(account) do
   	%{
+  		"object" => "Account",
 			"currency" => account.currency,
 			"kind" => account.kind,
 			"meta_data" => account.meta_data,
@@ -25,6 +27,7 @@ defmodule HayaiLedgerWeb.AccountView do
 
   def render("show.json", %{ account: account }) when is_map(account) do
   	%{
+  		"object" => "Account",
 			"currency" => account.currency,
 			"kind" => account.kind,
 			"meta_data" => account.meta_data,

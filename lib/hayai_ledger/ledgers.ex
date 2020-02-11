@@ -111,6 +111,23 @@ defmodule HayaiLedger.Ledgers do
       |> Repo.preload(:transactions)
   end
 
+  def get_entry_by_uid(uid) when is_binary(uid) do
+    case Repo.get_by(Entry, uid: uid) do
+      %Entry{} = entry -> {:ok, entry}
+      _ -> {:error, "entry not found for uid: #{uid}"}
+    end
+  end
+
+  def get_entry_by_uid(_), do: {:error, "entry not found"}
+
+  def get_entry_uid(nil), do: {:error, "no entry id"}
+
+  def get_entry_uid(id) do
+    Repo.one(from e in Entry,
+    where: e.id == ^id,
+    select: e.uid)
+  end
+
   @doc """
   Gets a single transaction.
 
@@ -126,6 +143,23 @@ defmodule HayaiLedger.Ledgers do
 
   """
   def get_transaction!(id), do: Repo.get!(Transaction, id)
+
+  def get_transaction_by_uid(uid) when is_binary(uid) do
+    with %Transaction{} = transaction_struct <- Repo.get_by(Transaction, uid: uid),
+      transaction_details when is_map(transaction_details) <- Map.from_struct(transaction_struct),
+      entry_uid when is_binary(entry_uid) <- get_entry_uid(transaction_struct.entry_id),
+      account_uid when is_binary(account_uid) <- Accounts.get_account_uid(transaction_struct.account_id),
+      transaction_with_entry when is_map(transaction_with_entry) <- Map.put(transaction_details, :entry_uid, entry_uid),
+      full_transaction when is_map(full_transaction) <- Map.put(transaction_with_entry, :account_uid, account_uid)
+    do
+     {:ok, full_transaction}
+    else
+      nil -> {:error, "transaction not found for uid: #{uid}"}
+      {:error, message} -> {:error, message}
+    end
+  end
+
+  def get_transaction_by_uid(_), do: {:error, "transaction not found"}
 
   def journal_entry(_attrs, []), do: {:error, "must have transactions that balance"}
 
@@ -327,9 +361,9 @@ defmodule HayaiLedger.Ledgers do
 
   defp validate_amounts_balance(transactions) do
     with grouped <- group_by_account_kind(transactions),
-      [{"credit", asset_credits}, {"debit", asset_debits}] <- total_credits_and_debits(grouped["assets"]),
+      [{"credit", asset_credits}, {"debit", asset_debits}] <- total_credits_and_debits(grouped["asset"]),
       [{"credit", other_credits}, {"debit", other_debits}] <- total_credits_and_debits(grouped["other"]),
-      true <- (asset_credits - asset_debits ) == (other_credits - other_debits)
+      true <- (asset_debits - asset_credits) == (other_credits - other_debits)
     do
       :ok
     else
