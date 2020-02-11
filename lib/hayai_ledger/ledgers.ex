@@ -10,6 +10,12 @@ defmodule HayaiLedger.Ledgers do
   alias HayaiLedger.Ledgers.{Balance, Entry, Transaction}
   alias HayaiLedger.Repo
 
+  def balance_amount_subunits_for_account(account_id) do
+    Repo.one(from b in Balance,
+    where: b.account_id == ^account_id,
+    select: b.amount_subunits)
+  end
+
   def build_entry(attrs \\ %{}) do
     %Entry{}
       |> Entry.changeset(attrs)
@@ -90,6 +96,10 @@ defmodule HayaiLedger.Ledgers do
   """
   def get_balance!(id), do: Repo.get!(Balance, id)
 
+  def get_balance_by_account(account_id) do
+    Repo.get_by(Balance, account_id: account_id)
+  end
+
   @doc """
   Gets a single entry.
 
@@ -165,9 +175,10 @@ defmodule HayaiLedger.Ledgers do
     with :ok <- transactions_all_valid?(transactions),
       :ok <- validate_transactions_balance(transactions),
       %Ecto.Changeset{ valid?: true } = entry <- build_entry(entry_attrs),
-      {:ok, %{ entry: entry } } <- save_journal_entry(entry, transactions)
+      {:ok, %{ entry: entry, transactions: {_, transactions} }} <- save_journal_entry(entry, transactions),
+      :ok <- update_transaction_account_balances(transactions)
     do
-      {:ok, entry}
+      {:ok, entry, transactions}
     end
   end
 
@@ -211,20 +222,20 @@ defmodule HayaiLedger.Ledgers do
   end
 
   def safe_journal_entry(attrs, transactions, %{ account: account_uid } = check_options) do
-    with false <- account_locked?(account_uid),
-      account_uid <- account_lock(account_uid),
-      :ok <- transactions_all_valid?(transactions),
+    with :ok <- transactions_all_valid?(transactions),
       :ok <- balance_check(transactions, check_options),
       :ok <- validate_transactions_balance(transactions),
+      false <- account_locked?(account_uid),
+      account_uid <- account_lock(account_uid),
       %Ecto.Changeset{ valid?: true } = entry <- build_entry(attrs),
-      {:ok, %{ entry: entry } } <- save_journal_entry(entry, transactions),
+      {:ok, %{ entry: entry, transactions: {_, transactions} }} <- save_journal_entry(entry, transactions),
+      :ok <- update_transaction_account_balances(transactions),
       true <- account_unlock(account_uid)
     do
-      {:ok, entry}
+      {:ok, entry, transactions}
     else
       true -> {:error, "account locked"}
       {:error, message} -> {:error, message}
-      
     end
   end
 
@@ -242,17 +253,12 @@ defmodule HayaiLedger.Ledgers do
 
   ## Examples
 
-      iex> update_balance(balance, %{field: new_value})
-      {:ok, %Balance{}}
-
-      iex> update_balance(balance, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
   """
-  def update_balance(%Balance{} = balance, attrs) do
-    balance
-    |> Balance.changeset(attrs)
-    |> Repo.update()
+  def update_balance(account_id, amount_subunits) do
+    with %Balance{} = balance <- get_balance_by_account(account_id) do
+      Balance.changeset(balance, %{amount_subunits: amount_subunits})
+      |> Repo.update()
+    end
   end
 
   defp balance_check(transactions, %{ account: account_uid, minimum: "non_negative" }) do
@@ -309,7 +315,7 @@ defmodule HayaiLedger.Ledgers do
         })
     end)
     Ecto.Multi.new()
-    |> Ecto.Multi.insert_all(:transactions, Transaction, changesets)
+    |> Ecto.Multi.insert_all(:transactions, Transaction, changesets, [returning: true])
   end
 
   defp save_journal_entry(entry_changeset, transactions) do
@@ -356,6 +362,18 @@ defmodule HayaiLedger.Ledgers do
   defp transactions_all_valid?([%Ecto.Changeset{ valid?: false } | _tail ]), do: {:error, "transactions must be valid"}
 
   defp transactions_all_valid?([%Ecto.Changeset{ valid?: true } | tail ]), do: transactions_all_valid?(tail)
+
+  defp update_transaction_account_balances([]), do: :ok
+
+  defp update_transaction_account_balances([%Transaction{ account_id: account_id } | tail]) do
+    with amount when is_integer(amount) <- transactions_sum_by_account(account_id),
+      {:ok, _} <- update_balance(account_id, amount)
+    do
+      update_transaction_account_balances(tail)
+    else
+      nil -> {:error, "balance update error"}
+    end
+  end
 
   defp validate_amounts_balance(transactions) do
     with grouped <- group_by_account_kind(transactions),

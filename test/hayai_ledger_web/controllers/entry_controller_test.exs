@@ -12,8 +12,8 @@ defmodule HayaiLedgerWeb.EntryControllerTest do
       transaction_2 = Ledgers.build_transaction(%{ "account_uid" => tax_account.uid, "amount_currency" => "THB", "amount_subunits" => 100, "kind" => "credit" })
       transaction_3 = Ledgers.build_transaction(%{ "account_uid" => equity_account.uid, "amount_currency" => "THB", "amount_subunits" => 900, "kind" => "credit" })
       entry_attrs = %{ "description" => "test create journal entry"}
-      {:ok, entry} = Ledgers.journal_entry(entry_attrs, [transaction_1, transaction_2, transaction_3])
 
+      {:ok, entry, _transactions} = Ledgers.journal_entry(entry_attrs, [transaction_1, transaction_2, transaction_3])
       response = get(conn, Routes.entry_path(conn, :show, entry.uid))
                 |> json_response(200)
 
@@ -56,8 +56,18 @@ defmodule HayaiLedgerWeb.EntryControllerTest do
   		      		|> json_response(200)
   		
       {:ok, entry} = Ledgers.get_entry_by_uid(response["uid"])
-      full_entry = Ledgers.get_entry_with_transactions(entry.id)
-      assert 3 == length(full_entry.transactions)
+      assert entry.uid == response["uid"]
+      assert "Entry" == response["object"]
+      assert entry.description == response["description"]
+      assert 3 == length(response["transactions"])
+      for transaction <- response["transactions"] do
+        assert nil != transaction["amount_subunits"]
+        assert "THB" == transaction["amount_currency"]
+        assert entry.uid == transaction["entry_uid"]
+        assert nil != transaction["kind"]
+        assert "Transaction" == transaction["object"]
+        assert nil != transaction["uid"]
+      end
     end
 
     test "returns a safe journal entry upon success", %{conn: conn} = context do
@@ -71,8 +81,18 @@ defmodule HayaiLedgerWeb.EntryControllerTest do
                 |> json_response(200)
       
       {:ok, entry} = Ledgers.get_entry_by_uid(response["uid"])
-      full_entry = Ledgers.get_entry_with_transactions(entry.id)
-      assert 3 == length(full_entry.transactions)
+      assert entry.uid == response["uid"]
+      assert "Entry" == response["object"]
+      assert entry.description == response["description"]
+      assert 3 == length(response["transactions"])
+      for transaction <- response["transactions"] do
+        assert nil != transaction["amount_subunits"]
+        assert "THB" == transaction["amount_currency"]
+        assert entry.uid == transaction["entry_uid"]
+        assert nil != transaction["kind"]
+        assert "Transaction" == transaction["object"]
+        assert nil != transaction["uid"]
+      end
     end
 
     test "returns error if transactions are invalid", %{conn: conn} = context do
@@ -93,6 +113,7 @@ defmodule HayaiLedgerWeb.EntryControllerTest do
       |> Enum.into(valid_account_attrs()) 
       |> HayaiLedger.Accounts.create_account()
 
+    Ledgers.create_balance(%{ account_id: account.id, amount_currency: account.currency, amount_subunits: 0})
     account
   end
 

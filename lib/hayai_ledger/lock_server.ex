@@ -52,7 +52,7 @@ defmodule HayaiLedger.LockServer do
   # Ets methods
 
   def init(_) do
-    :ets.new(@table_name, [:named_table, :public])
+    :ets.new(@table_name, [:named_table])
     {:ok, @table_name}
   end
 

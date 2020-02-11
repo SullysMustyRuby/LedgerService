@@ -1,8 +1,9 @@
 defmodule HayaiLedger.Ledgers.TransactionTest do
   use HayaiLedger.DataCase
+  import HayaiLedger.LockServer, only: [{:account_lock, 1}]
 
-   alias HayaiLedger.Ledgers.Transaction
-   alias HayaiLedger.Repo
+  alias HayaiLedger.Ledgers.Transaction
+  alias HayaiLedger.Repo
 
 
   describe "validations" do
@@ -27,6 +28,13 @@ defmodule HayaiLedger.Ledgers.TransactionTest do
       assert false == changeset.valid?
       assert changeset.errors[:account_uid] == {"account not found for uid: 555", [validation: :required]}
   	end
+
+    test "returns invalid with error if the account is locked", %{ valid_attrs: valid_attrs, account: account } do
+      account_lock(account.uid)
+      changeset = Transaction.changeset(%Transaction{}, valid_attrs)
+      assert false == changeset.valid?
+      assert changeset.errors[:account_uid] == {"account #{account.uid} is locked", [validation: :required]}
+    end
 
   	test "returns valid changeset when account exists", %{ valid_attrs: valid_attrs } do
   		changeset = Transaction.changeset(%Transaction{}, valid_attrs)
