@@ -217,8 +217,13 @@ defmodule HayaiLedger.Ledgers do
       [%Transaction{}, ...]
 
   """
-  def list_transactions do
+  def list_transactions() do
     Repo.all(Transaction)
+  end
+
+  def list_transactions(account_id) do
+    Repo.all(from t in Transaction,
+      where: t.account_id == ^account_id)
   end
 
   def safe_journal_entry(attrs, transactions, %{ account: account_uid } = check_options) do

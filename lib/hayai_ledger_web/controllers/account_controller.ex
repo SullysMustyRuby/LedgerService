@@ -7,12 +7,37 @@ defmodule HayaiLedgerWeb.AccountController do
   action_fallback HayaiLedgerWeb.FallbackController
 
   # GET
+  def show(conn, %{ "uid" => uid }) do
+    with {:ok, account} <- Accounts.get_account_by_uid(uid) do
+      render(conn, "show.json", %{ account: account })
+    end
+  end
+
+  # GET
   def balance(conn, %{ "uid" => uid }) do
   	with {:ok, account} <- Accounts.get_account_by_uid(uid),
-	  	balance when is_integer(balance) <- Ledgers.transactions_sum_by_account(account.id)
+	  	amount_subunits when is_integer(amount_subunits) <- Ledgers.transactions_sum_by_account(account.id)
   	do
-	  	render(conn, "balance.json", %{ account: account, balance: balance })
+	  	render(conn, "balance.json", %{ account: account, amount_subunits: amount_subunits })
 	  end
+  end
+
+  # GET
+  def running_balance(conn, %{ "uid" => uid }) do
+    with {:ok, account} <- Accounts.get_account_by_uid(uid),
+      amount_subunits when is_integer(amount_subunits) <- Ledgers.balance_amount_subunits_for_account(account.id)
+    do
+      render(conn, "balance.json", %{ account: account, amount_subunits: amount_subunits })
+    end
+  end
+
+  # GET
+  def transactions(conn, %{ "uid" => uid }) do
+    with {:ok, account} <- Accounts.get_account_by_uid(uid),
+      transactions when is_list(transactions) <- Ledgers.list_transactions(account.id)
+    do
+      render(conn, "show.json", %{ account: account, transactions: transactions })
+    end
   end
 
   # POST
@@ -20,12 +45,5 @@ defmodule HayaiLedgerWeb.AccountController do
 		with {:ok, account} <- Accounts.create_account(account_params) do
 			render(conn, "new.json", %{ account: account })
 		end
-  end
-
-  # GET
-  def show(conn, %{ "uid" => uid }) do
-  	with {:ok, account} <- Accounts.get_account_by_uid(uid) do
-	  	render(conn, "show.json", %{ account: account })
-	  end
   end
 end

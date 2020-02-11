@@ -250,6 +250,18 @@ defmodule HayaiLedger.LedgersTest do
     end
   end
 
+  describe "list_transactions/1" do
+    test "returns all transactions for the account_id" do
+      asset_account = create_account(%{ kind: "asset" })
+      equity_account = create_account(%{ kind: "equity" })
+      transaction_fixture(%{ account_uid: equity_account.uid })
+      transaction_fixture(%{ account_uid: asset_account.uid })
+
+      [transaction] = Ledgers.list_transactions(asset_account.id)
+      assert asset_account.id == transaction.account_id
+    end
+  end
+
   describe "safe_journal_entry/3" do
     setup do
       asset_account = create_account(%{ kind: "asset" })
