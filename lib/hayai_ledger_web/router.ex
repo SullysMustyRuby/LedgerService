@@ -13,11 +13,11 @@ defmodule HayaiLedgerWeb.Router do
     plug :accepts, ["html", "json"]
   end
 
-  scope "/", HayaiLedgerWeb do
-    pipe_through :browser
+  # scope "/", HayaiLedgerWeb do
+  #   pipe_through :browser
 
-    get "/", PageController, :index
-  end
+  #   get "/", PageController, :index
+  # end
 
   scope "/", HayaiLedgerWeb do
     pipe_through :api
@@ -32,9 +32,4 @@ defmodule HayaiLedgerWeb.Router do
 
     get "/transactions/:uid", TransactionController, :show
   end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", HayaiLedgerWeb do
-  #   pipe_through :api
-  # end
 end

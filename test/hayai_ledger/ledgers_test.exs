@@ -101,9 +101,9 @@ defmodule HayaiLedger.LedgersTest do
       entry = entry_fixture()
       account = create_account()
       transaction = transaction_fixture(%{ entry_id: entry.id, account_uid: account.uid })
-      {:ok, transaction_details} = Ledgers.get_transaction_by_uid(transaction.uid)
-      assert entry.uid == transaction_details.entry_uid
-      assert account.uid == transaction_details.account_uid
+      {:ok, transaction} = Ledgers.get_transaction_by_uid(transaction.uid)
+      assert entry.id == transaction.entry_id
+      assert account.id == transaction.account_id
     end
 
     test "returns an error transaction if not found" do

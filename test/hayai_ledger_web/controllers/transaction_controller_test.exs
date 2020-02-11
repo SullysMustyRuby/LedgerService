@@ -2,7 +2,6 @@ defmodule HayaiLedgerWeb.TransactionControllerTest do
   use HayaiLedgerWeb.ConnCase
 
  	alias HayaiLedger.Ledgers
- 	alias HayaiLedgerWeb.TransactionController
 
  	 describe "GET /transactions/:uid" do
     test "returns the transaction for the uid", %{conn: conn} do
@@ -21,6 +20,11 @@ defmodule HayaiLedgerWeb.TransactionControllerTest do
       assert transaction.kind == response["kind"]
       assert "Transaction" == response["object"]
       assert transaction.uid == response["uid"]
+    end
+
+    test "returns error if uid not found", %{conn: conn} do
+    	assert %{"error" => "transaction not found for uid: 555"} == get(conn, Routes.transaction_path(conn, :show, "555"))
+            																												|> json_response(500)
     end
   end
 

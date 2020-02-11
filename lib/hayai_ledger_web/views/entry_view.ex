@@ -1,7 +1,10 @@
 defmodule HayaiLedgerWeb.EntryView do
   use HayaiLedgerWeb, :view
 
-  def render("show.json", %{ entry: entry }) when is_map(entry) do
+  alias HayaiLedger.Ledgers.Entry
+  alias HayaiLedgerWeb.TransactionView
+
+  def render("show.json", %{ entry: %Entry{ transactions: %Ecto.Association.NotLoaded{} } = entry }) do
   	%{
       "object" => "Entry",
 			"description" => entry.description,
@@ -9,6 +12,17 @@ defmodule HayaiLedgerWeb.EntryView do
 			"object_uid" => entry.object_uid,
 			"uid" => entry.uid,
 		}
+  end
+
+  def render("show.json", %{ entry: entry }) when is_map(entry) do
+    %{
+      "object" => "Entry",
+      "description" => entry.description,
+      "object_type" => entry.object_type,
+      "object_uid" => entry.object_uid,
+      "uid" => entry.uid,
+      "transactions" => render_many(entry.transactions, TransactionView, "show.json")
+    }
   end
 
   def render("error.json", %{ errors: errors }) do

@@ -145,14 +145,8 @@ defmodule HayaiLedger.Ledgers do
   def get_transaction!(id), do: Repo.get!(Transaction, id)
 
   def get_transaction_by_uid(uid) when is_binary(uid) do
-    with %Transaction{} = transaction_struct <- Repo.get_by(Transaction, uid: uid),
-      transaction_details when is_map(transaction_details) <- Map.from_struct(transaction_struct),
-      entry_uid when is_binary(entry_uid) <- get_entry_uid(transaction_struct.entry_id),
-      account_uid when is_binary(account_uid) <- Accounts.get_account_uid(transaction_struct.account_id),
-      transaction_with_entry when is_map(transaction_with_entry) <- Map.put(transaction_details, :entry_uid, entry_uid),
-      full_transaction when is_map(full_transaction) <- Map.put(transaction_with_entry, :account_uid, account_uid)
-    do
-     {:ok, full_transaction}
+    with %Transaction{} = transaction <- Repo.get_by(Transaction, uid: uid) do
+     {:ok, transaction}
     else
       nil -> {:error, "transaction not found for uid: #{uid}"}
       {:error, message} -> {:error, message}
@@ -163,10 +157,10 @@ defmodule HayaiLedger.Ledgers do
 
   def journal_entry(_attrs, []), do: {:error, "must have transactions that balance"}
 
-  def journal_entry(attrs, transactions) do
+  def journal_entry(entry_attrs, transactions) do
     with :ok <- transactions_all_valid?(transactions),
       :ok <- validate_transactions_balance(transactions),
-      %Ecto.Changeset{ valid?: true } = entry <- build_entry(attrs),
+      %Ecto.Changeset{ valid?: true } = entry <- build_entry(entry_attrs),
       {:ok, %{ entry: entry } } <- save_journal_entry(entry, transactions)
     do
       {:ok, entry}
