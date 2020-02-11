@@ -112,7 +112,11 @@ defmodule HayaiLedger.Ledgers do
   end
 
   def get_entry_by_uid(uid) when is_binary(uid) do
-    case Repo.get_by(Entry, uid: uid) do
+    query = from e in Entry,
+      where: e.uid == ^uid,
+      preload: [:transactions]
+
+    case Repo.one(query) do
       %Entry{} = entry -> {:ok, entry}
       _ -> {:error, "entry not found for uid: #{uid}"}
     end

@@ -26,7 +26,6 @@ defmodule HayaiLedgerWeb.Router do
     get "/accounts/balance/:uid", AccountController, :balance
     post "/accounts/create", AccountController, :create
     
-    get "/entries/transactions/:uid", EntryController, :transactions_show
     get "/entries/:uid", EntryController, :show
     post "/entries/create", EntryController, :create
 

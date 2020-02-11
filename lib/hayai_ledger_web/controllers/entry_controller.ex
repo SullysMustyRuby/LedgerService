@@ -12,15 +12,6 @@ defmodule HayaiLedgerWeb.EntryController do
 	  end
   end
 
-  # GET
-  def transactions_show(conn, %{ "uid" => uid }) do
-  	with {:ok, entry} <- Ledgers.get_entry_by_uid(uid),
-  		full_entry <- Ledgers.get_entry_with_transactions(entry.id)
-  	do
-	  	render(conn, "show.json", %{ entry: full_entry })
-	  end
-  end
-
 	# POST
   def create(conn, %{ "journal_entry" => %{ "entry" => entry_attrs, "transactions" => transactions } }) do
   	with transaction_changesets <- Enum.map(transactions, fn(transaction) -> Ledgers.build_transaction(transaction) end),

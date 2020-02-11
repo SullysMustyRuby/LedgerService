@@ -1,8 +1,8 @@
 defmodule HayaiLedgerWeb.TransactionView do
   use HayaiLedgerWeb, :view
 
-  alias HayaiLedger.Accounts
-  alias HayaiLedger.Ledgers
+  import HayaiLedger.Accounts, only: [{:get_account_uid, 1}]
+  import HayaiLedger.Ledgers, only: [{:get_entry_uid, 1}]
 
   def render("show.json", %{ transaction: transaction }) when is_map(transaction) do
   	%{
@@ -19,13 +19,5 @@ defmodule HayaiLedgerWeb.TransactionView do
 
   def render("error.json", %{ errors: errors }) do
   	errors
-  end
-
-  defp get_account_uid(account_id) do
-    Accounts.get_account_uid(account_id)
-  end
-
-  defp get_entry_uid(entry_id) do
-    Ledgers.get_entry_uid(entry_id)
   end
 end

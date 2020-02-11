@@ -5,7 +5,6 @@ defmodule HayaiLedger.LedgersTest do
   alias HayaiLedger.Ledgers.{Balance, Entry, Transaction}
   alias HayaiLedger.LockServer
 
-  @valid_balance_attrs %{amount_subunits: 42}
   @update_balance_attrs %{amount_subunits: 43}
   @invalid_balance_attrs %{amount_subunits: nil}
   @valid_entry_attrs %{description: "some description", object_type: "some object_type", object_uid: "some object_uid"}
@@ -34,7 +33,7 @@ defmodule HayaiLedger.LedgersTest do
 
   describe "create_balance/1 " do
     test "with valid data creates a balance" do
-      assert {:ok, %Balance{} = balance} = Ledgers.create_balance(@valid_balance_attrs)
+      assert {:ok, %Balance{} = balance} = Ledgers.create_balance(valid_balance_attrs())
       assert balance.amount_subunits == 42
     end
 
@@ -84,7 +83,8 @@ defmodule HayaiLedger.LedgersTest do
   describe "get_entry_by_uid/1" do
     test "returns the entry if found" do
       entry = entry_fixture()
-      assert {:ok, entry} == Ledgers.get_entry_by_uid(entry.uid)
+      {:ok, found_entry} = Ledgers.get_entry_by_uid(entry.uid)
+      assert entry.id == found_entry.id
     end
 
     test "returns an error entry if not found" do
@@ -312,7 +312,7 @@ defmodule HayaiLedger.LedgersTest do
   defp balance_fixture(attrs \\ %{}) do
     {:ok, balance} =
       attrs
-      |> Enum.into(@valid_balance_attrs)
+      |> Enum.into(valid_balance_attrs())
       |> Ledgers.create_balance()
 
     balance
@@ -355,6 +355,15 @@ defmodule HayaiLedger.LedgersTest do
       kind: "equity",
       name: "Yuko Cash",
       type_id: create_account_type().id
+    }
+  end
+
+  defp valid_balance_attrs() do
+    account = create_account()
+    %{
+      account_id: account.id,
+      amount_currency: account.currency,
+      amount_subunits: 42
     }
   end
 

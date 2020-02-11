@@ -5,18 +5,6 @@ defmodule HayaiLedgerWeb.EntryControllerTest do
 
   describe "GET /entries/:uid" do
     test "returns the entry for the uid", %{conn: conn} do
-      {:ok, entry} = Ledgers.create_entry(%{ description: "testing create" })
-      response = get(conn, Routes.entry_path(conn, :show, entry.uid))
-            |> json_response(200)
-
-      assert entry.uid == response["uid"]
-      assert "Entry" == response["object"]
-      assert entry.description == response["description"]
-    end
-  end
-
-  describe "GET /entries/transactions/:uid" do
-    test "returns the transactions for the entry", %{conn: conn} do
       asset_account = create_account(%{ name: "asset acount", currency: "THB", kind: "asset" })
       tax_account = create_account(%{ name: "tax account", currency: "THB", kind: "liability" })
       equity_account = create_account(%{ name: "equity account", currency: "THB", kind: "equity" })
@@ -26,7 +14,7 @@ defmodule HayaiLedgerWeb.EntryControllerTest do
       entry_attrs = %{ "description" => "test create journal entry"}
       {:ok, entry} = Ledgers.journal_entry(entry_attrs, [transaction_1, transaction_2, transaction_3])
 
-      response = get(conn, Routes.entry_path(conn, :transactions_show, entry.uid))
+      response = get(conn, Routes.entry_path(conn, :show, entry.uid))
                 |> json_response(200)
 
       assert entry.uid == response["uid"]
