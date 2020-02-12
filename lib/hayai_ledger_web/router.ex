@@ -13,11 +13,12 @@ defmodule HayaiLedgerWeb.Router do
     plug :accepts, ["html", "json"]
   end
 
-  # scope "/", HayaiLedgerWeb do
-  #   pipe_through :browser
+  scope "/", HayaiLedgerWeb do
+    pipe_through :browser
 
-  #   get "/", PageController, :index
-  # end
+    resources "/users", UserController
+    resources "/organizations", OrganizationController
+  end
 
   scope "/", HayaiLedgerWeb do
     pipe_through :api

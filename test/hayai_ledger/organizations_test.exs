@@ -67,9 +67,9 @@ defmodule HayaiLedger.OrganizationsTest do
   describe "users" do
     alias HayaiLedger.Organizations.User
 
-    @valid_attrs %{admin: true, email: "some email", email_confirmation: true, encrypted_password: "some encrypted_password", first_name: "some first_name", last_name: "some last_name"}
-    @update_attrs %{admin: false, email: "some updated email", email_confirmation: false, encrypted_password: "some updated encrypted_password", first_name: "some updated first_name", last_name: "some updated last_name"}
-    @invalid_attrs %{admin: nil, email: nil, email_confirmation: nil, encrypted_password: nil, first_name: nil, last_name: nil}
+    @valid_attrs %{ email: "some email", first_name: "first_name", last_name: "last_name", password: "password", password_confirmation: "password"}
+    @update_attrs %{ first_name: "some updated first_name", last_name: "some updated last_name" }
+    @invalid_attrs %{ email: nil, first_name: nil, last_name: nil, password: nil, password_confirmation: nil }
 
     def user_fixture(attrs \\ %{}) do
       {:ok, user} =
@@ -82,22 +82,24 @@ defmodule HayaiLedger.OrganizationsTest do
 
     test "list_users/0 returns all users" do
       user = user_fixture()
-      assert Organizations.list_users() == [user]
+      [found_user] = Organizations.list_users()
+      assert user.id == found_user.id
+      assert user.email == found_user.email
     end
 
     test "get_user!/1 returns the user with given id" do
       user = user_fixture()
-      assert Organizations.get_user!(user.id) == user
+      found_user = Organizations.get_user!(user.id)
+      assert user.id == found_user.id
+      assert user.email == found_user.email
     end
 
     test "create_user/1 with valid data creates a user" do
       assert {:ok, %User{} = user} = Organizations.create_user(@valid_attrs)
-      assert user.admin == true
       assert user.email == "some email"
-      assert user.email_confirmation == true
-      assert user.encrypted_password == "some encrypted_password"
-      assert user.first_name == "some first_name"
-      assert user.last_name == "some last_name"
+      refute user.encrypted_password == nil
+      assert user.first_name == "first_name"
+      assert user.last_name == "last_name"
     end
 
     test "create_user/1 with invalid data returns error changeset" do
@@ -107,10 +109,6 @@ defmodule HayaiLedger.OrganizationsTest do
     test "update_user/2 with valid data updates the user" do
       user = user_fixture()
       assert {:ok, %User{} = user} = Organizations.update_user(user, @update_attrs)
-      assert user.admin == false
-      assert user.email == "some updated email"
-      assert user.email_confirmation == false
-      assert user.encrypted_password == "some updated encrypted_password"
       assert user.first_name == "some updated first_name"
       assert user.last_name == "some updated last_name"
     end
@@ -118,7 +116,9 @@ defmodule HayaiLedger.OrganizationsTest do
     test "update_user/2 with invalid data returns error changeset" do
       user = user_fixture()
       assert {:error, %Ecto.Changeset{}} = Organizations.update_user(user, @invalid_attrs)
-      assert user == Organizations.get_user!(user.id)
+      found_user = Organizations.get_user!(user.id)
+      assert user.id == found_user.id
+      assert user.email == found_user.email
     end
 
     test "delete_user/1 deletes the user" do

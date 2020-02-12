@@ -3,10 +3,7 @@
 <table>
   <thead>
     <tr>
-      <th>Admin</th>
       <th>Email</th>
-      <th>Encrypted password</th>
-      <th>Email confirmation</th>
       <th>First name</th>
       <th>Last name</th>
 
@@ -16,10 +13,7 @@
   <tbody>
 <%= for user <- @users do %>
     <tr>
-      <td><%= user.admin %></td>
       <td><%= user.email %></td>
-      <td><%= user.encrypted_password %></td>
-      <td><%= user.email_confirmation %></td>
       <td><%= user.first_name %></td>
       <td><%= user.last_name %></td>
 
