@@ -5,8 +5,7 @@ defmodule HayaiLedgerWeb.OrganizationController do
   alias HayaiLedger.Organizations.Organization
 
   def index(conn, params) do
-    user = current_user(conn)
-    organizations = Organizations.list_organizations(user)
+    organizations = Organizations.list_organizations()
     render(conn, "index.html", organizations: organizations)
   end
 

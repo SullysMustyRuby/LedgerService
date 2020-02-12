@@ -22,10 +22,6 @@ defmodule HayaiLedger.Organizations do
     Repo.all(Organization)
   end
 
-  def list_organizations(%User{ id: user_id}) do
-    
-  end
-
   @doc """
   Gets a single organization.
 
@@ -205,5 +201,54 @@ defmodule HayaiLedger.Organizations do
   """
   def change_user(%User{} = user) do
     User.changeset(user, %{})
+  end
+
+  alias HayaiLedger.Organizations.Membership
+
+  @doc """
+  Returns the list of memberships.
+
+  ## Examples
+
+      iex> list_memberships()
+      [%Membership{}, ...]
+
+  """
+  def list_memberships do
+    Repo.all(Membership)
+  end
+
+  @doc """
+  Gets a single membership.
+
+  Raises `Ecto.NoResultsError` if the Membership does not exist.
+
+  ## Examples
+
+      iex> get_membership!(123)
+      %Membership{}
+
+      iex> get_membership!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_membership!(id), do: Repo.get!(Membership, id)
+
+  @doc """
+  Creates a membership.
+
+  ## Examples
+
+      iex> create_membership(%{field: value})
+      {:ok, %Membership{}}
+
+      iex> create_membership(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_membership(attrs \\ %{}) do
+    %Membership{}
+    |> Membership.changeset(attrs)
+    |> Repo.insert()
   end
 end

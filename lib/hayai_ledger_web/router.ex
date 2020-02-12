@@ -38,7 +38,7 @@ defmodule HayaiLedgerWeb.Router do
     post "/sign-in", SessionController, :create
     delete "/sign-out", SessionController, :delete
 
-    resources "/users", UserController
+    resources "/users", UserController, except: [:create, :new]
     resources "/organizations", OrganizationController
     get "/dashboard", DashboardController, :index
   end

@@ -21,8 +21,8 @@ defmodule HayaiLedger.Organizations.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:email, :first_name, :last_name, :password])
-    |> validate_required([:email, :first_name, :last_name, :password])
+    |> cast(attrs, [:email, :first_name, :last_name, :password, :password_confirmation])
+    |> validate_required([:email, :first_name, :last_name, :password, :password_confirmation])
     |> validate_confirmation(:password)
     |> unique_constraint(:email)
     |> downcase_username()

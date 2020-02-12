@@ -23,6 +23,7 @@ defmodule HayaiLedger.DataCase do
       import Ecto.Changeset
       import Ecto.Query
       import HayaiLedger.DataCase
+      
       require IEx
     end
   end

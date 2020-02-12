@@ -1,20 +1,22 @@
 defmodule HayaiLedgerWeb.UserControllerTest do
   use HayaiLedgerWeb.ConnCase
 
-  alias HayaiLedger.Organizations
+  import Support.Fixtures.OrganizationFixtures, only: [{:user_fixture, 0}]
 
   @create_attrs %{ email: "some email", first_name: "first_name", last_name: "last_name", password: "password", password_confirmation: "password"}
-  @update_attrs %{ first_name: "some updated first_name", last_name: "some updated last_name" }
   @invalid_attrs %{ email: nil, first_name: nil, last_name: nil, password: nil, password_confirmation: nil }
 
-  def fixture(:user) do
-    {:ok, user} = Organizations.create_user(@create_attrs)
-    user
+  setup do
+    %{
+      conn: build_conn(),
+      auth_conn: login(),
+      user: user_fixture()
+    }
   end
 
   describe "index" do
-    test "lists all users", %{conn: conn} do
-      conn = get(conn, Routes.user_path(conn, :index))
+    test "lists all users", %{auth_conn: auth_conn} do
+      conn = get(auth_conn, Routes.user_path(auth_conn, :index))
       assert html_response(conn, 200) =~ "Listing Users"
     end
   end
@@ -30,11 +32,11 @@ defmodule HayaiLedgerWeb.UserControllerTest do
     test "redirects to show when data is valid", %{conn: conn} do
       conn = post(conn, Routes.user_path(conn, :create), user: @create_attrs)
 
-      assert %{id: id} = redirected_params(conn)
-      assert redirected_to(conn) == Routes.user_path(conn, :show, id)
+      refute nil == get_session(conn, "current_user_id")
+      assert redirected_to(conn) == Routes.dashboard_path(conn, :index)
 
-      conn = get(conn, Routes.user_path(conn, :show, id))
-      assert html_response(conn, 200) =~ "Show User"
+      conn = get(conn, Routes.dashboard_path(conn, :index))
+      assert html_response(conn, 200) =~ "Dashboard"
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
@@ -44,45 +46,34 @@ defmodule HayaiLedgerWeb.UserControllerTest do
   end
 
   describe "edit user" do
-    setup [:create_user]
-
-    test "renders form for editing chosen user", %{conn: conn, user: user} do
-      conn = get(conn, Routes.user_path(conn, :edit, user))
+    test "renders form for editing chosen user", %{auth_conn: auth_conn, user: user} do
+      conn = get(auth_conn, Routes.user_path(auth_conn, :edit, user))
       assert html_response(conn, 200) =~ "Edit User"
     end
   end
 
   describe "update user" do
-    setup [:create_user]
+    # test "redirects when data is valid", %{auth_conn: auth_conn, user: user} do
+    #   conn = put(auth_conn, Routes.user_path(auth_conn, :update, user), user: @update_attrs)
+    #   assert redirected_to(conn) == Routes.user_path(conn, :show, user)
 
-    test "redirects when data is valid", %{conn: conn, user: user} do
-      # conn = put(conn, Routes.user_path(conn, :update, user), user: @update_attrs)
-      # assert redirected_to(conn) == Routes.user_path(conn, :show, user)
+    #   conn = get(conn, Routes.user_path(conn, :show, user))
+    #   assert html_response(conn, 200) =~ "some updated first name"
+    # end
 
-      # conn = get(conn, Routes.user_path(conn, :show, user))
-      # assert html_response(conn, 200) =~ "some updated email"
-    end
-
-    test "renders errors when data is invalid", %{conn: conn, user: user} do
-      conn = put(conn, Routes.user_path(conn, :update, user), user: @invalid_attrs)
+    test "renders errors when data is invalid", %{auth_conn: auth_conn, user: user} do
+      conn = put(auth_conn, Routes.user_path(auth_conn, :update, user), user: @invalid_attrs)
       assert html_response(conn, 200) =~ "Edit User"
     end
   end
 
   describe "delete user" do
-    setup [:create_user]
-
-    test "deletes chosen user", %{conn: conn, user: user} do
-      conn = delete(conn, Routes.user_path(conn, :delete, user))
+    test "deletes chosen user", %{auth_conn: auth_conn, user: user} do
+      conn = delete(auth_conn, Routes.user_path(auth_conn, :delete, user))
       assert redirected_to(conn) == Routes.user_path(conn, :index)
       assert_error_sent 404, fn ->
         get(conn, Routes.user_path(conn, :show, user))
       end
     end
-  end
-
-  defp create_user(_) do
-    user = fixture(:user)
-    {:ok, user: user}
   end
 end

@@ -22,6 +22,8 @@ defmodule HayaiLedgerWeb.ChannelCase do
 
       # The default endpoint for testing
       @endpoint HayaiLedgerWeb.Endpoint
+
+      require IEx
     end
   end
 
