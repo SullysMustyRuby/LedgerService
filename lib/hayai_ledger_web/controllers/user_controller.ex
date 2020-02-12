@@ -20,7 +20,7 @@ defmodule HayaiLedgerWeb.UserController do
         conn
         |> put_session(:current_user_id, user.id)
         |> put_flash(:info, "Signed up successfully.")
-        |> redirect(to: Routes.organization_path(conn, :index))
+        |> redirect(to: Routes.dashboard_path(conn, :index))
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset)

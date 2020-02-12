@@ -23,6 +23,7 @@ defmodule HayaiLedgerWeb do
 
       import Plug.Conn
       import HayaiLedgerWeb.Gettext
+      import HayaiLedgerWeb.Helpers.Auth, only: [current_user: 1]
       alias HayaiLedgerWeb.Router.Helpers, as: Routes
     end
   end
@@ -39,7 +40,7 @@ defmodule HayaiLedgerWeb do
       # Use all HTML functionality (forms, tags, etc)
       use Phoenix.HTML
       
-      import HayaiLedgerWeb.Helpers.Auth, only: [signed_in?: 1]
+      import HayaiLedgerWeb.Helpers.Auth, only: [{:signed_in?, 1}, {:signed_in?, 2}]
       import HayaiLedgerWeb.ErrorHelpers
       import HayaiLedgerWeb.Gettext
       alias HayaiLedgerWeb.Router.Helpers, as: Routes

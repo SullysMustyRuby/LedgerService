@@ -16,7 +16,7 @@ defmodule HayaiLedgerWeb.SessionController do
       conn
       |> put_session(:current_user_id, user.id)
       |> put_flash(:info, "Signed in successfully.")
-      |> redirect(to: Routes.organization_path(conn, :index))
+      |> redirect(to: Routes.dashboard_path(conn, :index))
     {:error, _} ->
       conn
       |> put_flash(:error, "There was a problem with your username/password")

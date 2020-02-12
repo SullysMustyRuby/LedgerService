@@ -18,7 +18,18 @@ defmodule HayaiLedgerWeb.Helpers.Auth do
     end
   end
 
-  def signed_in?(conn) do
+  def current_user(conn) do
     conn.assigns[:current_user]
   end
+
+  def signed_in?(conn) do
+    case current_user(conn) do
+      %User{} -> true
+      _ -> false
+    end
+  end
+
+  def signed_in?(%Plug.Conn{ assigns: %{ current_user: %User{ id: id} } }, user_id), do: user_id == id
+
+  def signed_in?(_conn, _user_id), do: false
 end

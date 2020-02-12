@@ -6,7 +6,8 @@ defmodule HayaiLedger.Organizations do
   import Ecto.Query, warn: false
   alias HayaiLedger.Repo
 
-  alias HayaiLedger.Organizations.Organization
+  alias HayaiLedger.Organizations.{Organization, User}
+
 
   @doc """
   Returns the list of organizations.
@@ -19,6 +20,10 @@ defmodule HayaiLedger.Organizations do
   """
   def list_organizations do
     Repo.all(Organization)
+  end
+
+  def list_organizations(%User{ id: user_id}) do
+    
   end
 
   @doc """
@@ -101,8 +106,6 @@ defmodule HayaiLedger.Organizations do
   def change_organization(%Organization{} = organization) do
     Organization.changeset(organization, %{})
   end
-
-  alias HayaiLedger.Organizations.User
 
   @doc """
   Returns the list of users.

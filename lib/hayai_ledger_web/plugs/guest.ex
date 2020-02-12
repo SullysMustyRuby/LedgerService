@@ -7,7 +7,7 @@ defmodule HayaiLedgerWeb.Plugs.Guest do
   def call(conn, _opts) do
     if Plug.Conn.get_session(conn, :current_user_id) do
       conn
-      |> redirect(to: HayaiLedgerWeb.Router.Helpers.page_path(conn, :index))
+      |> redirect(to: HayaiLedgerWeb.Router.Helpers.public_path(conn, :index))
       |> halt()
     end
     conn
