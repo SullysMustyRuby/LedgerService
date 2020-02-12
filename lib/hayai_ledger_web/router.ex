@@ -14,7 +14,21 @@ defmodule HayaiLedgerWeb.Router do
   end
 
   scope "/", HayaiLedgerWeb do
-    pipe_through :browser
+    pipe_through [:browser, HayaiLedgerWeb.Plugs.Guest]
+
+    get "/", PublicController, :index
+
+    resources "/register", UserController, only: [:create, :new]
+    get "/login", SessionController, :new
+    post "/login", SessionController, :create
+  end
+
+  scope "/", HayaiLedgerWeb do
+    pipe_through [:browser, HayaiLedgerWeb.Plugs.Auth]
+
+    get "/sign-in", SessionController, :new
+    post "/sign-in", SessionController, :create
+    delete "/sign-out", SessionController, :delete
 
     resources "/users", UserController
     resources "/organizations", OrganizationController

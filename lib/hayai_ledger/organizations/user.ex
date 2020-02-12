@@ -2,7 +2,7 @@ defmodule HayaiLedger.Organizations.User do
   use Ecto.Schema
   import Ecto.Changeset
 
-  import HayaiLedger.Organizations.Authentication, only: [{:hash_password, 1}]
+  import HayaiLedger.Organizations.Encryption, only: [{:hash_password, 1}]
 
   schema "users" do
     field :admin, :boolean, default: false
@@ -21,8 +21,8 @@ defmodule HayaiLedger.Organizations.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:email, :first_name, :last_name, :password, :password_confirmation])
-    |> validate_required([:email, :first_name, :last_name, :password, :password_confirmation])
+    |> cast(attrs, [:email, :first_name, :last_name, :password])
+    |> validate_required([:email, :first_name, :last_name, :password])
     |> validate_confirmation(:password)
     |> unique_constraint(:email)
     |> downcase_username()

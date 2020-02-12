@@ -11,9 +11,13 @@
     <header>
       <section class="container">
         <nav role="navigation">
-          <ul>
-            <li><a href="https://hexdocs.pm/phoenix/overview.html">Get Started</a></li>
-          </ul>
+          <%= if signed_in?(@conn) do %>
+            <%= link "Sign out", to: Routes.session_path(@conn, :delete), method: :delete %>
+          <% else %>
+            <%= link "Sign In", to: Routes.session_path(@conn, :new) %>
+            |
+            <%= link "Sign up", to: Routes.user_path(@conn, :new) %>
+          <% end %>
         </nav>
         <a href="http://phoenixframework.org/" class="phx-logo">
           <img src="<%= Routes.static_path(@conn, "/images/phoenix.png") %>" alt="Phoenix Framework Logo"/>

@@ -38,7 +38,8 @@ defmodule HayaiLedgerWeb do
 
       # Use all HTML functionality (forms, tags, etc)
       use Phoenix.HTML
-
+      
+      import HayaiLedgerWeb.Helpers.Auth, only: [signed_in?: 1]
       import HayaiLedgerWeb.ErrorHelpers
       import HayaiLedgerWeb.Gettext
       alias HayaiLedgerWeb.Router.Helpers, as: Routes

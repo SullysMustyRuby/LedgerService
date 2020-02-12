@@ -133,6 +133,12 @@ defmodule HayaiLedger.Organizations do
   """
   def get_user!(id), do: Repo.get!(User, id)
 
+  def get_by_email(email) when is_binary(email) do
+    Repo.get_by(User, email: email)
+  end
+
+  def get_by_username(_), do: {:error, "user not found"}
+
   @doc """
   Creates a user.
 
