@@ -15,6 +15,9 @@ defmodule HayaiLedger.Organizations.User do
     field :password, :string, virtual: true
     field :password_confirmation, :string, virtual: true
 
+    # has_many :memberships = comments, company = author
+    # has_many :memberships_companies, through: [:memberships, :company]
+
     timestamps()
   end
 

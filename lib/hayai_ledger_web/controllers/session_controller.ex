@@ -28,6 +28,6 @@ defmodule HayaiLedgerWeb.SessionController do
     conn
     |> delete_session(:current_user_id)
     |> put_flash(:info, "Signed out successfully.")
-    |> redirect(to: Routes.session_path(conn, :new))
+    |> redirect(to: Routes.public_path(conn, :index))
   end
 end

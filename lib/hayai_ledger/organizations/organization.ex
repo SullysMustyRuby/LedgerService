@@ -6,6 +6,9 @@ defmodule HayaiLedger.Organizations.Organization do
     field :description, :string
     field :name, :string
 
+    # has_many :memberships = comments, user = author
+    # has_many :memberships_users, through: [:memberships, :user]
+
     timestamps()
   end
 

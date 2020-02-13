@@ -9,12 +9,21 @@ defmodule HayaiLedgerWeb.Router do
     plug :put_secure_browser_headers
   end
 
+  pipeline :public_browser do
+    plug :accepts, ["html"]
+    plug :fetch_session
+    plug :fetch_flash
+    plug :protect_from_forgery
+    plug :put_secure_browser_headers
+    plug(:put_layout, {HayaiLedgerWeb.PublicView, "main.html"})
+  end
+
   pipeline :api do
     plug :accepts, ["html", "json"]
   end
 
   scope "/", HayaiLedgerWeb do
-    pipe_through :browser
+    pipe_through :public_browser
 
     get "/", PublicController, :index
 
@@ -24,19 +33,11 @@ defmodule HayaiLedgerWeb.Router do
   end
 
   scope "/", HayaiLedgerWeb do
-    pipe_through [:browser, HayaiLedgerWeb.Plugs.Guest] #hmm not sure why we do this?
-
-    # resources "/register", UserController, only: [:create, :new]
-    # get "/login", SessionController, :new
-    # post "/login", SessionController, :create
-  end
-
-  scope "/", HayaiLedgerWeb do
     pipe_through [:browser, HayaiLedgerWeb.Plugs.Auth]
 
-    get "/sign-in", SessionController, :new
-    post "/sign-in", SessionController, :create
-    delete "/sign-out", SessionController, :delete
+    get "/login", SessionController, :new
+    post "/login", SessionController, :create
+    delete "/logout", SessionController, :delete
 
     resources "/users", UserController, except: [:create, :new]
     resources "/organizations", OrganizationController
@@ -58,3 +59,11 @@ defmodule HayaiLedgerWeb.Router do
     get "/transactions/:uid", TransactionController, :show
   end
 end
+
+  # scope "/", HayaiLedgerWeb do
+  #   pipe_through [:browser, HayaiLedgerWeb.Plugs.Guest] #hmm not sure why we do this?
+
+    # resources "/register", UserController, only: [:create, :new]
+    # get "/login", SessionController, :new
+    # post "/login", SessionController, :create
+  # end

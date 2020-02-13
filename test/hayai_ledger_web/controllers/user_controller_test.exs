@@ -24,7 +24,7 @@ defmodule HayaiLedgerWeb.UserControllerTest do
   describe "new user" do
     test "renders form", %{conn: conn} do
       conn = get(conn, Routes.user_path(conn, :new))
-      assert html_response(conn, 200) =~ "New User"
+      assert html_response(conn, 200) =~ "Registration"
     end
   end
 
@@ -41,7 +41,7 @@ defmodule HayaiLedgerWeb.UserControllerTest do
 
     test "renders errors when data is invalid", %{conn: conn} do
       conn = post(conn, Routes.user_path(conn, :create), user: @invalid_attrs)
-      assert html_response(conn, 200) =~ "New User"
+      assert html_response(conn, 200) =~ "Registration"
     end
   end
 
