@@ -18,8 +18,26 @@ defmodule HayaiLedgerWeb.Helpers.Auth do
     end
   end
 
+  def current_organization(conn) do
+    conn.assigns[:current_organization]
+  end
+
   def current_user(conn) do
     conn.assigns[:current_user]
+  end
+
+  def current_user_id(conn) do
+    with user_id when is_integer(user_id) <- Plug.Conn.get_session(conn, "current_user_id") do
+      {:ok, user_id}
+    else
+      _ -> {:error, "no current user"}
+    end
+  end
+
+  def current_user_id!(conn) do
+    with {:ok, user_id} <- current_user_id(conn) do
+      user_id
+    end
   end
 
   def signed_in?(conn) do

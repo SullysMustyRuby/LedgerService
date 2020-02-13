@@ -11,30 +11,42 @@
   <body>
     <header>
       <div class="container">
-        <ul class="nav nav-pills justify-content-end">
+        <ul class="nav justify-content-end">
           <%= if signed_in?(@conn) do %>
-            <li class="nav-item"><%= link "Sign out", to: Routes.session_path(@conn, :delete), method: :delete, class: "nav-link active" %></li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Menu</a>
+              <div class="dropdown-menu">
+                <%= link "Dashboard", to: Routes.dashboard_path(@conn, :index), class: "nav-link" %>
+                <%= link "Organizations", to: Routes.organization_path(@conn, :index), class: "nav-link" %>
+                <div class="dropdown-divider"></div>
+                <%= link "Sign out", to: Routes.session_path(@conn, :delete), method: :delete, class: "nav-link" %>
+              </div>
+            </li>
           <% else %>
             <li class="nav-item"><%= link "Sign In", to: Routes.session_path(@conn, :new), class: "nav-link" %></li>
             <li class="nav-item"><%= link "Sign up", to: Routes.user_path(@conn, :new), class: "nav-link" %></li>
           <% end %>
         </ul>
-        <a href="http://phoenixframework.org/" class="phx-logo">
           <img src="<%= Routes.static_path(@conn, "/images/phoenix.png") %>" alt="Phoenix Framework Logo"/>
-        </a>
       </div>
     </header>
     <main role="main" class="container">
-      <div class="row">
-        <div class="col-4">
-          <%= render HayaiLedgerWeb.DashboardView, "nav.html", assigns %>
+      <%= if @conn.assigns[:current_organization] do %>
+        <div class="row">
+          <div class="col-4">
+            <%= render HayaiLedgerWeb.SharedView, "nav.html", assigns %>
+          </div>
+          <div class="col-8">
+            <div class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></div>
+            <div class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></div>
+            <%= render @view_module, @view_template, assigns %>
+          </div>
         </div>
-        <div class="col-8">
-          <div class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></div>
-          <div class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></div>
-          <%= render @view_module, @view_template, assigns %>
-        </div>
-      </div>
+      <% else %>
+        <div class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></div>
+        <div class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></div>
+        <%= render @view_module, @view_template, assigns %>
+      <% end %>
     </main>
     <script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
   </body>

@@ -30,6 +30,15 @@ defmodule HayaiLedger.OrganizationsTest do
       assert organization.name == "some name"
     end
 
+    test "create_organization/2 with valid data creates a organization and a membership" do
+      user = user_fixture()
+      assert 0 == length(Organizations.list_memberships())
+      assert {:ok, %Organization{} = organization} = Organizations.create_organization(@valid_org_attrs, user.id)
+      assert organization.description == "some description"
+      assert organization.name == "some name"
+      assert 1 == length(Organizations.list_memberships()) 
+    end
+
     test "create_organization/1 with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} = Organizations.create_organization(@invalid_org_attrs)
     end
@@ -72,6 +81,16 @@ defmodule HayaiLedger.OrganizationsTest do
       found_user = Organizations.get_user!(user.id)
       assert user.id == found_user.id
       assert user.email == found_user.email
+    end
+
+    test "get_user_and_organizations/1 returns the user and the organizations" do
+      user = user_fixture()
+      for index <- (1..3) do
+        membership_fixture()
+        membership_fixture(%{ user_id: user.id })
+      end
+      organizations = Organizations.get_user_organizations(user.id)
+      assert 3 == length(organizations)
     end
 
     test "create_user/1 with valid data creates a user" do
@@ -119,6 +138,15 @@ defmodule HayaiLedger.OrganizationsTest do
     test "list_memberships/0 returns all memberships" do
       membership = membership_fixture()
       assert Organizations.list_memberships() == [membership]
+    end
+
+    test "list_memberships/1 returns all memberships" do
+      user = user_fixture()
+      for index <- (1..3) do
+        membership_fixture(%{ user_id: user.id })
+      end
+      memberships = Organizations.list_memberships_for_user(user.id)
+      assert 3 == length(memberships)
     end
 
     test "get_membership!/1 returns the membership with given id" do

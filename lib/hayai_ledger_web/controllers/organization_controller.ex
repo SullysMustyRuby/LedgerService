@@ -5,8 +5,11 @@ defmodule HayaiLedgerWeb.OrganizationController do
   alias HayaiLedger.Organizations.Organization
 
   def index(conn, params) do
-    organizations = Organizations.list_organizations()
-    render(conn, "index.html", organizations: organizations)
+    with {:ok, user_id} <- current_user_id(conn),
+      organizations = Organizations.list_organizations(user_id)
+    do
+      render(conn, "index.html", organizations: organizations)
+    end
   end
 
   def new(conn, _params) do
@@ -15,7 +18,7 @@ defmodule HayaiLedgerWeb.OrganizationController do
   end
 
   def create(conn, %{"organization" => organization_params}) do
-    case Organizations.create_organization(organization_params) do
+    case Organizations.create_organization(organization_params, current_user_id!(conn)) do
       {:ok, organization} ->
         conn
         |> put_flash(:info, "Organization created successfully.")
@@ -28,7 +31,9 @@ defmodule HayaiLedgerWeb.OrganizationController do
 
   def show(conn, %{"id" => id}) do
     organization = Organizations.get_organization!(id)
-    render(conn, "show.html", organization: organization)
+    conn
+    |> assign(:current_organization, organization)
+    |> render("show.html", organization: organization)
   end
 
   def edit(conn, %{"id" => id}) do

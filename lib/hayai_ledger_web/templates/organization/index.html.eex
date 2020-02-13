@@ -1,27 +1,19 @@
 <h1>Listing Organizations</h1>
 
-<table>
+<table class="table">
   <thead>
     <tr>
-      <th>Name</th>
-      <th>Description</th>
-
-      <th></th>
+      <th scope="col">Name</th>
+      <th scope="col">Description</th>
     </tr>
   </thead>
   <tbody>
-<%= for organization <- @organizations do %>
-    <tr>
-      <td><%= organization.name %></td>
-      <td><%= organization.description %></td>
-
-      <td>
-        <span><%= link "Show", to: Routes.organization_path(@conn, :show, organization) %></span>
-        <span><%= link "Edit", to: Routes.organization_path(@conn, :edit, organization) %></span>
-        <span><%= link "Delete", to: Routes.organization_path(@conn, :delete, organization), method: :delete, data: [confirm: "Are you sure?"] %></span>
-      </td>
-    </tr>
-<% end %>
+    <%= for organization <- @organizations do %>
+      <tr>
+        <td scope="row"><%= link organization.name, to: Routes.organization_path(@conn, :show, organization.id) %></td>
+        <td scope="row"><%= organization.description %></td>
+      </tr>
+    <% end %>
   </tbody>
 </table>
 

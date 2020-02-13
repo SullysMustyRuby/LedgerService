@@ -1,6 +1,8 @@
 defmodule HayaiLedger.Organizations.UserTest do
 	use HayaiLedger.DataCase
 
+	import Support.Fixtures.OrganizationFixtures, only: [{:membership_fixture, 1}, {:user_fixture, 0}]
+
 	alias HayaiLedger.Organizations
 	alias HayaiLedger.Organizations.User
 

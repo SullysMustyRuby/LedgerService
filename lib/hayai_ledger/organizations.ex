@@ -6,7 +6,7 @@ defmodule HayaiLedger.Organizations do
   import Ecto.Query, warn: false
   alias HayaiLedger.Repo
 
-  alias HayaiLedger.Organizations.{Organization, User}
+  alias HayaiLedger.Organizations.{Membership, Organization, User}
 
 
   @doc """
@@ -20,6 +20,14 @@ defmodule HayaiLedger.Organizations do
   """
   def list_organizations do
     Repo.all(Organization)
+  end
+
+  def list_organizations(user_id) do
+    Repo.all(from m in Membership,
+      where: m.user_id == ^user_id,
+      join: o in Organization,
+      on: m.organization_id == o.id,
+      select: o)
   end
 
   @doc """
@@ -54,6 +62,14 @@ defmodule HayaiLedger.Organizations do
     %Organization{}
     |> Organization.changeset(attrs)
     |> Repo.insert()
+  end
+
+  def create_organization(attrs, user_id) do
+    with {:ok, %Organization{ id: organization_id } = organization} <- create_organization(attrs),
+      {:ok, membership} <- create_membership(%{ organization_id: organization_id, user_id: user_id })
+    do
+      {:ok, organization}
+    end
   end
 
   @doc """
@@ -138,6 +154,14 @@ defmodule HayaiLedger.Organizations do
 
   def get_by_username(_), do: {:error, "user not found"}
 
+  def get_user_organizations(user_id) do
+    Repo.all(from m in Membership,
+      where: m.user_id == ^user_id,
+      join: o in Organization,
+      on: m.organization_id == o.id,
+      select: %{ id: o.id, name: o.name, description: o.description})
+  end
+
   @doc """
   Creates a user.
 
@@ -203,8 +227,6 @@ defmodule HayaiLedger.Organizations do
     User.changeset(user, %{})
   end
 
-  alias HayaiLedger.Organizations.Membership
-
   @doc """
   Returns the list of memberships.
 
@@ -216,6 +238,11 @@ defmodule HayaiLedger.Organizations do
   """
   def list_memberships do
     Repo.all(Membership)
+  end
+
+  def list_memberships_for_user(user_id) do
+    Repo.all(from m in Membership, 
+      where: m.user_id == ^user_id)
   end
 
   @doc """

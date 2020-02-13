@@ -1,8 +1,9 @@
 defmodule HayaiLedger.Organizations.User do
   use Ecto.Schema
   import Ecto.Changeset
-
   import HayaiLedger.Organizations.Encryption, only: [{:hash_password, 1}]
+
+  alias HayaiLedger.Organizations.Membership
 
   schema "users" do
     field :admin, :boolean, default: false
@@ -15,8 +16,8 @@ defmodule HayaiLedger.Organizations.User do
     field :password, :string, virtual: true
     field :password_confirmation, :string, virtual: true
 
-    # has_many :memberships = comments, company = author
-    # has_many :memberships_companies, through: [:memberships, :company]
+    has_many :memberships, Membership
+    has_many :memberships_organizations, through: [:memberships, :organization]
 
     timestamps()
   end

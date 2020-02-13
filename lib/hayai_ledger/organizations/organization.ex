@@ -2,12 +2,14 @@ defmodule HayaiLedger.Organizations.Organization do
   use Ecto.Schema
   import Ecto.Changeset
 
+    alias HayaiLedger.Organizations.Membership
+
   schema "organizations" do
     field :description, :string
     field :name, :string
 
-    # has_many :memberships = comments, user = author
-    # has_many :memberships_users, through: [:memberships, :user]
+    has_many :memberships, Membership
+    has_many :memberships_users, through: [:memberships, :user]
 
     timestamps()
   end
