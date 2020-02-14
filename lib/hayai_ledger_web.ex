@@ -17,13 +17,26 @@ defmodule HayaiLedgerWeb do
   and import those modules here.
   """
 
+  def api_controller do
+    quote do
+      use Phoenix.Controller, namespace: HayaiLedgerWeb
+
+      import Plug.Conn
+
+      import HayaiLedgerWeb.Gettext
+      import HayaiLedgerWeb.Helpers.Organization, only: [{:organization_id, 1}]
+    end
+  end
+
   def controller do
     quote do
       use Phoenix.Controller, namespace: HayaiLedgerWeb
 
       import Plug.Conn
       import HayaiLedgerWeb.Gettext
-      import HayaiLedgerWeb.Helpers.Auth, only: [{:current_organization, 1}, {:current_user, 1}, {:current_user_id, 1}, {:current_user_id!, 1}]
+      import HayaiLedgerWeb.Helpers.Auth, only: [{:current_user, 1}, {:current_user_id, 1}, {:current_user_id!, 1}]
+      import HayaiLedgerWeb.Helpers.Organization, only: [{:current_organization, 1}, {:current_organization_id, 1}]
+      
       alias HayaiLedgerWeb.Router.Helpers, as: Routes
     end
   end
@@ -40,9 +53,11 @@ defmodule HayaiLedgerWeb do
       # Use all HTML functionality (forms, tags, etc)
       use Phoenix.HTML
       
-      import HayaiLedgerWeb.Helpers.Auth, only: [{:current_organization, 1}, {:signed_in?, 1}, {:signed_in?, 2}]
+      import HayaiLedgerWeb.Helpers.Auth, only: [{:signed_in?, 1}, {:signed_in?, 2}]
+      import HayaiLedgerWeb.Helpers.Organization, only: [{:current_organization, 1}]
       import HayaiLedgerWeb.ErrorHelpers
       import HayaiLedgerWeb.Gettext
+      
       alias HayaiLedgerWeb.Router.Helpers, as: Routes
     end
   end

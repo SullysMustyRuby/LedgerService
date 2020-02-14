@@ -1,4 +1,4 @@
-defmodule HayaiLedgerWeb.EntryController do
+defmodule HayaiLedgerWeb.Api.EntryController do
   use HayaiLedgerWeb, :controller
 
   alias HayaiLedger.Ledgers

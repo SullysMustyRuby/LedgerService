@@ -1,4 +1,4 @@
- defmodule HayaiLedgerWeb.Plugs.Auth do
+defmodule HayaiLedgerWeb.Plugs.Auth do
 
  	import Plug.Conn
   import Phoenix.Controller

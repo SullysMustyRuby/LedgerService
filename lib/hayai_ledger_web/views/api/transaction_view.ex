@@ -1,4 +1,4 @@
-defmodule HayaiLedgerWeb.TransactionView do
+defmodule HayaiLedgerWeb.Api.TransactionView do
   use HayaiLedgerWeb, :view
 
   import HayaiLedger.Accounts, only: [{:get_account_uid, 1}]

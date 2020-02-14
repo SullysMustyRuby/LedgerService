@@ -6,7 +6,7 @@ defmodule HayaiLedger.Ledgers do
   import HayaiLedger.LockServer
 
   alias HayaiLedger.Accounts
-  alias HayaiLedger.Accounts.{Account, Balance}
+  alias HayaiLedger.Accounts.Account
   alias HayaiLedger.Ledgers.{Entry, Transaction}
   alias HayaiLedger.Repo
 

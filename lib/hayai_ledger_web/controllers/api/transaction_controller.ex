@@ -1,4 +1,4 @@
-defmodule HayaiLedgerWeb.TransactionController do
+defmodule HayaiLedgerWeb.Api.TransactionController do
   use HayaiLedgerWeb, :controller
 
   alias HayaiLedger.Ledgers

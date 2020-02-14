@@ -61,6 +61,14 @@ defmodule HayaiLedger.Accounts do
     end
   end
 
+  def create_account(attrs, organization_id) do
+    with {:ok, account} <- insert_account(attrs, organization_id),
+      {:ok, _balance} <- insert_balance(account)
+    do
+      {:ok, account}
+    end
+  end
+
   @doc """
   Creates a account_type.
 
@@ -297,6 +305,12 @@ defmodule HayaiLedger.Accounts do
     %Account{}
     |> Account.changeset(attrs)
     |> Repo.insert()
+  end
+
+
+  defp insert_account(attrs, organization_id) do
+    Map.put(attrs, "organization_id", organization_id)
+    |> insert_account()
   end
 
   defp insert_balance(%{ id: account_id, currency: currency }) do

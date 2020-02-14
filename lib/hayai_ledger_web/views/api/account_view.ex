@@ -1,7 +1,7 @@
-defmodule HayaiLedgerWeb.AccountView do
+defmodule HayaiLedgerWeb.Api.AccountView do
   use HayaiLedgerWeb, :view
 
-  alias HayaiLedgerWeb.TransactionView
+  alias HayaiLedgerWeb.Api.TransactionView
 
   def render("balance.json", %{ account: %{ uid: uid, currency: currency }, amount_subunits: amount_subunits }) do
   	%{

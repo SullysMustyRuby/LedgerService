@@ -1,8 +1,8 @@
-defmodule HayaiLedgerWeb.EntryView do
+defmodule HayaiLedgerWeb.Api.EntryView do
   use HayaiLedgerWeb, :view
 
   alias HayaiLedger.Ledgers.Entry
-  alias HayaiLedgerWeb.TransactionView
+  alias HayaiLedgerWeb.Api.TransactionView
 
   def render("show.json", %{ entry: entry, transactions: transactions }) do
   	%{

@@ -35,6 +35,20 @@ defmodule HayaiLedger.Accounts.AccountTest do
   		assert changeset.errors[:name] == {"can't be blank", [validation: :required]}
   	end
 
+    test "returns invalid with error if no organization_id" do
+      no_account = Map.delete(account_attrs(), :organization_id)
+      changeset = Account.changeset(%Account{}, no_account)
+      assert false == changeset.valid?
+      assert changeset.errors[:organization_id] == {"can't be blank", [validation: :required]}
+    end
+
+    test "returns invalid with error if the organization does not exist" do
+      bad_account = Map.put(account_attrs(), :organization_id, "555")
+      {:error, changeset} = Account.changeset(%Account{}, bad_account) |> Repo.insert()
+      refute changeset.valid?
+      assert changeset.errors[:organization_id] == {"does not exist", [{:constraint, :foreign}, {:constraint_name, "accounts_organization_id_fkey"}]}
+    end
+
   	test "returns an account when sucessful" do
   		changeset = Account.changeset(%Account{}, account_attrs())
   		{result, _account} = Repo.insert(changeset)

@@ -21,7 +21,8 @@ defmodule HayaiLedgerWeb.Router do
   end
 
   pipeline :api do
-    plug :accepts, ["html", "json"]
+    plug :accepts, ["json"]
+    plug HayaiLedgerWeb.Plugs.ApiAuth
   end
 
   scope "/", HayaiLedgerWeb do
@@ -37,8 +38,6 @@ defmodule HayaiLedgerWeb.Router do
   scope "/", HayaiLedgerWeb do
     pipe_through :browser
 
-    get "/login", SessionController, :new
-    post "/login", SessionController, :create
     delete "/logout", SessionController, :delete
 
     resources "/api_keys", ApiKeyController, only: [:index, :show]
@@ -47,26 +46,18 @@ defmodule HayaiLedgerWeb.Router do
     get "/dashboard", DashboardController, :index
   end
 
-  scope "/", HayaiLedgerWeb do
+  scope "/api", HayaiLedgerWeb do
     pipe_through :api
 
-    get "/accounts/:uid", AccountController, :show
-    get "/accounts/balance/:uid", AccountController, :balance
-    get "/accounts/running_balance/:uid", AccountController, :running_balance
-    get "/accounts/transactions/:uid", AccountController, :transactions
-    post "/accounts/create", AccountController, :create
+    get "/accounts/:uid", Api.AccountController, :show
+    get "/accounts/balance/:uid", Api.AccountController, :balance
+    get "/accounts/running_balance/:uid", Api.AccountController, :running_balance
+    get "/accounts/transactions/:uid", Api.AccountController, :transactions
+    post "/accounts/create", Api.AccountController, :create
     
-    get "/entries/:uid", EntryController, :show
-    post "/entries/create", EntryController, :create
+    get "/entries/:uid", Api.EntryController, :show
+    post "/entries/create", Api.EntryController, :create
 
-    get "/transactions/:uid", TransactionController, :show
+    get "/transactions/:uid", Api.TransactionController, :show
   end
 end
-
-  # scope "/", HayaiLedgerWeb do
-  #   pipe_through [:browser, HayaiLedgerWeb.Plugs.Guest] #hmm not sure why we do this?
-
-    # resources "/register", UserController, only: [:create, :new]
-    # get "/login", SessionController, :new
-    # post "/login", SessionController, :create
-  # end

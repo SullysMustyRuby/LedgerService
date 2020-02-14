@@ -280,6 +280,10 @@ defmodule HayaiLedger.Organizations do
     |> Repo.insert()
   end
 
+  def get_api_key_by_data(data) do
+    Repo.get_by(ApiKey, data: data)
+  end
+
   @doc """
   Returns the list of api_keys.
 

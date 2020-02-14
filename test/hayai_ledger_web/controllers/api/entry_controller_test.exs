@@ -1,12 +1,17 @@
-defmodule HayaiLedgerWeb.EntryControllerTest do
+defmodule HayaiLedgerWeb.Api.EntryControllerTest do
   use HayaiLedgerWeb.ConnCase
 
   import Support.Fixtures.AccountFixtures, only: [{:account_fixture, 1}]
+  import Support.Authentication, only: [{:api_setup, 0}]
 
  	alias HayaiLedger.Ledgers
 
+  setup do
+    api_setup()
+  end
+
   describe "GET /entries/:uid" do
-    test "returns the entry for the uid", %{conn: conn} do
+    test "returns the entry for the uid", %{ auth_conn: conn } do
       asset_account = account_fixture(%{ name: "asset acount", currency: "THB", kind: "asset" })
       tax_account = account_fixture(%{ name: "tax account", currency: "THB", kind: "liability" })
       equity_account = account_fixture(%{ name: "equity account", currency: "THB", kind: "equity" })
@@ -48,7 +53,7 @@ defmodule HayaiLedgerWeb.EntryControllerTest do
       }
     end
 
-    test "returns a journal entry upon success", %{conn: conn} = context do
+    test "returns a journal entry upon success", %{ auth_conn: conn } = context do
       transaction_1 = %{ "account_uid" => context.asset_account.uid, "amount_currency" => "THB", "amount_subunits" => 1000, "kind" => "debit" }
       transaction_2 = %{ "account_uid" => context.tax_account.uid, "amount_currency" => "THB", "amount_subunits" => 100, "kind" => "credit" }
       transaction_3 = %{ "account_uid" => context.equity_account.uid, "amount_currency" => "THB", "amount_subunits" => 900, "kind" => "credit" }
@@ -72,7 +77,7 @@ defmodule HayaiLedgerWeb.EntryControllerTest do
       end
     end
 
-    test "returns a safe journal entry upon success", %{conn: conn} = context do
+    test "returns a safe journal entry upon success", %{ auth_conn: conn } = context do
       transaction_1 = %{ "account_uid" => context.asset_account.uid, "amount_currency" => "THB", "amount_subunits" => 1000, "kind" => "debit" }
       transaction_2 = %{ "account_uid" => context.tax_account.uid, "amount_currency" => "THB", "amount_subunits" => 100, "kind" => "credit" }
       transaction_3 = %{ "account_uid" => context.equity_account.uid, "amount_currency" => "THB", "amount_subunits" => 900, "kind" => "credit" }
@@ -97,7 +102,7 @@ defmodule HayaiLedgerWeb.EntryControllerTest do
       end
     end
 
-    test "returns error if transactions are invalid", %{conn: conn} = context do
+    test "returns error if transactions are invalid", %{ auth_conn: conn } = context do
       transaction_1 = %{ "amount_currency" => "THB", "amount_subunits" => 1000, "kind" => "debit" }
       transaction_2 = %{ "amount_currency" => "THB", "amount_subunits" => 100, "kind" => "credit" }
       transaction_3 = %{ "amount_currency" => "THB", "amount_subunits" => 900, "kind" => "credit" }

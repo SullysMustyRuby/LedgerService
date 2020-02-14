@@ -2,6 +2,7 @@ defmodule HayaiLedger.AccountsTest do
   use HayaiLedger.DataCase
 
   import Support.Fixtures.AccountFixtures
+  import Support.Fixtures.OrganizationFixtures, only: [{:organization_fixture, 0}]
 
   alias HayaiLedger.Accounts
   alias HayaiLedger.Accounts.{Balance, Account, AccountType}
@@ -39,8 +40,35 @@ defmodule HayaiLedger.AccountsTest do
       assert account.uid != nil
     end
 
+    test "creates a balance account" do
+      assert {:ok, %Account{} = account} = Accounts.create_account(account_attrs())
+      balance = Accounts.get_balance_by_account(account.id)
+      assert account.id == balance.account_id
+    end
+
     test "with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} = Accounts.create_account(%{ kind: nil })
+    end
+  end
+
+  describe "create_account/2" do
+    setup do
+      %{ organization: organization_fixture() }
+    end
+    test "with valid data creates an account and assigns the organization", %{ organization: organization } do
+      assert {:ok, %Account{} = account} = Accounts.create_account(account_attrs(), organization.id)
+      assert account.name == "some name"
+      assert account.organization_id == organization.id
+    end
+
+    test "creates a balance account", %{ organization: organization } do
+      assert {:ok, %Account{} = account} = Accounts.create_account(account_attrs(), organization.id)
+      balance = Accounts.get_balance_by_account(account.id)
+      assert account.id == balance.account_id
+    end
+
+    test "with invalid data returns error changeset", %{ organization: organization } do
+      assert {:error, %Ecto.Changeset{}} = Accounts.create_account(%{ kind: nil }, organization.id)
     end
   end
 

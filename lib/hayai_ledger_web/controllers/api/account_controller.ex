@@ -1,5 +1,5 @@
-defmodule HayaiLedgerWeb.AccountController do
-  use HayaiLedgerWeb, :controller
+defmodule HayaiLedgerWeb.Api.AccountController do
+  use HayaiLedgerWeb, :api_controller
 
   alias HayaiLedger.Accounts
   alias HayaiLedger.Ledgers
@@ -42,7 +42,9 @@ defmodule HayaiLedgerWeb.AccountController do
 
   # POST
   def create(conn, %{ "account" => account_params }) do
-		with {:ok, account} <- Accounts.create_account(account_params) do
+		with {:ok, organization_id} <- organization_id(conn),
+      {:ok, account} <- Accounts.create_account(account_params, organization_id) 
+    do
 			render(conn, "new.json", %{ account: account })
 		end
   end

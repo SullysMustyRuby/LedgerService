@@ -18,11 +18,6 @@ defmodule HayaiLedgerWeb.Helpers.Auth do
     end
   end
 
-  def current_organization(conn) do
-    require IEx; IEx.pry
-    conn.assigns[:current_organization]
-  end
-
   def current_user(conn) do
     conn.assigns[:current_user]
   end
