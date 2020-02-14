@@ -36,7 +36,7 @@ defmodule HayaiLedgerWeb.OrganizationControllerTest do
       assert redirected_to(conn) == Routes.organization_path(conn, :show, id)
 
       conn = get(conn, Routes.organization_path(conn, :show, id))
-      assert html_response(conn, 200) =~ "Show Organization"
+      assert html_response(conn, 200) =~ @create_attrs[:name]
     end
 
     test "renders errors when data is invalid", %{ auth_conn: auth_conn } do

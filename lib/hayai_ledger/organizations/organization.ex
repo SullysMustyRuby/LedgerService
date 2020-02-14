@@ -2,7 +2,7 @@ defmodule HayaiLedger.Organizations.Organization do
   use Ecto.Schema
   import Ecto.Changeset
 
-    alias HayaiLedger.Organizations.Membership
+  alias HayaiLedger.Organizations.Membership
 
   schema "organizations" do
     field :description, :string

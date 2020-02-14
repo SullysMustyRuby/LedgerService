@@ -2,18 +2,15 @@ defmodule HayaiLedger.OrganizationsTest do
   use HayaiLedger.DataCase
 
   alias HayaiLedger.Organizations
-  alias HayaiLedger.Organizations.{Organization, User}
+  alias HayaiLedger.Organizations.{ApiKey, Organization, User}
 
   import Support.Fixtures.OrganizationFixtures
 
-  @valid_user_attrs %{ email: "some email", first_name: "first_name", last_name: "last_name", password: "password", password_confirmation: "password"}
-  @update_user_attrs %{ first_name: "some updated first_name", last_name: "some updated last_name" }
-  @invalid_user_attrs %{ email: nil, first_name: nil, last_name: nil, password: nil, password_confirmation: nil }  
-  @valid_org_attrs %{description: "some description", name: "some name"}
-  @update_org_attrs %{description: "some updated description", name: "some updated name"}
-  @invalid_org_attrs %{description: nil, name: nil}
-
   describe "organizations" do
+    @valid_org_attrs %{description: "some description", name: "some name"}
+    @update_org_attrs %{description: "some updated description", name: "some updated name"}
+    @invalid_org_attrs %{description: nil, name: nil}
+
     test "list_organizations/0 returns all organizations" do
       organization = organization_fixture()
       assert Organizations.list_organizations() == [organization]
@@ -69,6 +66,10 @@ defmodule HayaiLedger.OrganizationsTest do
   end
 
   describe "users" do
+    @valid_user_attrs %{ email: "some email", first_name: "first_name", last_name: "last_name", password: "password", password_confirmation: "password"}
+    @update_user_attrs %{ first_name: "some updated first_name", last_name: "some updated last_name" }
+    @invalid_user_attrs %{ email: nil, first_name: nil, last_name: nil, password: nil, password_confirmation: nil }
+
     test "list_users/0 returns all users" do
       user = user_fixture()
       [found_user] = Organizations.list_users()
@@ -161,6 +162,33 @@ defmodule HayaiLedger.OrganizationsTest do
 
     test "create_membership/1 with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} = Organizations.create_membership(%{ organization_id: nil })
+    end
+  end
+
+  describe "api_keys" do
+    @update_attrs %{active: false, data: "some updated data", kind: "some updated kind"}
+    @invalid_attrs %{active: nil, data: nil, kind: nil}
+
+    test "list_api_keys/0 returns all api_keys" do
+      api_key = api_key_fixture()
+      assert Organizations.list_api_keys() == [api_key]
+    end
+
+    test "get_api_key!/1 returns the api_key with given id" do
+      api_key = api_key_fixture()
+      assert Organizations.get_api_key!(api_key.id) == api_key
+    end
+
+    test "create_api_key/1 with valid data creates a api_key" do
+      organization = organization_fixture()
+      assert {:ok, %ApiKey{} = api_key} = Organizations.create_api_key(%{ kind: "full_api", organization_id: organization.id })
+      assert {:ok, {"full_api", organization.id}} == HayaiLedger.Organizations.Encryption.verify_token(api_key.token_salt, api_key.data)
+      assert api_key.active == true
+      assert api_key.kind == "full_api"
+    end
+
+    test "create_api_key/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Organizations.create_api_key(@invalid_attrs)
     end
   end
 end

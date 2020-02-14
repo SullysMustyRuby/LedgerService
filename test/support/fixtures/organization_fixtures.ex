@@ -2,6 +2,22 @@ defmodule Support.Fixtures.OrganizationFixtures do
 
 	alias HayaiLedger.Organizations
 
+  def api_key_attrs() do
+    %{
+      kind: "full_api",
+      organization_id: organization_fixture().id
+    }
+  end
+
+  def api_key_fixture(attrs \\ %{}) do
+    {:ok, api_key} =
+      attrs
+      |> Enum.into(api_key_attrs())
+      |> Organizations.create_api_key()
+
+    api_key
+  end
+
 	def membership_attrs() do
     %{
       organization_id: organization_fixture().id,

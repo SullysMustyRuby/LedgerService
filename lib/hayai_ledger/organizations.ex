@@ -6,7 +6,7 @@ defmodule HayaiLedger.Organizations do
   import Ecto.Query, warn: false
   alias HayaiLedger.Repo
 
-  alias HayaiLedger.Organizations.{Membership, Organization, User}
+  alias HayaiLedger.Organizations.{ApiKey, Membership, Organization, User}
 
 
   @doc """
@@ -276,6 +276,53 @@ defmodule HayaiLedger.Organizations do
   def create_membership(attrs \\ %{}) do
     %Membership{}
     |> Membership.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Returns the list of api_keys.
+
+  ## Examples
+
+      iex> list_api_keys()
+      [%ApiKey{}, ...]
+
+  """
+  def list_api_keys do
+    Repo.all(ApiKey)
+  end
+
+  @doc """
+  Gets a single api_key.
+
+  Raises `Ecto.NoResultsError` if the Api key does not exist.
+
+  ## Examples
+
+      iex> get_api_key!(123)
+      %ApiKey{}
+
+      iex> get_api_key!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_api_key!(id), do: Repo.get!(ApiKey, id)
+
+  @doc """
+  Creates a api_key.
+
+  ## Examples
+
+      iex> create_api_key(%{field: value})
+      {:ok, %ApiKey{}}
+
+      iex> create_api_key(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_api_key(attrs \\ %{}) do
+    %ApiKey{}
+    |> ApiKey.changeset(attrs)
     |> Repo.insert()
   end
 end
