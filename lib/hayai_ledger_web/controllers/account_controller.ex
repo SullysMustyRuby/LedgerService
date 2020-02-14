@@ -25,7 +25,7 @@ defmodule HayaiLedgerWeb.AccountController do
   # GET
   def running_balance(conn, %{ "uid" => uid }) do
     with {:ok, account} <- Accounts.get_account_by_uid(uid),
-      amount_subunits when is_integer(amount_subunits) <- Ledgers.balance_amount_subunits_for_account(account.id)
+      amount_subunits when is_integer(amount_subunits) <- Accounts.balance_amount_subunits_for_account(account.id)
     do
       render(conn, "balance.json", %{ account: account, amount_subunits: amount_subunits })
     end

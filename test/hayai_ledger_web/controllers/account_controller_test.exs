@@ -48,7 +48,7 @@ defmodule HayaiLedgerWeb.AccountControllerTest do
     test "returns the balance json", %{conn: conn} do
       equity_account = account_fixture(%{ kind: "equity" })
 
-      Ledgers.update_balance(equity_account.id, 1000)
+      Accounts.update_balance(equity_account.id, 1000)
       response = get(conn, Routes.account_path(conn, :running_balance, equity_account.uid))
                   |> json_response(200)
 

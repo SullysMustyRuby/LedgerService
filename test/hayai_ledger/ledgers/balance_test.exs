@@ -1,9 +1,9 @@
 defmodule HayaiLedger.Ledgers.BalanceTest do
 	use HayaiLedger.DataCase
 
-	import Support.Fixtures.LedgerFixtures
+	import Support.Fixtures.AccountFixtures
 
-	alias HayaiLedger.Ledgers.Balance
+	alias HayaiLedger.Accounts.Balance
 
 	describe "validations" do
 		test "returns error if no amount_currency" do

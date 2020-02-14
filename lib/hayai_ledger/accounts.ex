@@ -6,8 +6,14 @@ defmodule HayaiLedger.Accounts do
   import Ecto.Query, warn: false
 
   alias HayaiLedger.Repo
-  alias HayaiLedger.Accounts.{Account, AccountType}
+  alias HayaiLedger.Accounts.{Balance, Account, AccountType}
   alias HayaiLedger.Ledgers
+
+  def balance_amount_subunits_for_account(account_id) do
+    Repo.one(from b in Balance,
+    where: b.account_id == ^account_id,
+    select: b.amount_subunits)
+  end
 
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking account changes.
@@ -70,6 +76,24 @@ defmodule HayaiLedger.Accounts do
   def create_account_type(attrs \\ %{}) do
     %AccountType{}
     |> AccountType.changeset(attrs)
+    |> Repo.insert()
+  end
+  
+  @doc """
+  Creates a balance.
+
+  ## Examples
+
+      iex> create_balance(%{field: value})
+      {:ok, %Balance{}}
+
+      iex> create_balance(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_balance(attrs \\ %{}) do
+    %Balance{}
+    |> Balance.changeset(attrs)
     |> Repo.insert()
   end
 
@@ -162,6 +186,26 @@ defmodule HayaiLedger.Accounts do
   def get_account_type!(id), do: Repo.get!(AccountType, id)
 
   @doc """
+  Gets a single balance.
+
+  Raises `Ecto.NoResultsError` if the Balance does not exist.
+
+  ## Examples
+
+      iex> get_balance!(123)
+      %Balance{}
+
+      iex> get_balance!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_balance!(id), do: Repo.get!(Balance, id)
+
+  def get_balance_by_account(account_id) do
+    Repo.get_by(Balance, account_id: account_id)
+  end
+
+  @doc """
   Returns the list of accounts.
 
   ## Examples
@@ -185,6 +229,19 @@ defmodule HayaiLedger.Accounts do
   """
   def list_account_types do
     Repo.all(AccountType)
+  end
+
+  @doc """
+  Returns the list of balances.
+
+  ## Examples
+
+      iex> list_balances()
+      [%Balance{}, ...]
+
+  """
+  def list_balances do
+    Repo.all(Balance)
   end
 
   @doc """
@@ -222,6 +279,19 @@ defmodule HayaiLedger.Accounts do
     |> Account.changeset(attrs)
     |> Repo.update()
   end
+
+  @doc """
+  Updates a balance.
+
+  ## Examples
+
+  """
+  def update_balance(account_id, amount_subunits) do
+    with %Balance{} = balance <- get_balance_by_account(account_id) do
+      Balance.changeset(balance, %{ amount_subunits: amount_subunits })
+      |> Repo.update()
+    end
+  end
   
   defp insert_account(attrs) do
     %Account{}
@@ -230,6 +300,6 @@ defmodule HayaiLedger.Accounts do
   end
 
   defp insert_balance(%{ id: account_id, currency: currency }) do
-    Ledgers.create_balance(%{ account_id: account_id, amount_currency: currency, amount_subunits: 0 })
+    create_balance(%{ account_id: account_id, amount_currency: currency, amount_subunits: 0 })
   end
 end

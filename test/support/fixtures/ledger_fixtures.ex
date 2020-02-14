@@ -4,23 +4,6 @@ defmodule Support.Fixtures.LedgerFixtures do
 
 	alias HayaiLedger.Ledgers
 
-	def balance_attrs() do
-		%{
-			account_id: account_fixture().id,
-			amount_currency: "JPY",
-			amount_subunits: 0
-		}
-	end
-
-	def balance_fixture(attrs \\ %{}) do
-		{:ok, balance} =
-      attrs
-      |> Enum.into(balance_attrs())
-      |> Ledgers.create_balance()
-
-    balance
-	end
-
   def entry_fixture(attrs \\ %{}) do
     {:ok, entry} =
       attrs

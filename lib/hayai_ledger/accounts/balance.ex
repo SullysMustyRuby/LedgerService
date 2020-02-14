@@ -1,4 +1,4 @@
-defmodule HayaiLedger.Ledgers.Balance do
+defmodule HayaiLedger.Accounts.Balance do
   use Ecto.Schema
   import Ecto.Changeset
 

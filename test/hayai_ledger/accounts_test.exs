@@ -4,7 +4,19 @@ defmodule HayaiLedger.AccountsTest do
   import Support.Fixtures.AccountFixtures
 
   alias HayaiLedger.Accounts
-  alias HayaiLedger.Accounts.{Account, AccountType}
+  alias HayaiLedger.Accounts.{Balance, Account, AccountType}
+
+  describe "balance_amount_subunits_for_account/1" do
+    test "returns the amount_subunits" do
+      account = account_fixture()
+      Accounts.update_balance(account.id, 5000)
+      assert 5000 == Accounts.balance_amount_subunits_for_account(account.id)
+    end
+
+    test "returns nil if no account found" do
+      assert nil == Accounts.balance_amount_subunits_for_account("555")
+    end
+  end
 
   describe "change_account/1" do
     test "returns a account changeset" do
@@ -40,6 +52,43 @@ defmodule HayaiLedger.AccountsTest do
 
     test "with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} = Accounts.create_account_type(%{ name: nil })
+    end
+  end
+
+  describe "create_balance/1 " do
+    test "with valid data creates a balance" do
+      account = account_fixture(account_attrs())
+      attrs = %{
+        account_id: account.id,
+        amount_currency: account.currency,
+        amount_subunits: 0
+      }
+      assert {:ok, %Balance{} = balance} = Accounts.create_balance(attrs)
+      assert balance.amount_subunits == 0
+    end
+
+    test "with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Accounts.create_balance(%{ amount_currency: nil })
+    end
+  end
+
+  describe "get_balance!/1 " do
+    test "returns the balance with given id" do
+      account = account_fixture()
+      balance = balance_fixture(%{ account_id: account.id })
+      assert Accounts.get_balance!(balance.id) == balance
+    end
+  end
+
+  describe "get_balance_by_account/1" do
+    test "returns the balance" do
+      account = account_fixture()
+      found_balance = Accounts.get_balance_by_account(account.id)
+      assert account.id == found_balance.account_id
+    end
+
+    test "returns nil when account not found" do
+       assert nil == Accounts.get_balance_by_account("555")
     end
   end
 
@@ -81,6 +130,14 @@ defmodule HayaiLedger.AccountsTest do
 
     test "returns nil if account not found" do
       assert nil == Accounts.get_account_uid(555)
+    end
+  end
+
+  describe "list_balances/0" do
+    test "returns all balances" do
+      balance = balance_fixture()
+      balances = Accounts.list_balances()
+      assert Enum.member?(balances, balance)
     end
   end
 
@@ -130,6 +187,20 @@ defmodule HayaiLedger.AccountsTest do
       account_type = account_type_fixture()
       assert {:error, %Ecto.Changeset{}} = Accounts.update_account_type(account_type, %{ name: nil })
       assert account_type == Accounts.get_account_type!(account_type.id)
+    end
+  end
+
+  describe "update_balance/2" do
+    test "with valid data updates the balance" do
+      account = account_fixture()
+      assert {:ok, %Balance{} = balance} = Accounts.update_balance(account.id, 5000)
+      assert balance.amount_subunits == 5000
+    end
+
+    test "with invalid data returns error changeset" do
+      account = account_fixture()
+      assert {:error, %Ecto.Changeset{}} = Accounts.update_balance(account.id, "abcde")
+      # assert balance == Accounts.get_balance!(balance.id)
     end
   end
 end

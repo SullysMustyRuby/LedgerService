@@ -38,4 +38,21 @@ defmodule Support.Fixtures.AccountFixtures do
   		name: "cash" 
   	}
   end
+  
+  def balance_attrs() do
+    %{
+      account_id: account_fixture().id,
+      amount_currency: "JPY",
+      amount_subunits: 0
+    }
+  end
+
+  def balance_fixture(attrs \\ %{}) do
+    {:ok, balance} =
+      attrs
+      |> Enum.into(balance_attrs())
+      |> Accounts.create_balance()
+
+    balance
+  end
 end

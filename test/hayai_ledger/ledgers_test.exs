@@ -1,14 +1,14 @@
 defmodule HayaiLedger.LedgersTest do
   use HayaiLedger.DataCase
 
+  alias HayaiLedger.Accounts
   alias HayaiLedger.Ledgers
-  alias HayaiLedger.Ledgers.{Balance, Entry, Transaction}
+  alias HayaiLedger.Ledgers.{Entry, Transaction}
   alias HayaiLedger.LockServer
 
   import Support.Fixtures.LedgerFixtures
   import Support.Fixtures.AccountFixtures
 
-  @invalid_balance_attrs %{amount_subunits: nil}
   @valid_entry_attrs %{description: "some description", object_type: "some object_type", object_uid: "some object_uid"}
   @invalid_transaction_attrs %{amount_currency: nil, amount_subunits: nil, description: nil, type: nil, uid: nil}
 
@@ -33,23 +33,6 @@ defmodule HayaiLedger.LedgersTest do
     end
   end
 
-  describe "create_balance/1 " do
-    test "with valid data creates a balance" do
-      account = account_fixture(account_attrs())
-      attrs = %{
-        account_id: account.id,
-        amount_currency: account.currency,
-        amount_subunits: 0
-      }
-      assert {:ok, %Balance{} = balance} = Ledgers.create_balance(attrs)
-      assert balance.amount_subunits == 0
-    end
-
-    test "with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Ledgers.create_balance(@invalid_balance_attrs)
-    end
-  end
-
   describe "create_entry/1" do
     test "with valid data creates a entry" do
       assert {:ok, %Entry{} = entry} = Ledgers.create_entry(@valid_entry_attrs)
@@ -71,26 +54,6 @@ defmodule HayaiLedger.LedgersTest do
 
     test "create_transaction/1 with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} = Ledgers.create_transaction(@invalid_transaction_attrs)
-    end
-  end
-
-  describe "get_balance!/1 " do
-    test "returns the balance with given id" do
-      account = account_fixture()
-      balance = balance_fixture(%{ account_id: account.id })
-      assert Ledgers.get_balance!(balance.id) == balance
-    end
-  end
-
-  describe "get_balance_by_account/1" do
-    test "returns the balance" do
-      account = account_fixture()
-      found_balance = Ledgers.get_balance_by_account(account.id)
-      assert account.id == found_balance.account_id
-    end
-
-    test "returns nil when account not found" do
-       assert nil == Ledgers.get_balance_by_account("555")
     end
   end
 
@@ -144,18 +107,6 @@ defmodule HayaiLedger.LedgersTest do
 
     test "returns nil if entry not found" do
       assert nil == Ledgers.get_entry_uid(555)
-    end
-  end
-
-  describe "balance_amount_subunits_for_account/1" do
-    test "returns the amount_subunits" do
-      account = account_fixture()
-      Ledgers.update_balance(account.id, 5000)
-      assert 5000 == Ledgers.balance_amount_subunits_for_account(account.id)
-    end
-
-    test "returns nil if no account found" do
-      assert nil == Ledgers.balance_amount_subunits_for_account("555")
     end
   end
 
@@ -217,9 +168,9 @@ defmodule HayaiLedger.LedgersTest do
       equity_account = account_fixture(%{ kind: "equity" })
       liability_account = account_fixture(%{ kind: "liability" })
 
-      assert 0 = Ledgers.balance_amount_subunits_for_account(asset_account.id)
-      assert 0 = Ledgers.balance_amount_subunits_for_account(equity_account.id)
-      assert 0 = Ledgers.balance_amount_subunits_for_account(liability_account.id)
+      assert 0 = Accounts.balance_amount_subunits_for_account(asset_account.id)
+      assert 0 = Accounts.balance_amount_subunits_for_account(equity_account.id)
+      assert 0 = Accounts.balance_amount_subunits_for_account(liability_account.id)
 
       transaction_1 = build_transaction(%{ account_uid: asset_account.uid, amount_subunits: 1000, kind: "debit" })
       transaction_2 = build_transaction(%{ account_uid: equity_account.uid, amount_subunits: 500, kind: "credit" })
@@ -228,17 +179,9 @@ defmodule HayaiLedger.LedgersTest do
       {:ok, entry, transactions} = Ledgers.journal_entry(@valid_entry_attrs, [transaction_1, transaction_2, transaction_3])
       assert nil != entry.uid
       assert 3 == length(transactions)
-      assert -1000 = Ledgers.balance_amount_subunits_for_account(asset_account.id)
-      assert 500 = Ledgers.balance_amount_subunits_for_account(equity_account.id)
-      assert 500 = Ledgers.balance_amount_subunits_for_account(liability_account.id)
-    end
-  end
-
-  describe "list_balances/0" do
-    test "returns all balances" do
-      balance = balance_fixture()
-      balances = Ledgers.list_balances()
-      assert Enum.member?(balances, balance)
+      assert -1000 = Accounts.balance_amount_subunits_for_account(asset_account.id)
+      assert 500 = Accounts.balance_amount_subunits_for_account(equity_account.id)
+      assert 500 = Accounts.balance_amount_subunits_for_account(liability_account.id)
     end
   end
 
@@ -314,9 +257,9 @@ defmodule HayaiLedger.LedgersTest do
     end
 
     test "returns ok entry when success", context do
-      assert 0 = Ledgers.balance_amount_subunits_for_account(context.asset_account.id)
-      assert 0 = Ledgers.balance_amount_subunits_for_account(context.equity_account.id)
-      assert 0 = Ledgers.balance_amount_subunits_for_account(context.liability_account.id)
+      assert 0 = Accounts.balance_amount_subunits_for_account(context.asset_account.id)
+      assert 0 = Accounts.balance_amount_subunits_for_account(context.equity_account.id)
+      assert 0 = Accounts.balance_amount_subunits_for_account(context.liability_account.id)
 
       transactions = [context.transaction_1, context.transaction_2, context.transaction_3]
       check_options = %{ account: context.equity_account.uid, minimum: "non_negative" }
@@ -325,9 +268,9 @@ defmodule HayaiLedger.LedgersTest do
 
       assert nil != entry.uid
       assert 3 == length(transactions)
-      assert -1000 = Ledgers.balance_amount_subunits_for_account(context.asset_account.id)
-      assert 500 = Ledgers.balance_amount_subunits_for_account(context.equity_account.id)
-      assert 500 = Ledgers.balance_amount_subunits_for_account(context.liability_account.id)
+      assert -1000 = Accounts.balance_amount_subunits_for_account(context.asset_account.id)
+      assert 500 = Accounts.balance_amount_subunits_for_account(context.equity_account.id)
+      assert 500 = Accounts.balance_amount_subunits_for_account(context.liability_account.id)
     end
   end
 
@@ -363,20 +306,6 @@ defmodule HayaiLedger.LedgersTest do
       transaction_fixture(%{ account_uid: account.uid, amount_subunits: 1000, kind: "debit" })
       transaction_fixture(%{ account_uid: account.uid, amount_subunits: 1000, kind: "debit" })
       assert -2000 == Ledgers.transactions_sum_by_account(account.id)
-    end
-  end
-
-  describe "update_balance/2" do
-    test "with valid data updates the balance" do
-      account = account_fixture()
-      assert {:ok, %Balance{} = balance} = Ledgers.update_balance(account.id, 5000)
-      assert balance.amount_subunits == 5000
-    end
-
-    test "with invalid data returns error changeset" do
-      account = account_fixture()
-      assert {:error, %Ecto.Changeset{}} = Ledgers.update_balance(account.id, "abcde")
-      # assert balance == Ledgers.get_balance!(balance.id)
     end
   end
 
