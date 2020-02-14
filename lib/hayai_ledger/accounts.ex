@@ -7,6 +7,7 @@ defmodule HayaiLedger.Accounts do
 
   alias HayaiLedger.Repo
   alias HayaiLedger.Accounts.{Account, AccountType}
+  alias HayaiLedger.Ledgers
 
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking account changes.
@@ -47,9 +48,11 @@ defmodule HayaiLedger.Accounts do
 
   """
   def create_account(attrs \\ %{}) do
-    %Account{}
-    |> Account.changeset(attrs)
-    |> Repo.insert()
+    with {:ok, account} <- insert_account(attrs),
+      {:ok, _balance} <- insert_balance(account)
+    do
+      {:ok, account}
+    end
   end
 
   @doc """
@@ -218,5 +221,15 @@ defmodule HayaiLedger.Accounts do
     account
     |> Account.changeset(attrs)
     |> Repo.update()
+  end
+  
+  defp insert_account(attrs) do
+    %Account{}
+    |> Account.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  defp insert_balance(%{ id: account_id, currency: currency }) do
+    Ledgers.create_balance(%{ account_id: account_id, amount_currency: currency, amount_subunits: 0 })
   end
 end

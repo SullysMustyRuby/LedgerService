@@ -1,7 +1,7 @@
 defmodule HayaiLedger.Organizations.UserTest do
 	use HayaiLedger.DataCase
 
-	import Support.Fixtures.OrganizationFixtures, only: [{:membership_fixture, 1}, {:user_fixture, 0}]
+	import Support.Fixtures.OrganizationFixtures, only: [{:user_attrs, 0}]
 
 	alias HayaiLedger.Organizations
 	alias HayaiLedger.Organizations.User
@@ -15,8 +15,9 @@ defmodule HayaiLedger.Organizations.UserTest do
 		end
 
 		test "email must be unique" do
-			Organizations.create_user(user_attrs())
-			{:error, changeset} = Organizations.create_user(user_attrs())
+			{:ok, shina1} = Organizations.create_user(user_attrs())
+			bad_email = Map.put(user_attrs(), :email, shina1.email)
+			{:error, changeset} = Organizations.create_user(bad_email)
 			refute changeset.valid?
 			assert {"has already been taken", [{:constraint, :unique}, {:constraint_name, "users_email_index"}]} == changeset.errors[:email]
 		end
@@ -59,21 +60,10 @@ defmodule HayaiLedger.Organizations.UserTest do
 		test "returns a user if all validations pass" do
 			user = User.changeset(%User{}, user_attrs())
 			assert user.valid?
-			assert {:ok, "sully"} == fetch_change(user, :first_name)
-			assert {:ok, "musty"} == fetch_change(user, :last_name)
+			assert {:ok, "shina"} == fetch_change(user, :first_name)
+			assert {:ok, "ringo"} == fetch_change(user, :last_name)
 			{:ok, encrypted_password} = fetch_change(user, :encrypted_password)
 			refute is_nil(encrypted_password)
 		end
 	end
-
-   defp user_attrs() do
-   	%{
-   		email: "sullymustycode@gmail.com",
-   		password: "spleem",
-   		password_confirmation: "spleem",
-   		first_name: "Sully",
-   		last_name: "Musty",
-   	}
-   end
-
- end
+end

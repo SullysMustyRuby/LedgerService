@@ -1,16 +1,18 @@
 defmodule HayaiLedger.LockServerTest do
   use HayaiLedger.DataCase
 
-	alias HayaiLedger.Accounts
+  import Support.Fixtures.AccountFixtures, only: [{:account_fixture, 0}]
+  import Support.Fixtures.LedgerFixtures, only: [{:transaction_fixture, 1}]
+
 	alias HayaiLedger.Ledgers
   alias HayaiLedger.LockServer
 
   describe "await/2" do
   	setup do
-  		{:ok, account} = create_account()
-  		Ledgers.create_transaction(valid_transaction_attrs(%{ account_uid: account.uid, amount_subunits: 1000, kind: "credit" }))
-      Ledgers.create_transaction(valid_transaction_attrs(%{ account_uid: account.uid, amount_subunits: 1000, kind: "debit" }))
-      Ledgers.create_transaction(valid_transaction_attrs(%{ account_uid: account.uid, amount_subunits: 1000, kind: "credit" }))
+  		account = account_fixture()
+  		transaction_fixture(%{ account_uid: account.uid, amount_subunits: 1000, kind: "credit" })
+      transaction_fixture(%{ account_uid: account.uid, amount_subunits: 1000, kind: "debit" })
+      transaction_fixture(%{ account_uid: account.uid, amount_subunits: 1000, kind: "credit" })
       %{
       	account: account
       }
@@ -39,8 +41,13 @@ defmodule HayaiLedger.LockServerTest do
   end
 
 	describe "account_lock/1" do
-		test "stores the uid and the pid of the caller" do
-			{:ok, account} = create_account()
+    setup do
+      %{
+        account: account_fixture()
+      }
+    end
+
+		test "stores the uid and the pid of the caller", %{ account: account } do
 			assert account.uid == LockServer.account_lock(account.uid)
 			assert [{account.uid, self()}] == :ets.lookup(:account_locks, account.uid)
 		end
@@ -49,8 +56,7 @@ defmodule HayaiLedger.LockServerTest do
 			assert {:error, "account does not exist"} == LockServer.account_lock("555")
 		end
 
-		test "Does not save multiple locks" do
-			{:ok, account} = create_account()
+		test "Does not save multiple locks", %{ account: account } do
 			assert account.uid == LockServer.account_lock(account.uid)
 			assert {:error, "account lock timeout"} == LockServer.account_lock(account.uid)
 			assert LockServer.account_unlock(account.uid)
@@ -59,14 +65,18 @@ defmodule HayaiLedger.LockServerTest do
 	end
 
 	describe "account_locked?/1" do
-		test "returns true if account has been locked" do
-			{:ok, account} = create_account()
+    setup do
+      %{
+        account: account_fixture()
+      }
+    end
+
+		test "returns true if account has been locked", %{ account: account } do
 			assert account.uid == LockServer.account_lock(account.uid)
 			assert LockServer.account_locked?(account.uid)
 		end
 
-		test "returns false if account is not locked" do
-			{:ok, account} = create_account()
+		test "returns false if account is not locked", %{ account: account } do
 			assert false == LockServer.account_locked?(account.uid)
 		end
 
@@ -77,7 +87,7 @@ defmodule HayaiLedger.LockServerTest do
 
 	describe "account_unlock/1" do
 		test "it returns true if the account has been unlocked" do
-			{:ok, account} = create_account()
+			account = account_fixture()
 			assert account.uid == LockServer.account_lock(account.uid)
 			assert LockServer.account_locked?(account.uid)
 			assert LockServer.account_unlock(account.uid)
@@ -89,34 +99,8 @@ defmodule HayaiLedger.LockServerTest do
 		end
 	end
 
-  defp create_account_type() do
-    {:ok, type} = HayaiLedger.Accounts.create_account_type(%{ name: "cash" })
-    type
-  end
-
-	defp create_account() do
-    Accounts.create_account(%{
-      currency: "JPY",
-      meta_data: %{},
-      kind: "asset",
-      name: "some name", 
-      object_type: "some object_type", 
-      object_uid: "some object_uid",
-      type_id: create_account_type().id, 
-      uid: "some uid"
-    })
-  end
-
   defp sleep_unlock(account_uid, milisec) do
   	:timer.sleep(milisec)
   	LockServer.account_unlock(account_uid)
-  end
-
-  defp valid_transaction_attrs(attrs) do
-    Enum.into(attrs, %{
-      amount_currency: "JPY", 
-      amount_subunits: 42, 
-      kind: "credit"
-    })
   end
 end

@@ -1,13 +1,15 @@
 defmodule HayaiLedgerWeb.EntryControllerTest do
   use HayaiLedgerWeb.ConnCase
 
+  import Support.Fixtures.AccountFixtures, only: [{:account_fixture, 1}]
+
  	alias HayaiLedger.Ledgers
 
   describe "GET /entries/:uid" do
     test "returns the entry for the uid", %{conn: conn} do
-      asset_account = create_account(%{ name: "asset acount", currency: "THB", kind: "asset" })
-      tax_account = create_account(%{ name: "tax account", currency: "THB", kind: "liability" })
-      equity_account = create_account(%{ name: "equity account", currency: "THB", kind: "equity" })
+      asset_account = account_fixture(%{ name: "asset acount", currency: "THB", kind: "asset" })
+      tax_account = account_fixture(%{ name: "tax account", currency: "THB", kind: "liability" })
+      equity_account = account_fixture(%{ name: "equity account", currency: "THB", kind: "equity" })
       transaction_1 = Ledgers.build_transaction(%{ "account_uid" => asset_account.uid, "amount_currency" => "THB", "amount_subunits" => 1000, "kind" => "debit" })
       transaction_2 = Ledgers.build_transaction(%{ "account_uid" => tax_account.uid, "amount_currency" => "THB", "amount_subunits" => 100, "kind" => "credit" })
       transaction_3 = Ledgers.build_transaction(%{ "account_uid" => equity_account.uid, "amount_currency" => "THB", "amount_subunits" => 900, "kind" => "credit" })
@@ -34,9 +36,9 @@ defmodule HayaiLedgerWeb.EntryControllerTest do
 
  	describe "POST /entries/create" do
     setup do
-      asset_account = create_account(%{ name: "asset acount", currency: "THB", kind: "asset" })
-      tax_account = create_account(%{ name: "tax account", currency: "THB", kind: "liability" })
-      equity_account = create_account(%{ name: "equity account", currency: "THB", kind: "equity" })
+      asset_account = account_fixture(%{ name: "asset acount", currency: "THB", kind: "asset" })
+      tax_account = account_fixture(%{ name: "tax account", currency: "THB", kind: "liability" })
+      equity_account = account_fixture(%{ name: "equity account", currency: "THB", kind: "equity" })
       entry_attrs = %{ "description" => "test create journal entry"}
       %{
         asset_account: asset_account,
@@ -106,22 +108,4 @@ defmodule HayaiLedgerWeb.EntryControllerTest do
       assert %{"error" => "transactions must be valid"} == response
     end
  	end
-
-  defp create_account(attrs) do
-    {:ok, account} =
-      attrs
-      |> Enum.into(valid_account_attrs()) 
-      |> HayaiLedger.Accounts.create_account()
-
-    Ledgers.create_balance(%{ account_id: account.id, amount_currency: account.currency, amount_subunits: 0})
-    account
-  end
-
-  defp valid_account_attrs() do
-    %{
-      currency: "THB",
-      kind: "equity",
-      name: "Yuko Cash",
-    }
-  end
  end

@@ -1,17 +1,17 @@
 defmodule HayaiLedger.Ledgers.TransactionTest do
   use HayaiLedger.DataCase
   import HayaiLedger.LockServer, only: [{:account_lock, 1}]
+  import Support.Fixtures.AccountFixtures, only: [{:account_fixture, 0}]
+  import Support.Fixtures.LedgerFixtures
 
   alias HayaiLedger.Ledgers.Transaction
   alias HayaiLedger.Repo
 
-
   describe "validations" do
     setup do
-      account = create_account()
       %{
-        account: account,
-        valid_attrs: %{ account_uid: account.uid, amount_currency: "JPY", amount_subunits: 42, kind: "credit" }
+        account: account_fixture(),
+        valid_attrs: transaction_attrs()
       }
     end
 
@@ -31,7 +31,8 @@ defmodule HayaiLedger.Ledgers.TransactionTest do
 
     test "returns invalid with error if the account is locked", %{ valid_attrs: valid_attrs, account: account } do
       account_lock(account.uid)
-      changeset = Transaction.changeset(%Transaction{}, valid_attrs)
+      lock_attrs = Map.put(valid_attrs, :account_uid, account.uid)
+      changeset = Transaction.changeset(%Transaction{}, lock_attrs)
       assert false == changeset.valid?
       assert changeset.errors[:account_uid] == {"account #{account.uid} is locked", [validation: :required]}
     end
@@ -97,20 +98,5 @@ defmodule HayaiLedger.Ledgers.TransactionTest do
       assert :error == result
       assert transaction.errors[:kind] == {"is invalid", [validation: :inclusion, enum: ["credit", "debit"]]}
     end 
-  end
-
-  defp create_account() do
-    {:ok, account} = HayaiLedger.Accounts.create_account(%{
-                        currency: "JPY",
-                        kind: "asset",
-                        name: "Yuko Cash",
-                        type_id: create_account_type().id
-                      })
-    account
-  end
-
-  defp create_account_type() do
-    {:ok, type} = HayaiLedger.Accounts.create_account_type(%{ name: "cash" })
-    type
   end
 end

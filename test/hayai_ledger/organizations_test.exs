@@ -86,7 +86,7 @@ defmodule HayaiLedger.OrganizationsTest do
 
     test "get_user_and_organizations/1 returns the user and the organizations" do
       user = user_fixture()
-      for index <- (1..3) do
+      for _index <- (1..3) do
         membership_fixture()
         membership_fixture(%{ user_id: user.id })
       end
@@ -143,7 +143,7 @@ defmodule HayaiLedger.OrganizationsTest do
 
     test "list_memberships/1 returns all memberships" do
       user = user_fixture()
-      for index <- (1..3) do
+      for _index <- (1..3) do
         membership_fixture(%{ user_id: user.id })
       end
       memberships = Organizations.list_memberships_for_user(user.id)
@@ -166,9 +166,6 @@ defmodule HayaiLedger.OrganizationsTest do
   end
 
   describe "api_keys" do
-    @update_attrs %{active: false, data: "some updated data", kind: "some updated kind"}
-    @invalid_attrs %{active: nil, data: nil, kind: nil}
-
     test "list_api_keys/0 returns all api_keys" do
       api_key = api_key_fixture()
       assert Organizations.list_api_keys() == [api_key]
@@ -188,7 +185,7 @@ defmodule HayaiLedger.OrganizationsTest do
     end
 
     test "create_api_key/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Organizations.create_api_key(@invalid_attrs)
+      assert {:error, %Ecto.Changeset{}} = Organizations.create_api_key(%{ kind: nil })
     end
   end
 end

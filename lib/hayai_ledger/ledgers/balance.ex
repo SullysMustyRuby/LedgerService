@@ -19,6 +19,7 @@ defmodule HayaiLedger.Ledgers.Balance do
     |> cast(attrs, [:account_id, :amount_currency, :amount_subunits])
     |> validate_required([:account_id, :amount_currency, :amount_subunits])
     |> validate_account()
+    |> unique_constraint(:account_id)
     |> foreign_key_constraint(:account_id)
   end
 

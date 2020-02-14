@@ -261,7 +261,7 @@ defmodule HayaiLedger.Ledgers do
   """
   def update_balance(account_id, amount_subunits) do
     with %Balance{} = balance <- get_balance_by_account(account_id) do
-      Balance.changeset(balance, %{amount_subunits: amount_subunits})
+      Balance.changeset(balance, %{ amount_subunits: amount_subunits })
       |> Repo.update()
     end
   end

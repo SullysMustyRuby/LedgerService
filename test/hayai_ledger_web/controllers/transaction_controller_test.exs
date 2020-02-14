@@ -1,12 +1,14 @@
 defmodule HayaiLedgerWeb.TransactionControllerTest do
   use HayaiLedgerWeb.ConnCase
 
+  import Support.Fixtures.AccountFixtures, only: [{:account_fixture, 0}]
+
  	alias HayaiLedger.Ledgers
 
  	 describe "GET /transactions/:uid" do
     test "returns the transaction for the uid", %{conn: conn} do
     	{:ok, entry} = Ledgers.create_entry(%{ description: "testing view" })
-    	account = create_account()
+    	account = account_fixture()
       valid_transaction_attrs = %{ account_uid: account.uid, amount_currency: "JPY", amount_subunits: 42, entry_id: entry.id, kind: "credit" }
       {:ok, transaction} = Ledgers.create_transaction(valid_transaction_attrs)
       response = get(conn, Routes.transaction_path(conn, :show, transaction.uid))
@@ -26,20 +28,5 @@ defmodule HayaiLedgerWeb.TransactionControllerTest do
     	assert %{"error" => "transaction not found for uid: 555"} == get(conn, Routes.transaction_path(conn, :show, "555"))
             																												|> json_response(500)
     end
-  end
-
-  defp create_account() do
-    {:ok, account} = HayaiLedger.Accounts.create_account(%{
-                        currency: "JPY",
-                        kind: "asset",
-                        name: "Yuko Cash",
-                        type_id: create_account_type().id
-                      })
-    account
-  end
-
-  defp create_account_type() do
-    {:ok, type} = HayaiLedger.Accounts.create_account_type(%{ name: "cash" })
-    type
   end
  end

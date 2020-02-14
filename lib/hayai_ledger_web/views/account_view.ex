@@ -37,7 +37,7 @@ defmodule HayaiLedgerWeb.AccountView do
 			"object_type" => account.object_type,
 			"object_uid" => account.object_uid,
 			"uid" => account.uid,
-			"type" => account.type,
+			"type" => account.type_id,
 			"transactions" => render_many(transactions, TransactionView, "show.json")
 		}
   end
@@ -52,7 +52,7 @@ defmodule HayaiLedgerWeb.AccountView do
 			"object_type" => account.object_type,
 			"object_uid" => account.object_uid,
 			"uid" => account.uid,
-			"type" => account.type
+			"type" => account.type_id
 		}
   end
 
