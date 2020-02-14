@@ -66,7 +66,8 @@ defmodule HayaiLedger.Organizations do
 
   def create_organization(attrs, user_id) do
     with {:ok, %Organization{ id: organization_id } = organization} <- create_organization(attrs),
-      {:ok, membership} <- create_membership(%{ organization_id: organization_id, user_id: user_id })
+      {:ok, membership} <- create_membership(%{ organization_id: organization_id, user_id: user_id }),
+      :ok <- create_api_keys(organization_id)
     do
       {:ok, organization}
     end
@@ -292,6 +293,12 @@ defmodule HayaiLedger.Organizations do
     Repo.all(ApiKey)
   end
 
+  def list_api_keys(organization_id) do
+    Repo.all(from a in ApiKey,
+      where: a.organization_id == ^organization_id,
+      select: a)
+  end
+
   @doc """
   Gets a single api_key.
 
@@ -307,6 +314,8 @@ defmodule HayaiLedger.Organizations do
 
   """
   def get_api_key!(id), do: Repo.get!(ApiKey, id)
+
+  def get_api_key(id), do: Repo.get(ApiKey, id)
 
   @doc """
   Creates a api_key.
@@ -324,5 +333,13 @@ defmodule HayaiLedger.Organizations do
     %ApiKey{}
     |> ApiKey.changeset(attrs)
     |> Repo.insert()
+  end
+
+  defp create_api_keys(organization_id) do
+    with {:ok, full_key} <- create_api_key(%{ organization_id: organization_id, kind: "full_api"}),
+      {:ok, read_only} <- create_api_key(%{ organization_id: organization_id, kind: "read_only"})
+    do
+      :ok
+    end
   end
 end

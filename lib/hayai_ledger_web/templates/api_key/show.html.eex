@@ -1,0 +1,10 @@
+<ul class="list-group">
+  <li class="list-group-item">
+    <strong>kind</strong>
+    <%= @api_key.kind %>
+  </li>
+	<li class="list-group-item">
+    <strong>Data</strong>
+    <%= @api_key.data %>
+  </li>
+</ul>

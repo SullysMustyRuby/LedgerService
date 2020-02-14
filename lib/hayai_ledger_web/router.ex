@@ -7,6 +7,8 @@ defmodule HayaiLedgerWeb.Router do
     plug :fetch_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug HayaiLedgerWeb.Plugs.Auth
+    plug HayaiLedgerWeb.Plugs.Organization
   end
 
   pipeline :public_browser do
@@ -15,7 +17,7 @@ defmodule HayaiLedgerWeb.Router do
     plug :fetch_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
-    plug(:put_layout, {HayaiLedgerWeb.PublicView, "main.html"})
+    plug :put_layout, {HayaiLedgerWeb.PublicView, "main.html"}
   end
 
   pipeline :api do
@@ -33,12 +35,13 @@ defmodule HayaiLedgerWeb.Router do
   end
 
   scope "/", HayaiLedgerWeb do
-    pipe_through [:browser, HayaiLedgerWeb.Plugs.Auth]
+    pipe_through :browser
 
     get "/login", SessionController, :new
     post "/login", SessionController, :create
     delete "/logout", SessionController, :delete
 
+    resources "/api_keys", ApiKeyController, only: [:index, :show]
     resources "/users", UserController, except: [:create, :new]
     resources "/organizations", OrganizationController
     get "/dashboard", DashboardController, :index

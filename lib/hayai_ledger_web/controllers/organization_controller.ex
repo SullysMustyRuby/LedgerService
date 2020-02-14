@@ -4,11 +4,11 @@ defmodule HayaiLedgerWeb.OrganizationController do
   alias HayaiLedger.Organizations
   alias HayaiLedger.Organizations.Organization
 
-  def index(conn, params) do
-    with {:ok, user_id} <- current_user_id(conn),
+  def index(conn, _params) do
+    with {:ok, user_id} <- current_user_id(conn) do
       organizations = Organizations.list_organizations(user_id)
-    do
-      render(conn, "index.html", organizations: organizations)
+      conn
+      |> render("index.html", organizations: organizations)
     end
   end
 
@@ -32,7 +32,7 @@ defmodule HayaiLedgerWeb.OrganizationController do
   def show(conn, %{"id" => id}) do
     organization = Organizations.get_organization!(id)
     conn
-    |> assign(:current_organization, organization)
+    |> put_session("current_organization_id", organization.id)
     |> render("show.html", organization: organization)
   end
 

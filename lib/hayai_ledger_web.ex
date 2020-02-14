@@ -23,7 +23,7 @@ defmodule HayaiLedgerWeb do
 
       import Plug.Conn
       import HayaiLedgerWeb.Gettext
-      import HayaiLedgerWeb.Helpers.Auth, only: [{:current_user, 1}, {:current_user_id, 1}, {:current_user_id!, 1}]
+      import HayaiLedgerWeb.Helpers.Auth, only: [{:current_organization, 1}, {:current_user, 1}, {:current_user_id, 1}, {:current_user_id!, 1}]
       alias HayaiLedgerWeb.Router.Helpers, as: Routes
     end
   end

@@ -1,0 +1,16 @@
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">kind</th>
+      <th scope="col">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= for api_key <- @api_keys do %>
+      <tr>
+        <td scope="row"><%= link api_key.kind, to: Routes.api_key_path(@conn, :show, api_key.id) %></td>
+        <td scope="row"><%= api_key.inserted_at %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

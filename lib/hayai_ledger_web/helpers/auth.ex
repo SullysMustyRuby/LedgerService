@@ -19,6 +19,7 @@ defmodule HayaiLedgerWeb.Helpers.Auth do
   end
 
   def current_organization(conn) do
+    require IEx; IEx.pry
     conn.assigns[:current_organization]
   end
 
