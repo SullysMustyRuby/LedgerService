@@ -2,7 +2,7 @@ defmodule Support.Authentication do
   use Phoenix.ConnTest
   use Plug.Test
 
-  import Support.Fixtures.OrganizationFixtures, only: [{:user_fixture, 1}]
+  import Support.Fixtures.OrganizationFixtures, only: [{:user_fixture, 1}, {:membership_fixture, 1}, {:organization_fixture, 0}]
   import Support.Fixtures.AccountFixtures, only: [{:account_attrs, 0}, {:account_fixture, 1}]
 
   alias HayaiLedger.Accounts
@@ -16,7 +16,9 @@ defmodule Support.Authentication do
   end
 
   def login(%HayaiLedger.Organizations.User{ id: id }) do
-    init_test_session(build_conn(), %{ current_user_id: id })
+    organization = organization_fixture()
+    membership_fixture(%{ "organization_id" => organization.id, "user_id" => id })
+    init_test_session(build_conn(), %{ current_user_id: id, current_organization_id: organization.id })
   end
 
   def api_setup() do
