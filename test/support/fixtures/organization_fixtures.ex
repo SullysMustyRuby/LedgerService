@@ -4,8 +4,8 @@ defmodule Support.Fixtures.OrganizationFixtures do
 
   def api_key_attrs() do
     %{
-      kind: "full_api",
-      organization_id: organization_fixture().id
+      "kind" => "full_api",
+      "organization_id" => organization_fixture().id
     }
   end
 
@@ -20,8 +20,8 @@ defmodule Support.Fixtures.OrganizationFixtures do
 
 	def membership_attrs() do
     %{
-      organization_id: organization_fixture().id,
-      user_id: user_fixture().id
+      "organization_id" => organization_fixture().id,
+      "user_id" => user_fixture().id
     }
 	end
 
@@ -36,8 +36,8 @@ defmodule Support.Fixtures.OrganizationFixtures do
 
   def organization_attrs() do
   	%{
-  		description: "The best ledger system perid!", 
-  		name: "HaiyaiLedger"
+  		"description" => "The best ledger system perid!", 
+  		"name" => "HaiyaiLedger"
   	}
   end
 
@@ -53,11 +53,11 @@ defmodule Support.Fixtures.OrganizationFixtures do
   def user_attrs() do
     email = :crypto.strong_rand_bytes(12) |> Base.url_encode64
   	%{ 
-  		email: "#{email}@haiyailedger.com", 
-  		first_name: "Shina", 
-  		last_name: "Ringo", 
-  		password: "SuperSexy", 
-  		password_confirmation: "SuperSexy"
+  		"email" => "#{email}@haiyailedger.com", 
+  		"first_name" => "Shina", 
+  		"last_name" => "Ringo", 
+  		"password" => "SuperSexy", 
+  		"password_confirmation" => "SuperSexy"
   	}
   end
 

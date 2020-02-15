@@ -68,7 +68,7 @@ defmodule HayaiLedger.AccountsTest do
     end
 
     test "with invalid data returns error changeset", %{ organization: organization } do
-      assert {:error, %Ecto.Changeset{}} = Accounts.create_account(%{ kind: nil }, organization.id)
+      assert {:error, %Ecto.Changeset{}} = Accounts.create_account(%{ "kind" => nil }, organization.id)
     end
   end
 
@@ -103,7 +103,7 @@ defmodule HayaiLedger.AccountsTest do
   describe "get_balance!/1 " do
     test "returns the balance with given id" do
       account = account_fixture()
-      balance = balance_fixture(%{ account_id: account.id })
+      balance = balance_fixture(%{ "account_id" => account.id })
       assert Accounts.get_balance!(balance.id) == balance
     end
   end

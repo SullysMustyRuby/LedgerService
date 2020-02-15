@@ -8,7 +8,7 @@ defmodule HayaiLedger.Organizations.UserTest do
 
 	describe "validations" do
 		test "returns error witout an email" do
-			no_email = Map.delete(user_attrs(), :email)
+			no_email = Map.delete(user_attrs(), "email")
 			changeset = User.changeset(%User{}, no_email)
 			refute changeset.valid?
 			assert {"can't be blank", [validation: :required]} == changeset.errors[:email]
@@ -16,42 +16,42 @@ defmodule HayaiLedger.Organizations.UserTest do
 
 		test "email must be unique" do
 			{:ok, shina1} = Organizations.create_user(user_attrs())
-			bad_email = Map.put(user_attrs(), :email, shina1.email)
+			bad_email = Map.put(user_attrs(), "email", shina1.email)
 			{:error, changeset} = Organizations.create_user(bad_email)
 			refute changeset.valid?
 			assert {"has already been taken", [{:constraint, :unique}, {:constraint_name, "users_email_index"}]} == changeset.errors[:email]
 		end
 
 		test "returns error witout a password" do
-			no_password = Map.delete(user_attrs(), :password)
+			no_password = Map.delete(user_attrs(), "password")
 			changeset = User.changeset(%User{}, no_password)
 			refute changeset.valid?
 			assert {"can't be blank", [validation: :required]} == changeset.errors[:password]
 		end
 
 		test "returns error witout an password_confirmation" do
-			no_confirmation = Map.delete(user_attrs(), :password_confirmation)
+			no_confirmation = Map.delete(user_attrs(), "password_confirmation")
 			changeset = User.changeset(%User{}, no_confirmation)
 			refute changeset.valid?
 			assert {"can't be blank", [validation: :required]} == changeset.errors[:password_confirmation]
 		end
 
 		test "returns error if password and password_confirmation don't match" do
-			bad_match = Map.put(user_attrs(), :password_confirmation, "not spleem")
+			bad_match = Map.put(user_attrs(), "password_confirmation", "not spleem")
 			changeset = User.changeset(%User{}, bad_match)
 			refute changeset.valid?
 			assert {"does not match confirmation", [validation: :confirmation]} == changeset.errors[:password_confirmation]
 		end
 
 		test "returns error witout a first_name" do
-			no_first_name = Map.delete(user_attrs(), :first_name)
+			no_first_name = Map.delete(user_attrs(), "first_name")
 			changeset = User.changeset(%User{}, no_first_name)
 			refute changeset.valid?
 			assert {"can't be blank", [validation: :required]} == changeset.errors[:first_name]
 		end
 
 		test "returns error witout a last_name" do
-			no_last_name = Map.delete(user_attrs(), :last_name)
+			no_last_name = Map.delete(user_attrs(), "last_name")
 			changeset = User.changeset(%User{}, no_last_name)
 			refute changeset.valid?
 			assert {"can't be blank", [validation: :required]} == changeset.errors[:last_name]

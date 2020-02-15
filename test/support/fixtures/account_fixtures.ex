@@ -6,12 +6,12 @@ defmodule Support.Fixtures.AccountFixtures do
 
   def account_attrs() do
   	%{
-  		currency: "JPY",
-  		description: "some description",
-      kind: "asset",
-  		name: "some name",
-  		organization_id: organization_fixture().id,
-  		type_id: account_type_fixture().id
+  		"currency" => "JPY",
+  		"description" => "some description",
+      "kind" => "asset",
+  		"name" => "some name",
+  		"organization_id" => organization_fixture().id,
+  		"type_id" => account_type_fixture().id
   	}
   end
 
@@ -35,15 +35,15 @@ defmodule Support.Fixtures.AccountFixtures do
 
   def account_type_attrs() do
   	%{ 
-  		name: "cash" 
+  		"name" => "cash" 
   	}
   end
   
   def balance_attrs() do
     %{
-      account_id: account_fixture().id,
-      amount_currency: "JPY",
-      amount_subunits: 0
+      "account_id" => account_fixture().id,
+      "amount_currency" => "JPY",
+      "amount_subunits" => 0
     }
   end
 

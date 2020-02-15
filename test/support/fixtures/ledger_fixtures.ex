@@ -14,10 +14,10 @@ defmodule Support.Fixtures.LedgerFixtures do
 
 	def transaction_attrs() do
 		%{
-			account_uid: account_fixture().uid,
-			amount_currency: "JPY", 
-			amount_subunits: 42, 
-			kind: "credit"
+			"account_uid" => account_fixture().uid,
+			"amount_currency" => "JPY", 
+			"amount_subunits" => 42, 
+			"kind" => "credit"
 		}
 	end
 

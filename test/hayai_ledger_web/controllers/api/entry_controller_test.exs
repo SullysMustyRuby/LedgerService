@@ -12,9 +12,9 @@ defmodule HayaiLedgerWeb.Api.EntryControllerTest do
 
   describe "GET /entries/:uid" do
     test "returns the entry for the uid", %{ auth_conn: conn } do
-      asset_account = account_fixture(%{ name: "asset acount", currency: "THB", kind: "asset" })
-      tax_account = account_fixture(%{ name: "tax account", currency: "THB", kind: "liability" })
-      equity_account = account_fixture(%{ name: "equity account", currency: "THB", kind: "equity" })
+      asset_account = account_fixture(%{ "name" => "asset acount", "currency" => "THB", "kind" => "asset" })
+      tax_account = account_fixture(%{ "name" => "tax account", "currency" => "THB", "kind" => "liability" })
+      equity_account = account_fixture(%{ "name" => "equity account", "currency" => "THB", "kind" => "equity" })
       transaction_1 = Ledgers.build_transaction(%{ "account_uid" => asset_account.uid, "amount_currency" => "THB", "amount_subunits" => 1000, "kind" => "debit" })
       transaction_2 = Ledgers.build_transaction(%{ "account_uid" => tax_account.uid, "amount_currency" => "THB", "amount_subunits" => 100, "kind" => "credit" })
       transaction_3 = Ledgers.build_transaction(%{ "account_uid" => equity_account.uid, "amount_currency" => "THB", "amount_subunits" => 900, "kind" => "credit" })
@@ -41,9 +41,9 @@ defmodule HayaiLedgerWeb.Api.EntryControllerTest do
 
  	describe "POST /entries/create" do
     setup do
-      asset_account = account_fixture(%{ name: "asset acount", currency: "THB", kind: "asset" })
-      tax_account = account_fixture(%{ name: "tax account", currency: "THB", kind: "liability" })
-      equity_account = account_fixture(%{ name: "equity account", currency: "THB", kind: "equity" })
+      asset_account = account_fixture(%{ "name" => "asset acount", "currency" => "THB", "kind" => "asset" })
+      tax_account = account_fixture(%{ "name" => "tax account", "currency" => "THB", "kind" => "liability" })
+      equity_account = account_fixture(%{ "name" => "equity account", "currency" => "THB", "kind" => "equity" })
       entry_attrs = %{ "description" => "test create journal entry"}
       %{
         asset_account: asset_account,

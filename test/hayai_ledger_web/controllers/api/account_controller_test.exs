@@ -29,7 +29,7 @@ defmodule HayaiLedgerWeb.Api.AccountControllerTest do
 
   describe "GET /accounts/balance/:uid" do
   	test "returns the balance json", %{ auth_conn: auth_conn } do
-  		account = account_fixture(%{ currency: "THB" })
+  		account = account_fixture(%{ "currency" => "THB" })
       Ledgers.create_transaction(%{ amount_currency: "THB", account_uid: account.uid, amount_subunits: 1000, kind: "credit" })
       Ledgers.create_transaction(%{ amount_currency: "THB", account_uid: account.uid, amount_subunits: 1000, kind: "debit" })
       Ledgers.create_transaction(%{ amount_currency: "THB", account_uid: account.uid, amount_subunits: 1000, kind: "credit" })
@@ -50,7 +50,7 @@ defmodule HayaiLedgerWeb.Api.AccountControllerTest do
 
   describe "GET /accounts/running_balance/:uid" do
     test "returns the balance json", %{auth_conn: auth_conn} do
-      equity_account = account_fixture(%{ kind: "equity" })
+      equity_account = account_fixture(%{ "kind" => "equity" })
 
       Accounts.update_balance(equity_account.id, 1000)
       response = get(auth_conn, Routes.account_path(auth_conn, :running_balance, equity_account.uid))
@@ -70,11 +70,11 @@ defmodule HayaiLedgerWeb.Api.AccountControllerTest do
 
   describe "GET /accounts/transactions/:uid" do
     test "returns the transactions for the account_uid", %{auth_conn: auth_conn} do
-      asset_account = account_fixture(%{ kind: "asset" })
-      equity_account = account_fixture(%{ kind: "equity" })
+      asset_account = account_fixture(%{ "kind" => "asset" })
+      equity_account = account_fixture(%{ "kind" => "equity" })
       {:ok, entry} = Ledgers.create_entry(%{ desription: "no description" })
-      transaction_fixture(%{ account_uid: asset_account.uid, entry_id: entry.id })
-      transaction_fixture(%{ account_uid: equity_account.uid, entry_id: entry.id })
+      transaction_fixture(%{ "account_uid" => asset_account.uid, "entry_id" => entry.id })
+      transaction_fixture(%{ "account_uid" => equity_account.uid, "entry_id" => entry.id })
       response = get(auth_conn, Routes.account_path(auth_conn, :transactions, equity_account.uid))
                   |> json_response(200)
 

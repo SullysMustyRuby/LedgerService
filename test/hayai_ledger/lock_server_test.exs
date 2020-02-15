@@ -10,9 +10,9 @@ defmodule HayaiLedger.LockServerTest do
   describe "await/2" do
   	setup do
   		account = account_fixture()
-  		transaction_fixture(%{ account_uid: account.uid, amount_subunits: 1000, kind: "credit" })
-      transaction_fixture(%{ account_uid: account.uid, amount_subunits: 1000, kind: "debit" })
-      transaction_fixture(%{ account_uid: account.uid, amount_subunits: 1000, kind: "credit" })
+  		transaction_fixture(%{ "account_uid" => account.uid, "amount_subunits" => 1000, "kind" => "credit" })
+      transaction_fixture(%{ "account_uid" => account.uid, "amount_subunits" => 1000, "kind" => "debit" })
+      transaction_fixture(%{ "account_uid" => account.uid, "amount_subunits" => 1000, "kind" => "credit" })
       %{
       	account: account
       }

@@ -88,7 +88,7 @@ defmodule HayaiLedger.OrganizationsTest do
       user = user_fixture()
       for _index <- (1..3) do
         membership_fixture()
-        membership_fixture(%{ user_id: user.id })
+        membership_fixture(%{ "user_id" => user.id })
       end
       organizations = Organizations.get_user_organizations(user.id)
       assert 3 == length(organizations)
@@ -144,7 +144,7 @@ defmodule HayaiLedger.OrganizationsTest do
     test "list_memberships/1 returns all memberships" do
       user = user_fixture()
       for _index <- (1..3) do
-        membership_fixture(%{ user_id: user.id })
+        membership_fixture(%{ "user_id" => user.id })
       end
       memberships = Organizations.list_memberships_for_user(user.id)
       assert 3 == length(memberships)

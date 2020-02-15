@@ -84,7 +84,7 @@ defmodule HayaiLedger.LedgersTest do
     test "returns the transaction if found" do
       entry = entry_fixture()
       account = account_fixture()
-      transaction = transaction_fixture(%{ entry_id: entry.id, account_uid: account.uid })
+      transaction = transaction_fixture(%{ "entry_id" => entry.id, "account_uid" => account.uid })
       {:ok, transaction} = Ledgers.get_transaction_by_uid(transaction.uid)
       assert entry.id == transaction.entry_id
       assert account.id == transaction.account_id
@@ -126,55 +126,55 @@ defmodule HayaiLedger.LedgersTest do
     end
 
     test "returns error if transaction amounts do not balance" do
-      transaction_1 = build_transaction(%{ amount_subunits: 1000, kind: "credit" })
-      transaction_2 = build_transaction(%{ amount_subunits: 1000, kind: "debit" })
-      transaction_3 = build_transaction(%{ amount_subunits: 1000, kind: "credit" })
+      transaction_1 = build_transaction(%{ "amount_subunits" => 1000, "kind" => "credit" })
+      transaction_2 = build_transaction(%{ "amount_subunits" => 1000, "kind" => "debit" })
+      transaction_3 = build_transaction(%{ "amount_subunits" => 1000, "kind" => "credit" })
       assert {:error, "credits and debits do not balance"} == Ledgers.journal_entry(@valid_entry_attrs, [transaction_1, transaction_2, transaction_3])
 
-      thai_account = account_fixture(%{ currency: "THB" })
-      transaction_1 = build_transaction(%{ amount_subunits: 1000, kind: "credit" })
-      transaction_2 = build_transaction(%{ account_uid: thai_account.uid, amount_currency: "THB", amount_subunits: 1000, kind: "debit" })
-      transaction_3 = build_transaction(%{ account_uid: thai_account.uid, amount_currency: "THB", amount_subunits: 1000, kind: "credit" })
+      thai_account = account_fixture(%{ "currency" => "THB" })
+      transaction_1 = build_transaction(%{ "amount_subunits" => 1000, "kind" => "credit" })
+      transaction_2 = build_transaction(%{ "account_uid" => thai_account.uid, "amount_currency" => "THB", "amount_subunits" => 1000, "kind" => "debit" })
+      transaction_3 = build_transaction(%{ "account_uid" => thai_account.uid, "amount_currency" => "THB", "amount_subunits" => 1000, "kind" => "credit" })
       assert {:error, "credits and debits do not balance"} == Ledgers.journal_entry(@valid_entry_attrs, [transaction_1, transaction_2, transaction_3])
     end
 
     test "returns error if transactions are invalid" do
-      transaction_1 = build_transaction(%{ amount_currency: "THB", amount_subunits: 1000, kind: "credit" })
-      transaction_2 = build_transaction(%{ amount_currency: "THB", amount_subunits: 1000, kind: "debit" })
+      transaction_1 = build_transaction(%{ "amount_currency" => "THB", "amount_subunits" => 1000, "kind" => "credit" })
+      transaction_2 = build_transaction(%{ "amount_currency" => "THB", "amount_subunits" => 1000, "kind" => "debit" })
       assert {:error, "transactions must be valid"} == Ledgers.journal_entry(@valid_entry_attrs, [transaction_1, transaction_2])
     end
 
     test "returns error if a transaction account is locked" do
-      locked_account = account_fixture(%{ currency: "THB" })
-      transaction_1 = build_transaction(%{ account_uid: locked_account.uid, amount_currency: "THB", amount_subunits: 1000, kind: "credit" })
-      transaction_2 = build_transaction(%{ amount_currency: "THB", amount_subunits: 1000, kind: "debit" })
+      locked_account = account_fixture(%{ "currency" => "THB" })
+      transaction_1 = build_transaction(%{ "account_uid" => locked_account.uid, "amount_currency" => "THB", "amount_subunits" => 1000, "kind" => "credit" })
+      transaction_2 = build_transaction(%{ "amount_currency" => "THB", "amount_subunits" => 1000, "kind" => "debit" })
       LockServer.account_lock(locked_account.uid)
       assert {:error, "transactions must be valid"} == Ledgers.journal_entry(@valid_entry_attrs, [transaction_1, transaction_2])
     end
 
     test "returns error if the transactions fail" do
-      transaction_1 = build_transaction(%{ amount_currency: "JPY",  amount_subunits: 500, kind: "credit" })
-      transaction_2 = build_transaction(%{ amount_currency: "JPY",  amount_subunits: 1000, kind: "debit" })
-      transaction_3 = build_transaction(%{ amount_currency: "JPY",  amount_subunits: 500, kind: "credit" })
-      transaction_4 = build_transaction(%{ account_id: 555, amount_currency: "THB", amount_subunits: 1000, kind: "debit" })
-      transaction_5 = build_transaction(%{ account_id: 555, amount_currency: "THB", amount_subunits: 1000, kind: "credit" })
+      transaction_1 = build_transaction(%{ "amount_currency" => "JPY",  "amount_subunits" => 500, "kind" => "credit" })
+      transaction_2 = build_transaction(%{ "amount_currency" => "JPY",  "amount_subunits" => 1000, "kind" => "debit" })
+      transaction_3 = build_transaction(%{ "amount_currency" => "JPY",  "amount_subunits" => 500, "kind" => "credit" })
+      transaction_4 = build_transaction(%{ "account_id" => 555, "amount_currency" => "THB", "amount_subunits" => 1000, "kind" => "debit" })
+      transaction_5 = build_transaction(%{ "account_id" => 555, "amount_currency" => "THB", "amount_subunits" => 1000, "kind" => "credit" })
       assert {:error, "transactions must be valid"} == Ledgers.journal_entry(@valid_entry_attrs, [transaction_1, transaction_2, transaction_3, transaction_4, transaction_5])
       assert 0 == Repo.one(from t in "transactions", select: count(t.id))
       assert 0 == Repo.one(from e in "entries", select: count(e.id))
     end
 
     test "returns entry upon success" do
-      asset_account = account_fixture(%{ kind: "asset" })
-      equity_account = account_fixture(%{ kind: "equity" })
-      liability_account = account_fixture(%{ kind: "liability" })
+      asset_account = account_fixture(%{ "kind" => "asset" })
+      equity_account = account_fixture(%{ "kind" => "equity" })
+      liability_account = account_fixture(%{ "kind" => "liability" })
 
       assert 0 = Accounts.balance_amount_subunits_for_account(asset_account.id)
       assert 0 = Accounts.balance_amount_subunits_for_account(equity_account.id)
       assert 0 = Accounts.balance_amount_subunits_for_account(liability_account.id)
 
-      transaction_1 = build_transaction(%{ account_uid: asset_account.uid, amount_subunits: 1000, kind: "debit" })
-      transaction_2 = build_transaction(%{ account_uid: equity_account.uid, amount_subunits: 500, kind: "credit" })
-      transaction_3 = build_transaction(%{ account_uid: liability_account.uid, amount_subunits: 500, kind: "credit" })
+      transaction_1 = build_transaction(%{ "account_uid" => asset_account.uid, "amount_subunits" => 1000, "kind" => "debit" })
+      transaction_2 = build_transaction(%{ "account_uid" => equity_account.uid, "amount_subunits" => 500, "kind" => "credit" })
+      transaction_3 = build_transaction(%{ "account_uid" => liability_account.uid, "amount_subunits" => 500, "kind" => "credit" })
       
       {:ok, entry, transactions} = Ledgers.journal_entry(@valid_entry_attrs, [transaction_1, transaction_2, transaction_3])
       assert nil != entry.uid
@@ -201,10 +201,10 @@ defmodule HayaiLedger.LedgersTest do
 
   describe "list_transactions/1" do
     test "returns all transactions for the account_id" do
-      asset_account = account_fixture(%{ kind: "asset" })
-      equity_account = account_fixture(%{ kind: "equity" })
-      transaction_fixture(%{ account_uid: equity_account.uid })
-      transaction_fixture(%{ account_uid: asset_account.uid })
+      asset_account = account_fixture(%{ "kind" => "asset" })
+      equity_account = account_fixture(%{ "kind" => "equity" })
+      transaction_fixture(%{ "account_uid" => equity_account.uid })
+      transaction_fixture(%{ "account_uid" => asset_account.uid })
 
       [transaction] = Ledgers.list_transactions(asset_account.id)
       assert asset_account.id == transaction.account_id
@@ -213,9 +213,9 @@ defmodule HayaiLedger.LedgersTest do
 
   describe "safe_journal_entry/3" do
     setup do
-      asset_account = account_fixture(%{ kind: "asset" })
-      equity_account = account_fixture(%{ kind: "equity" })
-      liability_account = account_fixture(%{ kind: "liability" })
+      asset_account = account_fixture(%{ "kind" => "asset" })
+      equity_account = account_fixture(%{ "kind" => "equity" })
+      liability_account = account_fixture(%{ "kind" => "liability" })
       %{
         asset_account: asset_account,
         equity_account: equity_account,
@@ -235,7 +235,7 @@ defmodule HayaiLedger.LedgersTest do
     end
 
     test "returns error when balance will be negative", context do
-      transaction_fixture(%{ account_uid: context.equity_account.uid, amount_subunits: 500 })
+      transaction_fixture(%{ "account_uid" => context.equity_account.uid, "amount_subunits" => 500 })
       assert 500 == Ledgers.transactions_sum_by_account(context.equity_account.id)
  
       transaction_1 = Ledgers.build_transaction(%{ account_uid: context.asset_account.uid, amount_currency: context.asset_account.currency, amount_subunits: 600, kind: "credit" })
@@ -246,7 +246,7 @@ defmodule HayaiLedger.LedgersTest do
     end
 
     test "returns error when balance will be below minimum", context do
-      transaction_fixture(%{ account_uid: context.equity_account.uid, amount_subunits: 500 })
+      transaction_fixture(%{ "account_uid" => context.equity_account.uid, "amount_subunits" => 500 })
       assert 500 == Ledgers.transactions_sum_by_account(context.equity_account.id)
  
       transaction_1 = Ledgers.build_transaction(%{ account_uid: context.asset_account.uid, amount_currency: context.asset_account.currency, amount_subunits: 300, kind: "credit" })
@@ -282,9 +282,9 @@ defmodule HayaiLedger.LedgersTest do
     end
 
     test "returns the difference of the credits and debits", %{ account: account } do
-      transaction_fixture(%{ account_uid: account.uid, amount_subunits: 1000, kind: "credit" })
-      transaction_fixture(%{ account_uid: account.uid, amount_subunits: 1000, kind: "debit" })
-      transaction_fixture(%{ account_uid: account.uid, amount_subunits: 1000, kind: "credit" })
+      transaction_fixture(%{ "account_uid" => account.uid, "amount_subunits" => 1000, "kind" => "credit" })
+      transaction_fixture(%{ "account_uid" => account.uid, "amount_subunits" => 1000, "kind" => "debit" })
+      transaction_fixture(%{ "account_uid" => account.uid, "amount_subunits" => 1000, "kind" => "credit" })
       assert 1000 == Ledgers.transactions_sum_by_account(account.id)
     end
 
@@ -297,14 +297,14 @@ defmodule HayaiLedger.LedgersTest do
     end
 
     test "returns the credits balance if no debits", %{ account: account } do
-      transaction_fixture(%{ account_uid: account.uid, amount_subunits: 1000, kind: "credit" })
-      transaction_fixture(%{ account_uid: account.uid, amount_subunits: 1000, kind: "credit" })
+      transaction_fixture(%{ "account_uid" => account.uid, "amount_subunits" => 1000, "kind" => "credit" })
+      transaction_fixture(%{ "account_uid" => account.uid, "amount_subunits" => 1000, "kind" => "credit" })
       assert 2000 == Ledgers.transactions_sum_by_account(account.id)
     end
 
     test "returns the debits balance if no credits", %{ account: account } do
-      transaction_fixture(%{ account_uid: account.uid, amount_subunits: 1000, kind: "debit" })
-      transaction_fixture(%{ account_uid: account.uid, amount_subunits: 1000, kind: "debit" })
+      transaction_fixture(%{ "account_uid" => account.uid, "amount_subunits" => 1000, "kind" => "debit" })
+      transaction_fixture(%{ "account_uid" => account.uid, "amount_subunits" => 1000, "kind" => "debit" })
       assert -2000 == Ledgers.transactions_sum_by_account(account.id)
     end
   end

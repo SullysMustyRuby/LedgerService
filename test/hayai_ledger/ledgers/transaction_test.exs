@@ -16,14 +16,14 @@ defmodule HayaiLedger.Ledgers.TransactionTest do
     end
 
   	test "returns invalid with error if no account_id", %{ valid_attrs: valid_attrs } do
-      no_account = Map.delete(valid_attrs, :account_uid)
+      no_account = Map.delete(valid_attrs, "account_uid")
   		changeset = Transaction.changeset(%Transaction{}, no_account)
   		assert false == changeset.valid?
   		assert changeset.errors[:account_uid] == {"can't be blank", [validation: :required]}
   	end
 
   	test "returns invalid with error if the account does not exist", %{ valid_attrs: valid_attrs } do
-  		bad_account = Map.put(valid_attrs, :account_uid, "555")
+  		bad_account = Map.put(valid_attrs, "account_uid", "555")
   		changeset = Transaction.changeset(%Transaction{}, bad_account)
       assert false == changeset.valid?
       assert changeset.errors[:account_uid] == {"account not found for uid: 555", [validation: :required]}
@@ -31,7 +31,7 @@ defmodule HayaiLedger.Ledgers.TransactionTest do
 
     test "returns invalid with error if the account is locked", %{ valid_attrs: valid_attrs, account: account } do
       account_lock(account.uid)
-      lock_attrs = Map.put(valid_attrs, :account_uid, account.uid)
+      lock_attrs = Map.put(valid_attrs, "account_uid", account.uid)
       changeset = Transaction.changeset(%Transaction{}, lock_attrs)
       assert false == changeset.valid?
       assert changeset.errors[:account_uid] == {"account #{account.uid} is locked", [validation: :required]}
@@ -45,7 +45,7 @@ defmodule HayaiLedger.Ledgers.TransactionTest do
   	end
 
     test "returns error if no amount_currency", %{ valid_attrs: valid_attrs } do
-      no_currency = Map.delete(valid_attrs, :amount_currency)
+      no_currency = Map.delete(valid_attrs, "amount_currency")
       changeset = Transaction.changeset(%Transaction{}, no_currency)
       {result, transaction} = Repo.insert(changeset)
       assert :error == result
@@ -53,14 +53,14 @@ defmodule HayaiLedger.Ledgers.TransactionTest do
     end
 
     test "returns error if the amount_currency does not match the account currency", %{ valid_attrs: valid_attrs } do
-      bad_currency = Map.put(valid_attrs, :amount_currency, "THB")
+      bad_currency = Map.put(valid_attrs, "amount_currency", "THB")
       changeset = Transaction.changeset(%Transaction{}, bad_currency)
       assert false == changeset.valid?
       assert changeset.errors[:amount_currency] == {"currency must match accounts currency", [validation: :required]}
     end
 
     test "returns error if invalid amount_currency", %{ valid_attrs: valid_attrs } do
-      bad_currency = Map.put(valid_attrs, :amount_currency, 1234)
+      bad_currency = Map.put(valid_attrs, "amount_currency", 1234)
       changeset = Transaction.changeset(%Transaction{}, bad_currency)
       {result, transaction} = Repo.insert(changeset)
       assert :error == result
@@ -68,7 +68,7 @@ defmodule HayaiLedger.Ledgers.TransactionTest do
     end 
 
     test "returns error if no amount_subunits", %{ valid_attrs: valid_attrs } do
-      no_currency = Map.delete(valid_attrs, :amount_subunits)
+      no_currency = Map.delete(valid_attrs, "amount_subunits")
       changeset = Transaction.changeset(%Transaction{}, no_currency)
       {result, transaction} = Repo.insert(changeset)
       assert :error == result
@@ -76,7 +76,7 @@ defmodule HayaiLedger.Ledgers.TransactionTest do
     end
 
     test "returns error if invalid amount_subunits", %{ valid_attrs: valid_attrs } do
-      bad_currency = Map.put(valid_attrs, :amount_subunits, "abcde")
+      bad_currency = Map.put(valid_attrs, "amount_subunits", "abcde")
       changeset = Transaction.changeset(%Transaction{}, bad_currency)
       {result, transaction} = Repo.insert(changeset)
       assert :error == result
@@ -84,7 +84,7 @@ defmodule HayaiLedger.Ledgers.TransactionTest do
     end 
 
     test "returns error if no kind", %{ valid_attrs: valid_attrs } do
-      no_currency = Map.delete(valid_attrs, :kind)
+      no_currency = Map.delete(valid_attrs, "kind")
       changeset = Transaction.changeset(%Transaction{}, no_currency)
       {result, transaction} = Repo.insert(changeset)
       assert :error == result
@@ -92,7 +92,7 @@ defmodule HayaiLedger.Ledgers.TransactionTest do
     end
 
     test "returns error if invalid kind", %{ valid_attrs: valid_attrs } do
-      bad_currency = Map.put(valid_attrs, :kind, "abcde")
+      bad_currency = Map.put(valid_attrs, "kind", "abcde")
       changeset = Transaction.changeset(%Transaction{}, bad_currency)
       {result, transaction} = Repo.insert(changeset)
       assert :error == result
