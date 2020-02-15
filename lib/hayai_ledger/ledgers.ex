@@ -94,8 +94,8 @@ defmodule HayaiLedger.Ledgers do
 
   def get_entry_uid(id) do
     Repo.one(from e in Entry,
-    where: e.id == ^id,
-    select: e.uid)
+      where: e.id == ^id,
+      select: e.uid)
   end
 
   @doc """
@@ -151,6 +151,12 @@ defmodule HayaiLedger.Ledgers do
     Repo.all(Entry)
   end
 
+  def list_entries(organization_id) do
+    Repo.all(from e in Entry,
+      where: e.organization_id == ^organization_id,
+      select: e)
+  end
+
   @doc """
   Returns the list of transactions.
 
@@ -164,7 +170,15 @@ defmodule HayaiLedger.Ledgers do
     Repo.all(Transaction)
   end
 
-  def list_transactions(account_id) do
+  def list_transactions(organization_id) do
+    Repo.all(from a in Account,
+      where: a.organization_id == ^organization_id,
+      join: t in Transaction,
+      where: t.account_id == a.id,
+      select: t)
+  end
+
+  def list_transactions_for_account(account_id) do
     Repo.all(from t in Transaction,
       where: t.account_id == ^account_id)
   end

@@ -106,6 +106,16 @@ defmodule HayaiLedger.OrganizationsTest do
       assert {:error, %Ecto.Changeset{}} = Organizations.create_user(@invalid_user_attrs)
     end
 
+    test "list_users/1 returns all the users in an organization" do
+      organization = organization_fixture()
+      for _index <- (1..3) do
+        membership_fixture(%{ "organization_id" => organization.id })
+        membership_fixture()
+      end
+      users = Organizations.list_users(organization.id)
+      assert 3 == length(users)
+    end
+
     test "update_user/2 with valid data updates the user" do
       user = user_fixture()
       assert {:ok, %User{} = user} = Organizations.update_user(user, @update_user_attrs)

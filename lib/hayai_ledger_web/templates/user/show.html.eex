@@ -3,23 +3,8 @@
 <ul>
 
   <li>
-    <strong>Admin:</strong>
-    <%= @user.admin %>
-  </li>
-
-  <li>
     <strong>Email:</strong>
     <%= @user.email %>
-  </li>
-
-  <li>
-    <strong>Encrypted password:</strong>
-    <%= @user.encrypted_password %>
-  </li>
-
-  <li>
-    <strong>Email confirmation:</strong>
-    <%= @user.email_confirmation %>
   </li>
 
   <li>

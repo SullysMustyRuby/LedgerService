@@ -6,8 +6,9 @@ defmodule HayaiLedger.LedgersTest do
   alias HayaiLedger.Ledgers.{Entry, Transaction}
   alias HayaiLedger.LockServer
 
-  import Support.Fixtures.LedgerFixtures
   import Support.Fixtures.AccountFixtures
+  import Support.Fixtures.LedgerFixtures
+  import Support.Fixtures.OrganizationFixtures
 
   @valid_entry_attrs %{description: "some description", object_type: "some object_type", object_uid: "some object_uid"}
   @invalid_transaction_attrs %{amount_currency: nil, amount_subunits: nil, description: nil, type: nil, uid: nil}
@@ -192,6 +193,22 @@ defmodule HayaiLedger.LedgersTest do
     end
   end
 
+  describe "list_entries/1" do
+    test "returns all the entries for the organization" do
+      organization = organization_fixture()
+      for _index <- (1..3) do
+        entry_fixture(%{ "organization_id" => organization.id })
+        entry_fixture()
+      end
+
+      entries = Ledgers.list_entries(organization.id)
+      assert 3 == length(entries)
+      for entry <- entries do
+        assert entry.organization_id == organization.id
+      end
+    end
+  end
+
   describe "list_transactions/0" do
     test "returns all transactions" do
       transaction = transaction_fixture() |> Map.delete(:account_uid)
@@ -200,13 +217,32 @@ defmodule HayaiLedger.LedgersTest do
   end
 
   describe "list_transactions/1" do
+    test "returns all transactions for the organization" do
+      organization = organization_fixture()
+      asset_account = account_fixture(%{ "kind" => "asset", "organization_id" => organization.id })
+      equity_account = account_fixture(%{ "kind" => "equity", "organization_id" => organization.id })
+      for _index <- (1..3) do
+        transaction_fixture()
+        transaction_fixture(%{ "account_uid" => asset_account.uid })
+        transaction_fixture(%{ "account_uid" => equity_account.uid })
+      end
+
+      transactions = Ledgers.list_transactions(organization.id)
+      assert 6 == length(transactions)
+      for transaction <- transactions do
+        assert Enum.member?([asset_account.id, equity_account.id], transaction.account_id)
+      end
+    end
+  end
+
+  describe "list_transactions_for_account/1" do
     test "returns all transactions for the account_id" do
       asset_account = account_fixture(%{ "kind" => "asset" })
       equity_account = account_fixture(%{ "kind" => "equity" })
       transaction_fixture(%{ "account_uid" => equity_account.uid })
       transaction_fixture(%{ "account_uid" => asset_account.uid })
 
-      [transaction] = Ledgers.list_transactions(asset_account.id)
+      [transaction] = Ledgers.list_transactions_for_account(asset_account.id)
       assert asset_account.id == transaction.account_id
     end
   end

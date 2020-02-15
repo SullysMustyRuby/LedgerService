@@ -1,0 +1,40 @@
+<h1><%= @account.name %></h1>
+
+<ul>
+	<li>
+		 <strong>Balance:</strong>
+		 <%= balance_amount_subunits_for_account(@account.id) %>
+	</li>
+
+	<li>
+		 <strong>Currency:</strong>
+		<%= @account.currency %>
+	</li>
+
+	<li>
+		 <strong>Kind:</strong>
+		<%= @account.kind %>
+	</li>
+
+	<li>
+		 <strong>Meta data:</strong>
+		<%= @account.meta_data %>
+	</li>
+
+	<li>
+		 <strong>Object Type:</strong>
+		<%= @account.object_type %>
+	</li>
+
+	<li>
+		 <strong>Object UID:</strong>
+		<%= @account.object_uid %>
+	</li>
+
+	<li>
+		 <strong>UID:</strong>
+		<%= @account.uid %>
+	</li>
+</ul>
+
+<span><%= link "Edit", to: Routes.account_path(@conn, :edit, @account) %></span>

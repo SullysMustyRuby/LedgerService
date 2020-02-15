@@ -1,0 +1,40 @@
+<h1>Transaction</h1>
+
+<ul>
+
+	<li>
+		 <strong>Amount:</strong>
+		<%= @transaction.amount_subunits %>
+	</li>
+
+	<li>
+		 <strong>Currency:</strong>
+		<%= @transaction.amount_currency %>
+	</li>
+
+	<li>
+		 <strong>Description:</strong>
+		<%= @transaction.description %>
+	</li>
+
+	<li>
+		 <strong>Kind:</strong>
+		<%= @transaction.kind %>
+	</li>
+
+	<li>
+		 <strong>UID:</strong>
+		<%= @transaction.uid %>
+	</li>
+
+	<li>
+		 <strong>Account UID:</strong>
+		<%= link get_account_uid(@transaction.account_id), to: Routes.account_path(@conn, :show, @transaction.account_id) %>
+	</li>
+
+	<li>
+		 <strong>Entry UID:</strong>
+		 <%= link get_entry_uid(@transaction.entry_id), to: Routes.entry_path(@conn, :show, @transaction.entry_id) %>
+	</li>
+
+</ul>

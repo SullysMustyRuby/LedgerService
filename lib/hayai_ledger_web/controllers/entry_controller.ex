@@ -5,28 +5,22 @@ defmodule HayaiLedgerWeb.EntryController do
 
   action_fallback HayaiLedgerWeb.FallbackController
 
+  def index(conn, _params) do
+    with {:ok, organization_id} <- current_organization_id(conn),
+      entries <- Ledgers.list_entries(organization_id)
+    do
+      render(conn, "index.html", entries: entries)
+    end
+  end
+
   # GET
+  def show(conn, %{ "id" => id }) do
+    entry = Ledgers.get_entry_with_transactions(id)
+    render(conn, "show.html", %{ entry: entry })
+  end
+
   def show(conn, %{ "uid" => uid }) do
-  	with {:ok, entry} <- Ledgers.get_entry_by_uid(uid) do
-	  	render(conn, "show.json", %{ entry: entry })
-	  end
-  end
-
-	# POST
-  def create(conn, %{ "journal_entry" => %{ "entry" => entry_attrs, "transactions" => transactions } }) do
-  	with transaction_changesets <- Enum.map(transactions, fn(transaction) -> Ledgers.build_transaction(transaction) end),
-  		{:ok, entry, transactions} <- Ledgers.journal_entry(entry_attrs, transaction_changesets) 
-  	do
-  		render(conn, "show.json", %{ entry: entry, transactions: transactions })
-  	end
-  end
-
-	# POST
-  def create(conn, %{ "journal_entry" => %{ "entry" => entry_attrs, "transactions" => transactions, "options" => options } }) do
-  	with transaction_changesets <- Enum.map(transactions, fn(transaction) -> Ledgers.build_transaction(transaction) end),
-  		{:ok, entry, transactions} <- Ledgers.safe_journal_entry(entry_attrs, transaction_changesets, options) 
-  	do
-  		render(conn, "show.json", %{ entry: entry, transactions: transactions })
-  	end
+    entry = Ledgers.get_entry_by_uid(uid)
+    render(conn, "show.html", %{ entry: entry })
   end
 end

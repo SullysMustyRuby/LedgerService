@@ -226,6 +226,12 @@ defmodule HayaiLedger.Accounts do
     Repo.all(Account)
   end
 
+  def list_accounts(organization_id) do
+    Repo.all(from a in Account,
+      where: a.organization_id == ^organization_id,
+      select: a)
+  end
+
   @doc """
   Returns the list of account_types.
 

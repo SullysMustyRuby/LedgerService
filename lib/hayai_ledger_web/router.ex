@@ -41,23 +41,26 @@ defmodule HayaiLedgerWeb.Router do
     delete "/logout", SessionController, :delete
 
     resources "/api_keys", ApiKeyController, only: [:index, :show]
-    resources "/users", UserController, except: [:create, :new]
+    resources "/accounts", AccountController, except: [:delete]
+    resources "/entries", EntryController, only: [:index, :show]
     resources "/organizations", OrganizationController
+    resources "/transactions", TransactionController, only: [:index, :show]
+    resources "/users", UserController, except: [:create, :new]
     get "/dashboard", DashboardController, :index
   end
 
-  scope "/api", HayaiLedgerWeb do
+  scope "/api", as: :api  do
     pipe_through :api
 
-    get "/accounts/:uid", Api.AccountController, :show
-    get "/accounts/balance/:uid", Api.AccountController, :balance
-    get "/accounts/running_balance/:uid", Api.AccountController, :running_balance
-    get "/accounts/transactions/:uid", Api.AccountController, :transactions
-    post "/accounts/create", Api.AccountController, :create
+    get "/accounts/:uid", HayaiLedgerWeb.Api.AccountController, :show
+    get "/accounts/balance/:uid", HayaiLedgerWeb.Api.AccountController, :balance
+    get "/accounts/running_balance/:uid", HayaiLedgerWeb.Api.AccountController, :running_balance
+    get "/accounts/transactions/:uid", HayaiLedgerWeb.Api.AccountController, :transactions
+    post "/accounts/create", HayaiLedgerWeb.Api.AccountController, :create
     
-    get "/entries/:uid", Api.EntryController, :show
-    post "/entries/create", Api.EntryController, :create
+    get "/entries/:uid", HayaiLedgerWeb.Api.EntryController, :show
+    post "/entries/create", HayaiLedgerWeb.Api.EntryController, :create
 
-    get "/transactions/:uid", Api.TransactionController, :show
+    get "/transactions/:uid", HayaiLedgerWeb.Api.TransactionController, :show
   end
 end

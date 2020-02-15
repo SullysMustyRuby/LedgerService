@@ -1,0 +1,22 @@
+<h1>Listing Transactions</h1>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Amount</th>
+      <th scope="col">Currency</th>
+      <th scope="col">Kind</th>
+      <th scope="col"> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= for transaction <- @transactions do %>
+      <tr>
+        <td scope="row"><%= transaction.amount_subunits %></td>
+        <td scope="row"><%= transaction.amount_currency %></td>
+        <td scope="row"><%= transaction.kind %></td>
+        <td scope="row"><%= link "Show", to: Routes.transaction_path(@conn, :show, transaction.id) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

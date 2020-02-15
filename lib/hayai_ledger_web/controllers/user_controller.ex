@@ -5,8 +5,11 @@ defmodule HayaiLedgerWeb.UserController do
   alias HayaiLedger.Organizations.User
 
   def index(conn, _params) do
-    users = Organizations.list_users()
-    render(conn, "index.html", users: users)
+    with {:ok, organization_id} <- current_organization_id(conn),
+      users <- Organizations.list_users(organization_id)
+    do
+      render(conn, "index.html", users: users)
+    end
   end
 
   def new(conn, _params) do

@@ -33,10 +33,10 @@
     <main role="main" class="container">
       <%= if @conn.assigns[:current_organization] do %>
         <div class="row">
-          <div class="col-4">
+          <div class="col-3">
             <%= render HayaiLedgerWeb.SharedView, "nav.html", assigns %>
           </div>
-          <div class="col-8">
+          <div class="col-9">
             <div class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></div>
             <div class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></div>
             <%= render @view_module, @view_template, assigns %>

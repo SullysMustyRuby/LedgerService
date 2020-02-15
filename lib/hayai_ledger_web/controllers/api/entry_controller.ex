@@ -15,7 +15,9 @@ defmodule HayaiLedgerWeb.Api.EntryController do
 	# POST
   def create(conn, %{ "journal_entry" => %{ "entry" => entry_attrs, "transactions" => transactions } }) do
   	with transaction_changesets <- Enum.map(transactions, fn(transaction) -> Ledgers.build_transaction(transaction) end),
-  		{:ok, entry, transactions} <- Ledgers.journal_entry(entry_attrs, transaction_changesets) 
+      {:ok, organization_id} <- organization_id(conn),
+      entry_with_org <- Map.put(entry_attrs, "organization_id", organization_id),
+  		{:ok, entry, transactions} <- Ledgers.journal_entry(entry_with_org, transaction_changesets) 
   	do
   		render(conn, "show.json", %{ entry: entry, transactions: transactions })
   	end

@@ -133,6 +133,14 @@ defmodule HayaiLedger.Organizations do
     Repo.all(User)
   end
 
+  def list_users(organization_id) do
+    Repo.all(from m in Membership,
+      where: m.organization_id == ^organization_id,
+      join: u in User,
+      where: m.user_id == u.id,
+      select: u)
+  end
+
   @doc """
   Gets a single user.
 

@@ -16,7 +16,7 @@ defmodule HayaiLedgerWeb.Api.TransactionControllerTest do
     	account = account_fixture()
       valid_transaction_attrs = %{ account_uid: account.uid, amount_currency: "JPY", amount_subunits: 42, entry_id: entry.id, kind: "credit" }
       {:ok, transaction} = Ledgers.create_transaction(valid_transaction_attrs)
-      response = get(conn, Routes.transaction_path(conn, :show, transaction.uid))
+      response = get(conn, Routes.api_transaction_path(conn, :show, transaction.uid))
             |> json_response(200)
 
       assert account.uid == response["account_uid"]
@@ -30,7 +30,7 @@ defmodule HayaiLedgerWeb.Api.TransactionControllerTest do
     end
 
     test "returns error if uid not found", %{ auth_conn: conn } do
-    	assert %{"error" => "transaction not found for uid: 555"} == get(conn, Routes.transaction_path(conn, :show, "555"))
+    	assert %{"error" => "transaction not found for uid: 555"} == get(conn, Routes.api_transaction_path(conn, :show, "555"))
             																												|> json_response(500)
     end
   end

@@ -1,0 +1,25 @@
+<h1>Entry</h1>
+
+<ul>
+	<li>
+		<strong>Description:</strong>
+		<%= @entry.description %>
+	</li>
+
+	<li>
+		<strong>Object Type:</strong>
+		<%= @entry.object_type %>
+	</li>
+
+	<li>
+		<strong>Object UID:</strong>
+		<%= @entry.object_uid %>
+	</li>
+
+	<li>
+		<strong>UID:</strong>
+		<%= @entry.uid %>
+	</li>
+</ul>
+
+<%= render HayaiLedgerWeb.TransactionView, "index.html", %{ transactions: @entry.transactions, conn: @conn  } %>

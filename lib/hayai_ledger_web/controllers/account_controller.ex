@@ -1,51 +1,60 @@
 defmodule HayaiLedgerWeb.AccountController do
-  use HayaiLedgerWeb, :api_controller
+  use HayaiLedgerWeb, :controller
 
   alias HayaiLedger.Accounts
+  alias HayaiLedger.Accounts.Account
   alias HayaiLedger.Ledgers
 
-  action_fallback HayaiLedgerWeb.Api.FallbackController
+  action_fallback HayaiLedgerWeb.FallbackController
 
-  # GET
-  def show(conn, %{ "uid" => uid }) do
-    with {:ok, account} <- Accounts.get_account_by_uid(uid) do
-      render(conn, "show.json", %{ account: account })
-    end
-  end
-
-  # GET
-  def balance(conn, %{ "uid" => uid }) do
-  	with {:ok, account} <- Accounts.get_account_by_uid(uid),
-	  	amount_subunits when is_integer(amount_subunits) <- Ledgers.transactions_sum_by_account(account.id)
-  	do
-	  	render(conn, "balance.json", %{ account: account, amount_subunits: amount_subunits })
-	  end
-  end
-
-  # GET
-  def running_balance(conn, %{ "uid" => uid }) do
-    with {:ok, account} <- Accounts.get_account_by_uid(uid),
-      amount_subunits when is_integer(amount_subunits) <- Accounts.balance_amount_subunits_for_account(account.id)
+  def index(conn, _params) do
+    with {:ok, organization_id} <- current_organization_id(conn),
+      accounts <- Accounts.list_accounts(organization_id)
     do
-      render(conn, "balance.json", %{ account: account, amount_subunits: amount_subunits })
+      render(conn, "index.html", accounts: accounts)
     end
   end
 
-  # GET
-  def transactions(conn, %{ "uid" => uid }) do
-    with {:ok, account} <- Accounts.get_account_by_uid(uid),
-      transactions when is_list(transactions) <- Ledgers.list_transactions(account.id)
-    do
-      render(conn, "show.json", %{ account: account, transactions: transactions })
-    end
+  def new(conn, _params) do
+    changeset = Accounts.change_account(%Account{})
+    render(conn, "new.html", changeset: changeset)
   end
 
-  # POST
   def create(conn, %{ "account" => account_params }) do
-		with {:ok, organization_id} <- organization_id(conn),
+    with {:ok, organization_id} <- current_organization_id(conn),
       {:ok, account} <- Accounts.create_account(account_params, organization_id) 
     do
-			render(conn, "new.json", %{ account: account })
-		end
+      conn
+      |> put_flash(:info, "Account created successfully.")
+      |> redirect(to: Routes.account_path(conn, :show, account))
+    else
+      {:error, %Ecto.Changeset{} = changeset} ->
+        render(conn, "new.html", changeset: changeset)
+    end
+  end
+
+  def show(conn, %{ "id" => id }) do
+    account = Accounts.get_account!(id)
+    render(conn, "show.html", %{ account: account })
+  end
+
+  def edit(conn, %{"id" => id}) do
+    account = Accounts.get_account!(id)
+    changeset = Accounts.change_account(account)
+    render(conn, "edit.html", account: account, changeset: changeset)
+  end
+
+  def update(conn, %{"id" => id, "account" => account_params}) do
+    account = Accounts.get_account!(id)
+
+    case Accounts.update_account(account, account_params) do
+      {:ok, account} ->
+        conn
+        |> put_flash(:info, "Account updated successfully.")
+        |> redirect(to: Routes.account_path(conn, :show, account))
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        render(conn, "edit.html", account: account, changeset: changeset)
+    end
   end
 end

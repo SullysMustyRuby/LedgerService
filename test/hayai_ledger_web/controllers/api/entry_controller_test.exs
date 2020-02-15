@@ -21,7 +21,7 @@ defmodule HayaiLedgerWeb.Api.EntryControllerTest do
       entry_attrs = %{ "description" => "test create journal entry"}
 
       {:ok, entry, _transactions} = Ledgers.journal_entry(entry_attrs, [transaction_1, transaction_2, transaction_3])
-      response = get(conn, Routes.entry_path(conn, :show, entry.uid))
+      response = get(conn, Routes.api_entry_path(conn, :show, entry.uid))
                 |> json_response(200)
 
       assert entry.uid == response["uid"]
@@ -59,7 +59,7 @@ defmodule HayaiLedgerWeb.Api.EntryControllerTest do
       transaction_3 = %{ "account_uid" => context.equity_account.uid, "amount_currency" => "THB", "amount_subunits" => 900, "kind" => "credit" }
       journal_entry_params = %{ "entry" => context.entry_attrs, "transactions" => [transaction_1, transaction_2, transaction_3] }
 
-  		response = post(conn, Routes.entry_path(conn, :create), journal_entry: journal_entry_params)
+  		response = post(conn, Routes.api_entry_path(conn, :create), journal_entry: journal_entry_params)
   		      		|> json_response(200)
   		
       {:ok, entry} = Ledgers.get_entry_by_uid(response["uid"])
@@ -84,7 +84,7 @@ defmodule HayaiLedgerWeb.Api.EntryControllerTest do
       options = %{ "account" => context.asset_account.uid, "minimum" => "non_negative" }
       journal_entry_params = %{ "entry" => context.entry_attrs, "transactions" => [transaction_1, transaction_2, transaction_3], "options" => options }
 
-      response = post(conn, Routes.entry_path(conn, :create), journal_entry: journal_entry_params)
+      response = post(conn, Routes.api_entry_path(conn, :create), journal_entry: journal_entry_params)
                 |> json_response(200)
       
       {:ok, entry} = Ledgers.get_entry_by_uid(response["uid"])
@@ -107,7 +107,7 @@ defmodule HayaiLedgerWeb.Api.EntryControllerTest do
       transaction_2 = %{ "amount_currency" => "THB", "amount_subunits" => 100, "kind" => "credit" }
       transaction_3 = %{ "amount_currency" => "THB", "amount_subunits" => 900, "kind" => "credit" }
       journal_entry_params = %{ "entry" => context.entry_attrs, "transactions" => [transaction_1, transaction_2, transaction_3] }
-      response = post(conn, Routes.entry_path(conn, :create), journal_entry: journal_entry_params)
+      response = post(conn, Routes.api_entry_path(conn, :create), journal_entry: journal_entry_params)
                 |> json_response(500)
 
       assert %{"error" => "transactions must be valid"} == response
