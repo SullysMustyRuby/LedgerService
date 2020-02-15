@@ -1,5 +1,5 @@
 defmodule HayaiLedgerWeb.Api.EntryView do
-  use HayaiLedgerWeb, :view
+  use HayaiLedgerWeb, :api_view
 
   alias HayaiLedger.Ledgers.Entry
   alias HayaiLedgerWeb.Api.TransactionView

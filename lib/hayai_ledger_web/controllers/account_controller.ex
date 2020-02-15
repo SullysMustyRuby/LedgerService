@@ -1,4 +1,4 @@
-defmodule HayaiLedgerWeb.Api.AccountController do
+defmodule HayaiLedgerWeb.AccountController do
   use HayaiLedgerWeb, :api_controller
 
   alias HayaiLedger.Accounts

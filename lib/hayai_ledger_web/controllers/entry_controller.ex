@@ -1,9 +1,9 @@
-defmodule HayaiLedgerWeb.Api.EntryController do
-  use HayaiLedgerWeb, :api_controller
+defmodule HayaiLedgerWeb.EntryController do
+  use HayaiLedgerWeb, :controller
 
   alias HayaiLedger.Ledgers
 
-  action_fallback HayaiLedgerWeb.Api.FallbackController
+  action_fallback HayaiLedgerWeb.FallbackController
 
   # GET
   def show(conn, %{ "uid" => uid }) do

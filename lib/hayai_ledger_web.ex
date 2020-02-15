@@ -28,6 +28,17 @@ defmodule HayaiLedgerWeb do
     end
   end
 
+  def api_view do
+    quote do
+      use Phoenix.View,
+        root: "lib/hayai_ledger_web/templates",
+        namespace: HayaiLedgerWeb
+
+      import HayaiLedgerWeb.Gettext
+      
+    end
+  end
+
   def controller do
     quote do
       use Phoenix.Controller, namespace: HayaiLedgerWeb
