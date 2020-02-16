@@ -7,11 +7,12 @@ defmodule Support.Fixtures.AccountFixtures do
   def account_attrs() do
   	%{
   		"currency" => "JPY",
-  		"description" => "some description",
-      "kind" => "asset",
-  		"name" => "some name",
-  		"organization_id" => organization_fixture().id,
-  		"type_id" => account_type_fixture().id
+      "meta_data" => %{ "customer" => "id" },
+      "name" => "some name",
+      "object_type" => "Account",
+      "object_uid" => "originating_sytstem_uid",
+  		"type" => "equity",
+      "organization_id" => organization_fixture().id,
   	}
   end
 
@@ -23,21 +24,6 @@ defmodule Support.Fixtures.AccountFixtures do
 
     account
 	end
-
-  def account_type_fixture(attrs \\ %{}) do
-  	{:ok, type} =
-  		attrs
-  		|> Enum.into(account_type_attrs())
-  		|> Accounts.create_account_type()
-
-  	type
-  end
-
-  def account_type_attrs() do
-  	%{ 
-  		"name" => "cash" 
-  	}
-  end
   
   def balance_attrs() do
     %{

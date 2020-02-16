@@ -2,4 +2,5 @@
 
 <p><%= @organization.description %></p>
 
-<span><%= link "Edit", to: Routes.organization_path(@conn, :edit, @organization) %></span>
+<span><%= link "Edit", to: Routes.organization_path(@conn, :edit, @organization), class: "btn btn-primary" %></span>
+<span><%= link "Dashboard", to: Routes.dashboard_path(@conn, :index), class: "btn btn-primary" %></span>

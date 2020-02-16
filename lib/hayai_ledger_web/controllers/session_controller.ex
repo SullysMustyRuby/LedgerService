@@ -27,6 +27,7 @@ defmodule HayaiLedgerWeb.SessionController do
   def delete(conn, _params) do
     conn
     |> delete_session(:current_user_id)
+    |> delete_session(:current_organization_id)
     |> put_flash(:info, "Signed out successfully.")
     |> redirect(to: Routes.public_path(conn, :index))
   end

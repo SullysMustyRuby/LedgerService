@@ -29,19 +29,6 @@ defmodule HayaiLedger.Accounts do
   end
 
   @doc """
-  Returns an `%Ecto.Changeset{}` for tracking account_type changes.
-
-  ## Examples
-
-      iex> change_account_type(account_type)
-      %Ecto.Changeset{source: %AccountType{}}
-
-  """
-  def change_account_type(%AccountType{} = account_type) do
-    AccountType.changeset(account_type, %{})
-  end
-
-  @doc """
   Creates a account.
 
   ## Examples
@@ -69,24 +56,6 @@ defmodule HayaiLedger.Accounts do
     end
   end
 
-  @doc """
-  Creates a account_type.
-
-  ## Examples
-
-      iex> create_account_type(%{field: value})
-      {:ok, %AccountType{}}
-
-      iex> create_account_type(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_account_type(attrs \\ %{}) do
-    %AccountType{}
-    |> AccountType.changeset(attrs)
-    |> Repo.insert()
-  end
-  
   @doc """
   Creates a balance.
 
@@ -122,22 +91,6 @@ defmodule HayaiLedger.Accounts do
   #   Repo.delete(account)
   # end
 
-  @doc """
-  Deletes a AccountType.
-
-  ## Examples
-
-      iex> delete_account_type(account_type)
-      {:ok, %AccountType{}}
-
-      iex> delete_account_type(account_type)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  #  soft delete this
-  # def delete_account_type(%AccountType{} = account_type) do
-  #   Repo.delete(account_type)
-  # end
 
   @doc """
   Gets a single account.
@@ -159,7 +112,6 @@ defmodule HayaiLedger.Accounts do
 
   def get_account_by_uid!(uid) do
     Repo.get_by(Account, uid: uid)
-      |> Repo.preload(:type)
   end
 
   def get_account_by_uid(uid) do
@@ -176,22 +128,6 @@ defmodule HayaiLedger.Accounts do
     where: a.id == ^id,
     select: a.uid)
   end
-
-  @doc """
-  Gets a single account_type.
-
-  Raises `Ecto.NoResultsError` if the Account type does not exist.
-
-  ## Examples
-
-      iex> get_account_type!(123)
-      %AccountType{}
-
-      iex> get_account_type!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_account_type!(id), do: Repo.get!(AccountType, id)
 
   @doc """
   Gets a single balance.
@@ -233,19 +169,6 @@ defmodule HayaiLedger.Accounts do
   end
 
   @doc """
-  Returns the list of account_types.
-
-  ## Examples
-
-      iex> list_account_types()
-      [%AccountType{}, ...]
-
-  """
-  def list_account_types do
-    Repo.all(AccountType)
-  end
-
-  @doc """
   Returns the list of balances.
 
   ## Examples
@@ -256,24 +179,6 @@ defmodule HayaiLedger.Accounts do
   """
   def list_balances do
     Repo.all(Balance)
-  end
-
-  @doc """
-  Updates a account_type.
-
-  ## Examples
-
-      iex> update_account_type(account_type, %{field: new_value})
-      {:ok, %AccountType{}}
-
-      iex> update_account_type(account_type, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_account_type(%AccountType{} = account_type, attrs) do
-    account_type
-    |> AccountType.changeset(attrs)
-    |> Repo.update()
   end
 
   @doc """
@@ -312,7 +217,6 @@ defmodule HayaiLedger.Accounts do
     |> Account.changeset(attrs)
     |> Repo.insert()
   end
-
 
   defp insert_account(attrs, organization_id) do
     Map.put(attrs, "organization_id", organization_id)

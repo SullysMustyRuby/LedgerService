@@ -2,4 +2,3 @@
 
 <%= render "form.html", Map.put(assigns, :action, Routes.organization_path(@conn, :update, @organization)) %>
 
-<span><%= link "Back", to: Routes.organization_path(@conn, :index) %></span>

@@ -50,7 +50,7 @@ defmodule HayaiLedgerWeb.Api.AccountControllerTest do
 
   describe "GET /accounts/running_balance/:uid" do
     test "returns the balance json", %{auth_conn: auth_conn} do
-      equity_account = account_fixture(%{ "kind" => "equity" })
+      equity_account = account_fixture(%{ "type" => "equity" })
 
       Accounts.update_balance(equity_account.id, 1000)
       response = get(auth_conn, Routes.api_account_path(auth_conn, :running_balance, equity_account.uid))
@@ -70,8 +70,8 @@ defmodule HayaiLedgerWeb.Api.AccountControllerTest do
 
   describe "GET /accounts/transactions/:uid" do
     test "returns the transactions for the account_uid", %{auth_conn: auth_conn} do
-      asset_account = account_fixture(%{ "kind" => "asset" })
-      equity_account = account_fixture(%{ "kind" => "equity" })
+      asset_account = account_fixture(%{ "type" => "asset" })
+      equity_account = account_fixture(%{ "type" => "equity" })
       {:ok, entry} = Ledgers.create_entry(%{ desription: "no description" })
       transaction_fixture(%{ "account_uid" => asset_account.uid, "entry_id" => entry.id })
       transaction_fixture(%{ "account_uid" => equity_account.uid, "entry_id" => entry.id })
@@ -96,7 +96,7 @@ defmodule HayaiLedgerWeb.Api.AccountControllerTest do
 	  	resp_conn = post(auth_conn, Routes.api_account_path(auth_conn, :create), account: %{ "name" => "not enough info" })
       response = json_response(resp_conn, 500)
 	  	assert "can't be blank" == response["currency"]
-      assert "can't be blank" == response["kind"]
+      assert "can't be blank" == response["type"]
 	  end
   end
 end

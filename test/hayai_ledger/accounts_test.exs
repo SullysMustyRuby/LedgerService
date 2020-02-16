@@ -5,7 +5,7 @@ defmodule HayaiLedger.AccountsTest do
   import Support.Fixtures.OrganizationFixtures, only: [{:organization_fixture, 0}]
 
   alias HayaiLedger.Accounts
-  alias HayaiLedger.Accounts.{Balance, Account, AccountType}
+  alias HayaiLedger.Accounts.{Balance, Account}
 
   describe "balance_amount_subunits_for_account/1" do
     test "returns the amount_subunits" do
@@ -23,13 +23,6 @@ defmodule HayaiLedger.AccountsTest do
     test "returns a account changeset" do
       account = account_fixture()
       assert %Ecto.Changeset{} = Accounts.change_account(account)
-    end
-  end
-
-  describe "change_account_type/1" do
-    test "returns a account_type changeset" do
-      account_type = account_type_fixture()
-      assert %Ecto.Changeset{} = Accounts.change_account_type(account_type)
     end
   end
 
@@ -69,17 +62,6 @@ defmodule HayaiLedger.AccountsTest do
 
     test "with invalid data returns error changeset", %{ organization: organization } do
       assert {:error, %Ecto.Changeset{}} = Accounts.create_account(%{ "kind" => nil }, organization.id)
-    end
-  end
-
-  describe "create_account_type/1" do
-    test "with valid data creates a account_type" do
-      assert {:ok, %AccountType{} = account_type} = Accounts.create_account_type(account_type_attrs())
-      assert account_type.name == "cash"
-    end
-
-    test "with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Accounts.create_account_type(%{ name: nil })
     end
   end
 
@@ -128,25 +110,10 @@ defmodule HayaiLedger.AccountsTest do
     # end
   end
 
-  describe "delete_account_type/1" do
-    # test "deletes the account_type" do
-    #   account_type = account_type_fixture()
-    #   assert {:ok, %AccountType{}} = Accounts.delete_account_type(account_type)
-    #   assert_raise Ecto.NoResultsError, fn -> Accounts.get_account_type!(account_type.id) end
-    # end
-  end
-
   describe "get_account!/1" do
     test "returns the account with given id" do
       account = account_fixture()
       assert Accounts.get_account!(account.id) == account
-    end
-  end
-
-  describe "get_account_type!/1" do
-    test "returns the account_type with given id" do
-      account_type = account_type_fixture()
-      assert Accounts.get_account_type!(account_type.id) == account_type
     end
   end
 
@@ -176,13 +143,6 @@ defmodule HayaiLedger.AccountsTest do
     end
   end
 
-  describe "list_account_types/0" do
-    test "returns all account_types" do
-      account_type = account_type_fixture()
-      assert Accounts.list_account_types() == [account_type]
-    end
-  end
-
   describe "update_account/2" do
     test "uwith valid data updates the account" do
       update_account_attrs = %{ meta_data: %{}, kind: "asset", name: "some updated name", object_type: "some updated object_type", object_uid: "some updated object_uid", uid: "some updated uid" }
@@ -199,22 +159,6 @@ defmodule HayaiLedger.AccountsTest do
       account = account_fixture()
       assert {:error, %Ecto.Changeset{}} = Accounts.update_account(account, %{ currency: nil })
       assert account == Accounts.get_account!(account.id)
-    end
-  end
-
-  describe "update_account_type/2" do
-    test "with valid data updates the account_type" do
-      account_type = account_type_fixture()
-      update_type_attrs = %{ description: "some updated description" }
-      assert {:ok, %AccountType{} = account_type} = Accounts.update_account_type(account_type, update_type_attrs)
-      assert account_type.description == "some updated description"
-      assert account_type.name == "cash"
-    end
-
-    test "with invalid data returns error changeset" do
-      account_type = account_type_fixture()
-      assert {:error, %Ecto.Changeset{}} = Accounts.update_account_type(account_type, %{ name: nil })
-      assert account_type == Accounts.get_account_type!(account_type.id)
     end
   end
 

@@ -14,18 +14,18 @@ defmodule HayaiLedger.Accounts.AccountTest do
   		assert changeset.errors[:currency] == {"can't be blank", [validation: :required]}
   	end
 
-    test "returns error if no kind" do
-      bad_kind = Map.delete(account_attrs(), "kind")
-      changeset = Account.changeset(%Account{}, bad_kind)
+    test "returns error if no type" do
+      bad_type = Map.delete(account_attrs(), "type")
+      changeset = Account.changeset(%Account{}, bad_type)
       assert changeset.valid? == false
-      assert changeset.errors[:kind] == {"can't be blank", [validation: :required]}
+      assert changeset.errors[:type] == {"can't be blank", [validation: :required]}
     end
 
-    test "returns error if kind is not asset, equity, or liability" do
-      bad_kind = Map.put(account_attrs(), "kind", "nonono")
-      changeset = Account.changeset(%Account{}, bad_kind)
+    test "returns error if type is not a proper type" do
+      bad_type = Map.put(account_attrs(), "type", "nonono")
+      changeset = Account.changeset(%Account{}, bad_type)
       assert changeset.valid? == false
-      assert changeset.errors[:kind] == {"is invalid", [{:validation, :inclusion}, {:enum, ["asset", "equity", "liability"]}]}
+      assert changeset.errors[:type] == {"is invalid", [{:validation, :inclusion}, {:enum, ["asset", "equity", "expense", "liability", "revenue"]}]}
     end
 
   	test "returns error if no name" do

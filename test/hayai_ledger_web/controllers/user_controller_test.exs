@@ -1,8 +1,6 @@
 defmodule HayaiLedgerWeb.UserControllerTest do
   use HayaiLedgerWeb.ConnCase
 
-  import Support.Fixtures.OrganizationFixtures, only: [{:user_fixture, 0}]
-
   alias HayaiLedger.Organizations
 
   @create_attrs %{ email: "some email", first_name: "first_name", last_name: "last_name", password: "password", password_confirmation: "password"}

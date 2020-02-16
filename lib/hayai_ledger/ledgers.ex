@@ -245,6 +245,7 @@ defmodule HayaiLedger.Ledgers do
   end
 
   defp group_by_account_kind(transactions) do
+    # Enum.group_by(transactions, fn(changeset) -> Ecto.Changeset.fetch_change!(changeset, :kind) end)
     Enum.group_by(transactions, fn(changeset) -> get_account_kind(changeset) end)
   end
 
@@ -326,8 +327,11 @@ defmodule HayaiLedger.Ledgers do
 
   defp validate_amounts_balance(transactions) do
     with grouped <- group_by_account_kind(transactions),
+      # [{"credit", debit_kind_credits}, {"debit", debit_kind_debits}] <- total_credits_and_debits(grouped["debit"]),
+      # [{"credit", credit_kind_credits}, {"debit", credit_kind_debits}] <- total_credits_and_debits(grouped["credit"]),
       [{"credit", asset_credits}, {"debit", asset_debits}] <- total_credits_and_debits(grouped["asset"]),
       [{"credit", other_credits}, {"debit", other_debits}] <- total_credits_and_debits(grouped["other"]),
+      # true <- (debit_kind_debits - debit_kind_credits) == (credit_kind_credits - credit_kind_debits)
       true <- (asset_debits - asset_credits) == (other_credits - other_debits)
     do
       :ok
