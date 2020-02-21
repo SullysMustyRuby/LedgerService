@@ -3,7 +3,7 @@
 <ul>
 	<li>
 		 <strong>Balance:</strong>
-		 <%= balance_amount_subunits_for_account(@account.id) %>
+		 <%= current_balance(@account.id) %>
 	</li>
 
 	<li>
@@ -12,8 +12,8 @@
 	</li>
 
 	<li>
-		 <strong>Kind:</strong>
-		<%= @account.kind %>
+		 <strong>Type:</strong>
+		<%= @account.type %>
 	</li>
 
 	<li>

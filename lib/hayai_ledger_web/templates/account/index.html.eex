@@ -6,7 +6,7 @@
       <th scope="col">Name</th>
       <th scope="col">Balance</th> 
       <th scope="col">Currency</th>
-      <th scope="col">Kind</th>
+      <th scope="col">Type</th>
       <th scope="col">Object Type</th>
     </tr>
   </thead>
@@ -14,9 +14,9 @@
     <%= for account <- @accounts do %>
       <tr>
         <td scope="row"><%= link account.name, to: Routes.account_path(@conn, :show, account.id) %></td>
-        <td scope="row"><%= balance_amount_subunits_for_account(account.id) %></td>
+        <td scope="row"><%= current_balance(account.id) %></td>
         <td scope="row"><%= account.currency %></td>
-        <td scope="row"><%= account.kind %></td>
+        <td scope="row"><%= account.type %></td>
         <td scope="row"><%= account.object_type %></td>
       </tr>
     <% end %>

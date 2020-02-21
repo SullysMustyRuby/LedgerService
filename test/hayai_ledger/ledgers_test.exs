@@ -165,9 +165,9 @@ defmodule HayaiLedger.LedgersTest do
     end
 
     test "returns entry upon success" do
-      asset_account = account_fixture(%{ "kind" => "asset" })
-      equity_account = account_fixture(%{ "kind" => "equity" })
-      liability_account = account_fixture(%{ "kind" => "liability" })
+      asset_account = account_fixture(%{ "type" => "asset" })
+      equity_account = account_fixture(%{ "type" => "equity" })
+      liability_account = account_fixture(%{ "type" => "liability" })
 
       assert 0 = Accounts.balance_amount_subunits_for_account(asset_account.id)
       assert 0 = Accounts.balance_amount_subunits_for_account(equity_account.id)
@@ -219,8 +219,8 @@ defmodule HayaiLedger.LedgersTest do
   describe "list_transactions/1" do
     test "returns all transactions for the organization" do
       organization = organization_fixture()
-      asset_account = account_fixture(%{ "kind" => "asset", "organization_id" => organization.id })
-      equity_account = account_fixture(%{ "kind" => "equity", "organization_id" => organization.id })
+      asset_account = account_fixture(%{ "type" => "asset", "organization_id" => organization.id })
+      equity_account = account_fixture(%{ "type" => "equity", "organization_id" => organization.id })
       for _index <- (1..3) do
         transaction_fixture()
         transaction_fixture(%{ "account_uid" => asset_account.uid })
@@ -237,8 +237,8 @@ defmodule HayaiLedger.LedgersTest do
 
   describe "list_transactions_for_account/1" do
     test "returns all transactions for the account_id" do
-      asset_account = account_fixture(%{ "kind" => "asset" })
-      equity_account = account_fixture(%{ "kind" => "equity" })
+      asset_account = account_fixture(%{ "type" => "asset" })
+      equity_account = account_fixture(%{ "type" => "equity" })
       transaction_fixture(%{ "account_uid" => equity_account.uid })
       transaction_fixture(%{ "account_uid" => asset_account.uid })
 
@@ -249,9 +249,9 @@ defmodule HayaiLedger.LedgersTest do
 
   describe "safe_journal_entry/3" do
     setup do
-      asset_account = account_fixture(%{ "kind" => "asset" })
-      equity_account = account_fixture(%{ "kind" => "equity" })
-      liability_account = account_fixture(%{ "kind" => "liability" })
+      asset_account = account_fixture(%{ "type" => "asset" })
+      equity_account = account_fixture(%{ "type" => "equity" })
+      liability_account = account_fixture(%{ "type" => "liability" })
       %{
         asset_account: asset_account,
         equity_account: equity_account,

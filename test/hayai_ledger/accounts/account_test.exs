@@ -51,8 +51,10 @@ defmodule HayaiLedger.Accounts.AccountTest do
 
   	test "returns an account when sucessful" do
   		changeset = Account.changeset(%Account{}, account_attrs())
-  		{result, _account} = Repo.insert(changeset)
+  		{result, account} = Repo.insert(changeset)
   		assert result == :ok
+      assert account.type == "equity"
+      assert account.kind == "credit"
   	end
   end
 end

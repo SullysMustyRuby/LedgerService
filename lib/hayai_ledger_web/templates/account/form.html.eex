@@ -19,7 +19,7 @@
 
   <div class="form-group">
     <%= label f, :kind %>
-    <%= select f, :kind, ["asset", "equity", "liability"], [class: "form-control"] %>
+    <%= select f, :kind, account_types(), [class: "form-control"] %>
     <%= error_tag f, :kind %>
   </div>
 

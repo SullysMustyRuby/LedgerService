@@ -1,6 +1,11 @@
 defmodule HayaiLedgerWeb.AccountView do
   use HayaiLedgerWeb, :view
 
-  import HayaiLedger.Accounts, only: [{:balance_amount_subunits_for_account, 1}]
+  def account_types() do
+  	HayaiLedger.Accounts.Account.types()
+  end
 
+  def current_balance(account_id) do
+  	HayaiLedger.Accounts.balance_amount_subunits_for_account(account_id)
+  end
 end
