@@ -1,5 +1,6 @@
 defmodule Support.Fixtures.ProcedureFixtures do
 
+  import Support.Fixtures.AccountFixtures, only: [{:account_fixture, 1}]
 	import Support.Fixtures.OrganizationFixtures, only: [{:organization_fixture, 0}]
 
 	alias HayaiLedger.Procedures
@@ -74,51 +75,157 @@ defmodule Support.Fixtures.ProcedureFixtures do
       type: "Account",
       action: "create",
       organization_id: organization_id,
-      inputs: inputs(),
-      params: params()
+      inputs: [
+        %{ name: "object_uid" },
+        %{ name: "currency" }
+        ],
+        params: [
+        %{
+          name: "currency", 
+          value: "currency",
+          type: "inputs"
+        },
+        %{
+          name: "name", 
+          value: "BankAccount",
+          type: "string"
+        },
+        %{
+          name: "object_type", 
+          value: "Site",
+          type: "string"
+        },
+        %{
+          name: "object_uid", 
+          value: "object_uid",
+          type: "inputs"
+        },
+        %{
+          name: "type", 
+          value: "asset",
+          type: "string"
+        }
+      ]
     })
 
     procedure
   end
 
-  def inputs() do
-    [
-      %{
-        name: "object_uid"
-      },
-      %{
-        name: "currency"
-      }
-    ]
+  def total_sale_procedure(organization_id) do
+    account = account_fixture(%{ "organization_id" => organization_id, "name" => "Cash", "currency" => "THB" })
+    {:ok, procedure} = Procedures.create_procedure(%{
+      name: "TotalSale",
+      description: "total cash sale made on site",
+      type: "Transaction",
+      action: "create",
+      organization_id: organization_id,
+      inputs: [
+        %{ name: "object_uid"},
+        %{ name: "total_amount"}
+      ],
+      params: [
+        %{
+          name: "amount_subunits", 
+          value: "total_amount",
+          type: "inputs"
+        },
+        %{
+          name: "kind", 
+          value: "debit",
+          type: "string"
+        },
+        %{
+          name: "account_uid", 
+          value: "object_uid",
+          type: "inputs"
+        },
+        %{
+          name: "account_uid", 
+          value: account.uid,
+          type: "string"
+        },
+      ]
+    })
+
+    procedure
   end
 
-  def params() do
-    [
-      %{
-        name: "currency", 
-        value: "currency",
-        type: "inputs"
-      },
-      %{
-        name: "name", 
-        value: "BankAccount",
-        type: "string"
-      },
-      %{
-        name: "object_type", 
-        value: "Site",
-        type: "string"
-      },
-      %{
-        name: "object_uid", 
-        value: "object_uid",
-        type: "inputs"
-      },
-      %{
-        name: "type", 
-        value: "asset",
-        type: "string"
-      }
-    ]
+  def net_sale_procedure(organization_id) do
+    account = account_fixture(%{ "organization_id" => organization_id, "name" => "CashSales", "currency" => "THB" })
+    {:ok, procedure} = Procedures.create_procedure(%{
+      name: "NetSale",
+      description: "net cash sale made on site after sales tax",
+      type: "Transaction",
+      action: "create",
+      organization_id: organization_id,
+      inputs: [
+        %{ name: "object_uid"},
+        %{ name: "net_amount"}
+      ],
+      params: [
+        %{
+          name: "amount_subunits",
+          value: "net_amount",
+          type: "inputs"
+        },
+        %{
+          name: "kind", 
+          value: "credit",
+          type: "string"
+        },
+        %{
+          name: "account_uid", 
+          value: "object_uid",
+          type: "inputs"
+        },
+        %{
+          name: "account_uid", 
+          value: account.uid,
+          type: "string"
+        },
+      ]
+    })
+
+    procedure
   end
+
+  def net_sale_procedure(organization_id) do
+    account = account_fixture(%{ "organization_id" => organization_id, "name" => "CashSales", "currency" => "THB" })
+    {:ok, procedure} = Procedures.create_procedure(%{
+      name: "SalesTax",
+      description: "sales tax from cash sale on site",
+      type: "Transaction",
+      action: "create",
+      organization_id: organization_id,
+      inputs: [
+        %{ name: "object_uid"},
+        %{ name: "tax_amount"}
+      ],
+      params: [
+        %{
+          name: "amount_subunits",
+          value: "tax_amount",
+          type: "inputs"
+        },
+        %{
+          name: "kind", 
+          value: "credit",
+          type: "string"
+        },
+        %{
+          name: "account_uid", 
+          value: "object_uid",
+          type: "inputs"
+        },
+        %{
+          name: "account_uid", 
+          value: account.uid,
+          type: "string"
+        },
+      ]
+    })
+
+    procedure
+  end
+
 end
