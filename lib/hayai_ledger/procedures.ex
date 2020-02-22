@@ -8,12 +8,14 @@ defmodule HayaiLedger.Procedures do
 
   alias HayaiLedger.Accounts
   alias HayaiLedger.Accounts.Account
+  alias HayaiLedger.Ledgers
   alias HayaiLedger.Procedures.Procedure
 
   def process(%{ "name" => name, "inputs" => inputs }, organization_id) do
     with {:ok, procedure} <- get_procedure_by_name(name, organization_id) do
       case procedure.type do
-        "Account" -> Accounts.handle_procedure(procedure, inputs, organization_id)
+        "Account" -> Accounts.handle_account_procedure(procedure, inputs, organization_id)
+        "Transaction" -> Ledgers.handle_transaction_procedure(procedure, inputs, organization_id)
       end
     end
   end

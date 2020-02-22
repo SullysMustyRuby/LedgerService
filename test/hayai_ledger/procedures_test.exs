@@ -4,6 +4,7 @@ defmodule HayaiLedger.ProceduresTest do
   import Support.Fixtures.OrganizationFixtures, only: [{:organization_fixture, 0}]
   import Support.Fixtures.ProcedureFixtures
 
+  alias HayaiLedger.Accounts
   alias HayaiLedger.Procedures
   alias HayaiLedger.Procedures.{Input, Procedure, Param}
 
@@ -170,8 +171,8 @@ defmodule HayaiLedger.ProceduresTest do
 
       assert procedure.name == "DefaultBankAccount"
       assert procedure.organization_id == organization.id
-      # assert length(inputs()) == length(procedure.inputs)
-      # assert length(params()) == length(procedure.params)
+      assert 2 == length(procedure.inputs)
+      assert 5 == length(procedure.params)
     end
 
     test "returns error if no process for the procedure", %{ organization: organization } do
@@ -180,11 +181,51 @@ defmodule HayaiLedger.ProceduresTest do
   end
 
   describe "process/2" do
-    test "returns the account for an account create" do
-      organization = organization_fixture()
-      account_create_procedure(organization.id) 
+    setup do
+      %{ organization: organization_fixture() }
+    end
 
-      Procedures.process(account_create_params(), organization.id)
+    test "returns the account for an account create", %{ organization: organization } do
+      account_create_procedure(organization.id) 
+      assert {:ok, account} = Procedures.process(account_create_params(), organization.id)
+
+      assert "THB" == account.currency
+      assert "asset" == account.type
+      assert "BankAccount" == account.name
+      assert "Site" == account.object_type
+      assert "uid_kkjielkjafoie3" == account.object_uid
+    end
+
+    test "returns a changeset for an transaction build", %{ organization: organization } do
+      account_create_procedure(organization.id)
+      {:ok, account} = Procedures.process(account_create_params(), organization.id)
+      total_sale_procedure(organization.id, account.uid)
+
+      assert {:ok, changeset} = Procedures.process(total_sale_params(), organization.id)
+      assert changeset.valid?
+      assert "THB" == changeset.changes[:amount_currency]
+      assert 10000 == changeset.changes[:amount_subunits]
+      assert "debit" == changeset.changes[:kind]
+    end
+
+    test "looks up account for a transaction build", %{ organization: organization } do
+      account_params = %{
+        "currency" => "THB",
+        "name" => "CashSale",
+        "object_type" => "Account",
+        "object_uid" => "uid_123456789",
+        "type" => "revenue",
+        "organization_id" => organization.id
+      }
+      {:ok, account} = Accounts.create_account(account_params)
+      net_sale_procedure(organization.id)
+
+      assert {:ok, changeset} = Procedures.process(net_sale_params(), organization.id)
+      assert changeset.valid?
+      assert "THB" == changeset.changes[:amount_currency]
+      assert 9300 == changeset.changes[:amount_subunits]
+      assert "credit" == changeset.changes[:kind]
+      assert account.id == changeset.changes[:account_id]
     end
   end
 end

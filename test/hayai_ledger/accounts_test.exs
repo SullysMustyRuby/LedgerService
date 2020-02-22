@@ -136,7 +136,7 @@ defmodule HayaiLedger.AccountsTest do
     end
   end
 
-  describe "handle_procedure/2" do
+  describe "handle_account_procedure/2" do
     setup do
       organization = organization_fixture()
       %{
@@ -147,7 +147,7 @@ defmodule HayaiLedger.AccountsTest do
 
     test "creates an account with the args provided", %{ organization: organization, procedure: procedure } do
       %{ "inputs" => inputs } = account_create_params()
-      {:ok, account} = Accounts.handle_procedure(procedure, inputs, organization.id)
+      {:ok, account} = Accounts.handle_account_procedure(procedure, inputs, organization.id)
       assert "BankAccount" == account.name
       assert "THB" == account.currency
       assert "uid_kkjielkjafoie3" == account.object_uid

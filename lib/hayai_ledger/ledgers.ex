@@ -4,10 +4,12 @@ defmodule HayaiLedger.Ledgers do
   """
   import Ecto.Query, warn: false
   import HayaiLedger.LockServer
+  import HayaiLedger.Helpers, only: [{:apply_params, 3}]
 
   alias HayaiLedger.Accounts
   alias HayaiLedger.Accounts.Account
   alias HayaiLedger.Ledgers.{Entry, Transaction}
+  alias HayaiLedger.Procedures.Procedure
   alias HayaiLedger.Repo
 
   def build_entry(attrs \\ %{}) do
@@ -124,6 +126,17 @@ defmodule HayaiLedger.Ledgers do
   end
 
   def get_transaction_by_uid(_), do: {:error, "transaction not found"}
+
+  def handle_transaction_procedure(%Procedure{ action: "build", params: params }, inputs, organization_id) do
+    transaction = apply_params(params, inputs, organization_id)
+                  |> build_transaction()
+    case transaction.valid? do
+      true -> {:ok, transaction}
+      false -> {:error, transaction.errors}
+    end
+  end
+
+  def handle_transaction_procedure(_procedure, _inputs, _organization_id), do: {:error, "no procedure for that action"}
 
   def journal_entry(_attrs, []), do: {:error, "must have transactions that balance"}
 

@@ -4,6 +4,7 @@ defmodule HayaiLedger.Accounts do
   """
 
   import Ecto.Query, warn: false
+  import HayaiLedger.Helpers, only: [{:apply_params, 3}]
 
   alias HayaiLedger.Repo
   alias HayaiLedger.Accounts.{Balance, Account, AccountType}
@@ -18,12 +19,24 @@ defmodule HayaiLedger.Accounts do
       )
   end
 
+  def get_account_by_name(%{ name: name, object_uid: object_uid }) do
+    account_name_filter(%{ name: name, object_uid: object_uid })
+    |> Repo.one()
+  end
+
   def active_accounts_exist?(%{ name: name, organization_id: organization_id }) do
     Repo.exists?(from a in Account,
       where: a.name == ^name,
       where: a.organization_id == ^organization_id,
       where: a.active == true
       )
+  end
+
+  defp account_name_filter(%{ name: name, object_uid: object_uid }) do
+    from a in Account,
+    where: a.name == ^name,
+    where: a.object_uid == ^object_uid,
+    where: a.active == true
   end
 
   def balance_amount_subunits_for_account(account_id) do
@@ -148,12 +161,12 @@ defmodule HayaiLedger.Accounts do
     Repo.get_by(Balance, account_id: account_id)
   end
 
-  def handle_procedure(%Procedure{ action: "create", params: params }, inputs, organization_id) do
-    Account.apply_params(params, inputs, organization_id)
+  def handle_account_procedure(%Procedure{ action: "create", params: params }, inputs, organization_id) do
+    apply_params(params, inputs, organization_id)
     |> create_account()
   end
 
-  def handle_procedure(_procedure, _inputs, _organization_id), do: {:error, "no procedure for that action"}
+  def handle_account_procedure(_procedure, _inputs, _organization_id), do: {:error, "no procedure for that action"}
 
   @doc """
   Returns the list of accounts.

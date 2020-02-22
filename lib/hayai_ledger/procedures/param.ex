@@ -4,7 +4,7 @@ defmodule HayaiLedger.Procedures.Param do
 
   alias HayaiLedger.Procedures.Procedure
 
-  @types ["inputs", "string", "integer", "boolean", "list", "map", "date"]
+  @types ["inputs", "string", "lookup"]
 
   schema "params" do
     field :name, :string

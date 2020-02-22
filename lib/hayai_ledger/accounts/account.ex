@@ -29,11 +29,6 @@ defmodule HayaiLedger.Accounts.Account do
     timestamps()
   end
 
-  def apply_params(params, inputs, organization_id) do
-    attrs_from_params(params, inputs)
-    |> Map.put("organization_id", organization_id)
-  end
-
   @doc false
   def changeset(account, attrs) do
     account
@@ -47,23 +42,6 @@ defmodule HayaiLedger.Accounts.Account do
   end
 
   def types(), do: @types
-
-  defp attrs_from_params(params, inputs, attrs \\ %{})
-
-  defp attrs_from_params([], _inputs, attrs), do: attrs
-
-  defp attrs_from_params([ param | tail ], inputs, attrs) do
-    attrs_from_params(tail, inputs, put_attr(param, inputs, attrs))
-  end
-
-  defp put_attr(%Param{ type: "inputs", name: name}, inputs, attrs) do
-    attr_map = Enum.find(inputs, fn(input) -> Map.has_key?(input, name) end)
-    Map.put(attrs, name, attr_map[name])
-  end
-
-  defp put_attr(%Param{ name: name, value: value}, _inputs, attrs) do
-    Map.put(attrs, name, value)
-  end
 
   defp set_kind(%Ecto.Changeset{ changes: %{ type: type } } = changeset) do
     case Enum.member?(@debit_types, type) do

@@ -5,7 +5,7 @@ defmodule HayaiLedger.Procedures.Procedure do
   alias HayaiLedger.Organizations.Organization
   alias HayaiLedger.Procedures.{Input, Param}
 
-  @actions ["create"]
+  @actions ["build", "create"]
   @types ["Account", "Entry", "Transaction"]
 
   schema "procedures" do

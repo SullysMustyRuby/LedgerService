@@ -1,6 +1,5 @@
 defmodule Support.Fixtures.ProcedureFixtures do
 
-  import Support.Fixtures.AccountFixtures, only: [{:account_fixture, 1}]
 	import Support.Fixtures.OrganizationFixtures, only: [{:organization_fixture, 0}]
 
 	alias HayaiLedger.Procedures
@@ -111,17 +110,16 @@ defmodule Support.Fixtures.ProcedureFixtures do
     procedure
   end
 
-  def total_sale_procedure(organization_id) do
-    account = account_fixture(%{ "organization_id" => organization_id, "name" => "Cash", "currency" => "THB" })
+  def total_sale_procedure(organization_id, account_uid) do
     {:ok, procedure} = Procedures.create_procedure(%{
       name: "TotalSale",
       description: "total cash sale made on site",
       type: "Transaction",
-      action: "create",
+      action: "build",
       organization_id: organization_id,
       inputs: [
-        %{ name: "object_uid"},
-        %{ name: "total_amount"}
+        %{ name: "object_uid" },
+        %{ name: "total_amount" }
       ],
       params: [
         %{
@@ -130,18 +128,23 @@ defmodule Support.Fixtures.ProcedureFixtures do
           type: "inputs"
         },
         %{
+          name: "amount_currency",
+          value: "THB",
+          type: "string"
+        },
+        %{
           name: "kind", 
           value: "debit",
           type: "string"
         },
         %{
-          name: "account_uid", 
+          name: "object_uid", 
           value: "object_uid",
           type: "inputs"
         },
         %{
           name: "account_uid", 
-          value: account.uid,
+          value: account_uid,
           type: "string"
         },
       ]
@@ -150,17 +153,26 @@ defmodule Support.Fixtures.ProcedureFixtures do
     procedure
   end
 
+  def total_sale_params() do
+    %{ 
+      "name" => "TotalSale", 
+      "inputs" => [
+        %{ "object_uid" => "uid_123456789" },
+        %{ "total_amount" => "10000"}
+      ],
+    }
+  end
+
   def net_sale_procedure(organization_id) do
-    account = account_fixture(%{ "organization_id" => organization_id, "name" => "CashSales", "currency" => "THB" })
     {:ok, procedure} = Procedures.create_procedure(%{
       name: "NetSale",
       description: "net cash sale made on site after sales tax",
       type: "Transaction",
-      action: "create",
+      action: "build",
       organization_id: organization_id,
       inputs: [
-        %{ name: "object_uid"},
-        %{ name: "net_amount"}
+        %{ name: "object_uid" },
+        %{ name: "net_amount" }
       ],
       params: [
         %{
@@ -169,19 +181,24 @@ defmodule Support.Fixtures.ProcedureFixtures do
           type: "inputs"
         },
         %{
+          name: "amount_currency",
+          value: "THB",
+          type: "string"
+        },
+        %{
           name: "kind", 
           value: "credit",
           type: "string"
         },
         %{
-          name: "account_uid", 
+          name: "object_uid", 
           value: "object_uid",
           type: "inputs"
         },
         %{
           name: "account_uid", 
-          value: account.uid,
-          type: "string"
+          value: "CashSale",
+          type: "lookup"
         },
       ]
     })
@@ -189,17 +206,26 @@ defmodule Support.Fixtures.ProcedureFixtures do
     procedure
   end
 
-  def net_sale_procedure(organization_id) do
-    account = account_fixture(%{ "organization_id" => organization_id, "name" => "CashSales", "currency" => "THB" })
+  def net_sale_params() do
+    %{ 
+      "name" => "NetSale", 
+      "inputs" => [
+        %{ "object_uid" => "uid_123456789" },
+        %{ "net_amount" => "9300"}
+      ],
+    }
+  end
+
+  def sales_tax_procedure(organization_id, account_uid) do
     {:ok, procedure} = Procedures.create_procedure(%{
       name: "SalesTax",
       description: "sales tax from cash sale on site",
       type: "Transaction",
-      action: "create",
+      action: "build",
       organization_id: organization_id,
       inputs: [
-        %{ name: "object_uid"},
-        %{ name: "tax_amount"}
+        %{ name: "object_uid" },
+        %{ name: "tax_amount" }
       ],
       params: [
         %{
@@ -208,19 +234,24 @@ defmodule Support.Fixtures.ProcedureFixtures do
           type: "inputs"
         },
         %{
+          name: "amount_currency",
+          value: "THB",
+          type: "string"
+        },
+        %{
           name: "kind", 
           value: "credit",
           type: "string"
         },
         %{
-          name: "account_uid", 
+          name: "object_uid", 
           value: "object_uid",
           type: "inputs"
         },
         %{
           name: "account_uid", 
-          value: account.uid,
-          type: "string"
+          value: "SalesTax",
+          type: "lookup"
         },
       ]
     })
