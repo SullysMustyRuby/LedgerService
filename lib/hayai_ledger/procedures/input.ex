@@ -15,7 +15,7 @@ defmodule HayaiLedger.Procedures.Input do
   def changeset(input, attrs) do
     input
     |> cast(attrs, [:name, :procedure_id])
-    |> validate_required([:name, :procedure_id])
+    |> validate_required([:name])
     |> foreign_key_constraint(:procedure_id)
   end
 end

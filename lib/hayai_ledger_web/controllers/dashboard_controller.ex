@@ -6,7 +6,8 @@ defmodule HayaiLedgerWeb.DashboardController do
 
   def index(conn, _params) do
   	with {:ok, user_id} <- current_user_id(conn),
-  		organizations when is_list(organizations) <- Organizations.get_user_organizations(user_id) 
+  		memberships <- Organizations.list_memberships_for_user(user_id),
+      organizations <- Enum.map(memberships, fn(membership) -> membership.organization end)
   	do
 	  	render(conn, "index.html", %{ organizations: organizations })
   	end

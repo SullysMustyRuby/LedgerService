@@ -1,0 +1,49 @@
+<h4><%= @procedure.name %></h4>
+
+<div class="row">
+	<div class="col">
+		<ul>
+			<li>
+				 <strong>Action:</strong>
+				<%= @procedure.action %>
+			</li>
+			<li>
+				 <strong>Description:</strong>
+				<%= @procedure.description %>
+			</li>
+			<li>
+				 <strong>Type:</strong>
+				<%= @procedure.type %>
+			</li>
+		</ul>
+
+		<span><%= link "Edit", to: Routes.procedure_path(@conn, :edit, @procedure) %></span>
+	</div>
+</div>
+
+<br/>
+
+<div class="row">
+	<div class="col-md">
+		<p>Inputs</p>
+		<ul>
+		<%= for input <- @procedure.inputs do %>
+			<li><%= link input.name, to: Routes.input_path(@conn, :edit, input) %></li>
+		<% end %>
+		</ul>
+		<%= link "Add input", to: Routes.input_path(@conn, :new, procedure_id: @procedure.id) %>
+	</div>
+	<div class="col-md">
+		<p>Params</p>
+		<ul>
+		<%= for param <- @procedure.params do %>
+			<li><%= link param.name, to: Routes.param_path(@conn, :edit, param) %></li>
+		<% end %>
+		</ul>
+		<%= link "Add param", to: Routes.param_path(@conn, :new, procedure_id: @procedure.id) %>
+	</div>
+</div>
+
+<br/>
+
+<span><%= link "Delete", to: Routes.procedure_path(@conn, :delete, @procedure), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-primary" %></span>

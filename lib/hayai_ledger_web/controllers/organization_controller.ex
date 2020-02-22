@@ -6,7 +6,7 @@ defmodule HayaiLedgerWeb.OrganizationController do
 
   def index(conn, _params) do
     with {:ok, user_id} <- current_user_id(conn) do
-      organizations = Organizations.list_organizations(user_id)
+      organizations = Organizations.list_organizations_for_user(user_id)
       conn
       |> render("index.html", organizations: organizations)
     end

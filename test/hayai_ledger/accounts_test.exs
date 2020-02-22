@@ -3,6 +3,7 @@ defmodule HayaiLedger.AccountsTest do
 
   import Support.Fixtures.AccountFixtures
   import Support.Fixtures.OrganizationFixtures, only: [{:organization_fixture, 0}]
+  import Support.Fixtures.ProcedureFixtures, only: [{:account_create_procedure, 1}, {:account_create_params, 0}]
 
   alias HayaiLedger.Accounts
   alias HayaiLedger.Accounts.{Balance, Account}
@@ -102,14 +103,6 @@ defmodule HayaiLedger.AccountsTest do
     end
   end
 
-  describe "delete_account/1" do
-    # test "deletes the account" do
-    #   account = account_fixture()
-    #   assert {:ok, %Account{}} = Accounts.delete_account(account)
-    #   assert_raise Ecto.NoResultsError, fn -> Accounts.get_account!(account.id) end
-    # end
-  end
-
   describe "get_account!/1" do
     test "returns the account with given id" do
       account = account_fixture()
@@ -125,6 +118,26 @@ defmodule HayaiLedger.AccountsTest do
 
     test "returns nil if account not found" do
       assert nil == Accounts.get_account_uid(555)
+    end
+  end
+
+  describe "handle_procedure/2" do
+    setup do
+      organization = organization_fixture()
+      %{
+        organization: organization,
+        procedure: account_create_procedure(organization.id)
+      }
+    end
+
+    test "creates an account with the args provided", %{ organization: organization, procedure: procedure } do
+      %{ "inputs" => inputs } = account_create_params()
+      {:ok, account} = Accounts.handle_procedure(procedure, inputs, organization.id)
+      assert "BankAccount" == account.name
+      assert "THB" == account.currency
+      assert "uid_kkjielkjafoie3" == account.object_uid
+      assert "Site" == account.object_type
+      assert "asset" == account.type
     end
   end
 

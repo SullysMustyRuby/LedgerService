@@ -3,16 +3,19 @@ defmodule HayaiLedger.Procedures.Procedure do
   import Ecto.Changeset
 
   alias HayaiLedger.Organizations.Organization
-  alias HayaiLedger.Procedures.{Input, ProcedureAction, ProcedureType, TypeParam}
+  alias HayaiLedger.Procedures.{Input, Param}
+
+  @actions ["create"]
+  @types ["Account", "Entry", "Transaction"]
 
   schema "procedures" do
+    field :action, :string
     field :description, :string
     field :name, :string
+    field :type, :string
     belongs_to :organization, Organization
-    belongs_to :action, ProcedureAction
-    belongs_to :type, ProcedureType
     has_many :inputs, Input
-    has_many :type_params, TypeParam
+    has_many :params, Param
 
     timestamps()
   end
@@ -20,10 +23,17 @@ defmodule HayaiLedger.Procedures.Procedure do
   @doc false
   def changeset(procedure, attrs) do
     procedure
-    |> cast(attrs, [:action_id, :description, :name, :organization_id, :type_id])
-    |> validate_required([:action_id, :description, :name, :organization_id, :type_id])
-    |> foreign_key_constraint(:action_id)
+    |> cast(attrs, [:action, :description, :name, :organization_id, :type])
+    |> cast_assoc(:inputs, with: &Input.changeset/2)
+    |> cast_assoc(:params, with: &Param.changeset/2)
+    |> validate_required([:action, :description, :name, :organization_id, :type])
+    |> validate_inclusion(:action, @actions)
+    |> validate_inclusion(:type, @types)
     |> foreign_key_constraint(:organization_id)
-    |> foreign_key_constraint(:type_id)
   end
+
+  def actions(), do: @actions
+
+  def types(), do: @types
+  
 end

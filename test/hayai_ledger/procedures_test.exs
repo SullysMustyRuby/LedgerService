@@ -1,107 +1,11 @@
 defmodule HayaiLedger.ProceduresTest do
   use HayaiLedger.DataCase
 
+  import Support.Fixtures.OrganizationFixtures, only: [{:organization_fixture, 0}]
   import Support.Fixtures.ProcedureFixtures
 
   alias HayaiLedger.Procedures
-  alias HayaiLedger.Procedures.{Input, ParamsType, Procedure, ProcedureAction, ProcedureType, TypeParam}
-
-  describe "procedure_types" do
-
-    @update_attrs %{name: "some updated name"}
-    @invalid_attrs %{name: nil}
-
-    test "list_procedure_types/0 returns all procedure_types" do
-      procedure_types = procedure_types_fixture()
-      assert Procedures.list_procedure_types() == [procedure_types]
-    end
-
-    test "get_procedure_types!/1 returns the procedure_types with given id" do
-      procedure_types = procedure_types_fixture()
-      assert Procedures.get_procedure_types!(procedure_types.id) == procedure_types
-    end
-
-    test "create_procedure_types/1 with valid data creates a procedure_types" do
-      assert {:ok, %ProcedureType{} = procedure_types} = Procedures.create_procedure_types(procedure_types_attrs())
-      assert procedure_types.name == "Account"
-    end
-
-    test "create_procedure_types/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Procedures.create_procedure_types(@invalid_attrs)
-    end
-
-    test "update_procedure_types/2 with valid data updates the procedure_types" do
-      procedure_types = procedure_types_fixture()
-      assert {:ok, %ProcedureType{} = procedure_types} = Procedures.update_procedure_types(procedure_types, @update_attrs)
-      assert procedure_types.name == "some updated name"
-    end
-
-    test "update_procedure_types/2 with invalid data returns error changeset" do
-      procedure_types = procedure_types_fixture()
-      assert {:error, %Ecto.Changeset{}} = Procedures.update_procedure_types(procedure_types, @invalid_attrs)
-      assert procedure_types == Procedures.get_procedure_types!(procedure_types.id)
-    end
-
-    test "delete_procedure_types/1 deletes the procedure_types" do
-      procedure_types = procedure_types_fixture()
-      assert {:ok, %ProcedureType{}} = Procedures.delete_procedure_types(procedure_types)
-      assert_raise Ecto.NoResultsError, fn -> Procedures.get_procedure_types!(procedure_types.id) end
-    end
-
-    test "change_procedure_types/1 returns a procedure_types changeset" do
-      procedure_types = procedure_types_fixture()
-      assert %Ecto.Changeset{} = Procedures.change_procedure_types(procedure_types)
-    end
-  end
-
-  describe "procedure_actions" do
-
-    @update_attrs %{name: "some updated name"}
-    @invalid_attrs %{name: nil}
-
-
-    test "list_procedure_actions/0 returns all procedure_actions" do
-      procedure_actions = procedure_actions_fixture()
-      assert Procedures.list_procedure_actions() == [procedure_actions]
-    end
-
-    test "get_procedure_actions!/1 returns the procedure_actions with given id" do
-      procedure_actions = procedure_actions_fixture()
-      assert Procedures.get_procedure_actions!(procedure_actions.id) == procedure_actions
-    end
-
-    test "create_procedure_actions/1 with valid data creates a procedure_actions" do
-      assert {:ok, %ProcedureAction{} = procedure_actions} = Procedures.create_procedure_actions(procedure_actions_attrs())
-      assert procedure_actions.name == "create"
-    end
-
-    test "create_procedure_actions/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Procedures.create_procedure_actions(@invalid_attrs)
-    end
-
-    test "update_procedure_actions/2 with valid data updates the procedure_actions" do
-      procedure_actions = procedure_actions_fixture()
-      assert {:ok, %ProcedureAction{} = procedure_actions} = Procedures.update_procedure_actions(procedure_actions, @update_attrs)
-      assert procedure_actions.name == "some updated name"
-    end
-
-    test "update_procedure_actions/2 with invalid data returns error changeset" do
-      procedure_actions = procedure_actions_fixture()
-      assert {:error, %Ecto.Changeset{}} = Procedures.update_procedure_actions(procedure_actions, @invalid_attrs)
-      assert procedure_actions == Procedures.get_procedure_actions!(procedure_actions.id)
-    end
-
-    test "delete_procedure_actions/1 deletes the procedure_actions" do
-      procedure_actions = procedure_actions_fixture()
-      assert {:ok, %ProcedureAction{}} = Procedures.delete_procedure_actions(procedure_actions)
-      assert_raise Ecto.NoResultsError, fn -> Procedures.get_procedure_actions!(procedure_actions.id) end
-    end
-
-    test "change_procedure_actions/1 returns a procedure_actions changeset" do
-      procedure_actions = procedure_actions_fixture()
-      assert %Ecto.Changeset{} = Procedures.change_procedure_actions(procedure_actions)
-    end
-  end
+  alias HayaiLedger.Procedures.{Input, Procedure, Param}
 
   describe "procedures" do
 
@@ -115,7 +19,9 @@ defmodule HayaiLedger.ProceduresTest do
 
     test "get_procedure!/1 returns the procedure with given id" do
       procedure = procedure_fixture()
-      assert Procedures.get_procedure!(procedure.id) == procedure
+      found_procedure = Procedures.get_procedure!(procedure.id)
+      assert procedure.organization_id == found_procedure.organization_id
+      assert procedure.name == found_procedure.name
     end
 
     test "create_procedure/1 with valid data creates a procedure" do
@@ -138,7 +44,9 @@ defmodule HayaiLedger.ProceduresTest do
     test "update_procedure/2 with invalid data returns error changeset" do
       procedure = procedure_fixture()
       assert {:error, %Ecto.Changeset{}} = Procedures.update_procedure(procedure, @invalid_attrs)
-      assert procedure == Procedures.get_procedure!(procedure.id)
+      found_procedure = Procedures.get_procedure!(procedure.id)
+      assert procedure.organization_id == found_procedure.organization_id
+      assert procedure.name == found_procedure.name
     end
 
     test "delete_procedure/1 deletes the procedure" do
@@ -201,101 +109,82 @@ defmodule HayaiLedger.ProceduresTest do
     end
   end
 
-  describe "params_types" do
-
-    @update_attrs %{name: "some updated name"}
-    @invalid_attrs %{name: nil}
-
-    test "list_params_types/0 returns all params_types" do
-      params_types = params_types_fixture()
-      assert Procedures.list_params_types() == [params_types]
-    end
-
-    test "get_params_types!/1 returns the params_types with given id" do
-      params_types = params_types_fixture()
-      assert Procedures.get_params_types!(params_types.id) == params_types
-    end
-
-    test "create_params_types/1 with valid data creates a params_types" do
-      assert {:ok, %ParamsType{} = params_types} = Procedures.create_params_types(params_types_attrs())
-      assert params_types.name == "inputs"
-    end
-
-    test "create_params_types/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Procedures.create_params_types(@invalid_attrs)
-    end
-
-    test "update_params_types/2 with valid data updates the params_types" do
-      params_types = params_types_fixture()
-      assert {:ok, %ParamsType{} = params_types} = Procedures.update_params_types(params_types, @update_attrs)
-      assert params_types.name == "some updated name"
-    end
-
-    test "update_params_types/2 with invalid data returns error changeset" do
-      params_types = params_types_fixture()
-      assert {:error, %Ecto.Changeset{}} = Procedures.update_params_types(params_types, @invalid_attrs)
-      assert params_types == Procedures.get_params_types!(params_types.id)
-    end
-
-    test "delete_params_types/1 deletes the params_types" do
-      params_types = params_types_fixture()
-      assert {:ok, %ParamsType{}} = Procedures.delete_params_types(params_types)
-      assert_raise Ecto.NoResultsError, fn -> Procedures.get_params_types!(params_types.id) end
-    end
-
-    test "change_params_types/1 returns a params_types changeset" do
-      params_types = params_types_fixture()
-      assert %Ecto.Changeset{} = Procedures.change_params_types(params_types)
-    end
-  end
-
-  describe "type_params" do
+  describe "params" do
 
     @update_attrs %{name: "some updated name", value: "some updated value"}
     @invalid_attrs %{name: nil, value: nil}
 
-    test "list_type_params/0 returns all type_params" do
-      type_param = type_param_fixture()
-      assert Procedures.list_type_params() == [type_param]
+    test "list_params/0 returns all params" do
+      param = param_fixture()
+      assert Procedures.list_params() == [param]
     end
 
-    test "get_type_param!/1 returns the type_param with given id" do
-      type_param = type_param_fixture()
-      assert Procedures.get_type_param!(type_param.id) == type_param
+    test "get_param!/1 returns the param with given id" do
+      param = param_fixture()
+      assert Procedures.get_param!(param.id) == param
     end
 
-    test "create_type_param/1 with valid data creates a type_param" do
-      assert {:ok, %TypeParam{} = type_param} = Procedures.create_type_param(type_param_attrs())
-      assert type_param.name == "currency"
-      assert type_param.value == "inputs['currency']"
+    test "create_param/1 with valid data creates a param" do
+      assert {:ok, %Param{} = param} = Procedures.create_param(param_attrs())
+      assert param.name == "currency"
+      assert param.value == "currency"
     end
 
-    test "create_type_param/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Procedures.create_type_param(@invalid_attrs)
+    test "create_param/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Procedures.create_param(@invalid_attrs)
     end
 
-    test "update_type_param/2 with valid data updates the type_param" do
-      type_param = type_param_fixture()
-      assert {:ok, %TypeParam{} = type_param} = Procedures.update_type_param(type_param, @update_attrs)
-      assert type_param.name == "some updated name"
-      assert type_param.value == "some updated value"
+    test "update_param/2 with valid data updates the param" do
+      param = param_fixture()
+      assert {:ok, %Param{} = param} = Procedures.update_param(param, @update_attrs)
+      assert param.name == "some updated name"
+      assert param.value == "some updated value"
     end
 
-    test "update_type_param/2 with invalid data returns error changeset" do
-      type_param = type_param_fixture()
-      assert {:error, %Ecto.Changeset{}} = Procedures.update_type_param(type_param, @invalid_attrs)
-      assert type_param == Procedures.get_type_param!(type_param.id)
+    test "update_param/2 with invalid data returns error changeset" do
+      param = param_fixture()
+      assert {:error, %Ecto.Changeset{}} = Procedures.update_param(param, @invalid_attrs)
+      assert param == Procedures.get_param!(param.id)
     end
 
-    test "delete_type_param/1 deletes the type_param" do
-      type_param = type_param_fixture()
-      assert {:ok, %TypeParam{}} = Procedures.delete_type_param(type_param)
-      assert_raise Ecto.NoResultsError, fn -> Procedures.get_type_param!(type_param.id) end
+    test "delete_param/1 deletes the param" do
+      param = param_fixture()
+      assert {:ok, %Param{}} = Procedures.delete_param(param)
+      assert_raise Ecto.NoResultsError, fn -> Procedures.get_param!(param.id) end
     end
 
-    test "change_type_param/1 returns a type_param changeset" do
-      type_param = type_param_fixture()
-      assert %Ecto.Changeset{} = Procedures.change_type_param(type_param)
+    test "change_param/1 returns a param changeset" do
+      param = param_fixture()
+      assert %Ecto.Changeset{} = Procedures.change_param(param)
+    end
+  end
+
+  describe "get_procedure_by_name/2" do
+    setup do
+       %{ organization: organization_fixture() }
+    end
+
+    test "returns the procedure", %{ organization: organization } do
+      account_create_procedure(organization.id)
+      {:ok, procedure} = Procedures.get_procedure_by_name("DefaultBankAccount", organization.id)
+
+      assert procedure.name == "DefaultBankAccount"
+      assert procedure.organization_id == organization.id
+      assert length(inputs()) == length(procedure.inputs)
+      assert length(params()) == length(procedure.params)
+    end
+
+    test "returns error if no process for the procedure", %{ organization: organization } do
+      assert {:error, "no process for that procedure"} == Procedures.get_procedure_by_name("DestroyDatabase", organization.id)
+    end
+  end
+
+  describe "process/2" do
+    test "returns the account for an account create" do
+      organization = organization_fixture()
+      account_create_procedure(organization.id) 
+
+      Procedures.process(account_create_params(), organization.id)
     end
   end
 end

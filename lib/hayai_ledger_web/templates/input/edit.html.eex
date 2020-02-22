@@ -1,0 +1,7 @@
+<h1>Edit Input</h1>
+
+<%= render "form.html", Map.put(assigns, :action, Routes.input_path(@conn, :update, @input)) %>
+
+<br/>
+
+<span><%= link "Delete", to: Routes.input_path(@conn, :delete, @input), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-primary" %></span>

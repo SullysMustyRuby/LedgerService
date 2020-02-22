@@ -40,13 +40,17 @@ defmodule HayaiLedgerWeb.Router do
 
     delete "/logout", SessionController, :delete
 
+    get "/dashboard", DashboardController, :index
+
     resources "/api_keys", ApiKeyController, only: [:index, :show]
     resources "/accounts", AccountController, except: [:delete]
     resources "/entries", EntryController, only: [:index, :show]
+    resources "/inputs", InputController, except: [:index, :show]
     resources "/organizations", OrganizationController
+    resources "/params", ParamController, except: [:index, :show]
+    resources "/procedures", ProcedureController
     resources "/transactions", TransactionController, only: [:index, :show]
     resources "/users", UserController, except: [:create, :new]
-    get "/dashboard", DashboardController, :index
   end
 
   scope "/api", as: :api  do
@@ -62,5 +66,7 @@ defmodule HayaiLedgerWeb.Router do
     post "/entries/create", HayaiLedgerWeb.Api.EntryController, :create
 
     get "/transactions/:uid", HayaiLedgerWeb.Api.TransactionController, :show
+
+    post "procedures/process", HayaiLedgerWeb.Api.ProcedureController, :process
   end
 end

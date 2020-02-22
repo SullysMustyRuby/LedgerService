@@ -1,0 +1,7 @@
+<h1>Edit Param</h1>
+
+<%= render "form.html", Map.put(assigns, :action, Routes.param_path(@conn, :update, @param)) %>
+
+<br/>
+
+<span><%= link "Delete", to: Routes.param_path(@conn, :delete, @param), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-primary" %></span>

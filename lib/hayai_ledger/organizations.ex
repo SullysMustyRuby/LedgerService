@@ -22,14 +22,6 @@ defmodule HayaiLedger.Organizations do
     Repo.all(Organization)
   end
 
-  def list_organizations(user_id) do
-    Repo.all(from m in Membership,
-      where: m.user_id == ^user_id,
-      join: o in Organization,
-      on: m.organization_id == o.id,
-      select: o)
-  end
-
   @doc """
   Gets a single organization.
 
@@ -163,14 +155,6 @@ defmodule HayaiLedger.Organizations do
 
   def get_by_username(_), do: {:error, "user not found"}
 
-  def get_user_organizations(user_id) do
-    Repo.all(from m in Membership,
-      where: m.user_id == ^user_id,
-      join: o in Organization,
-      on: m.organization_id == o.id,
-      select: %{ id: o.id, name: o.name, description: o.description})
-  end
-
   @doc """
   Creates a user.
 
@@ -251,7 +235,13 @@ defmodule HayaiLedger.Organizations do
 
   def list_memberships_for_user(user_id) do
     Repo.all(from m in Membership, 
-      where: m.user_id == ^user_id)
+      where: m.user_id == ^user_id,
+      preload: [:organization])
+  end
+
+  def list_organizations_for_user(user_id) do
+    list_memberships_for_user(user_id)
+    |> Enum.map(fn(membership) -> membership.organization end)
   end
 
   @doc """

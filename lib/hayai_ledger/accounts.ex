@@ -8,6 +8,7 @@ defmodule HayaiLedger.Accounts do
   alias HayaiLedger.Repo
   alias HayaiLedger.Accounts.{Balance, Account, AccountType}
   alias HayaiLedger.Ledgers
+  alias HayaiLedger.Procedures.Procedure
 
   def balance_amount_subunits_for_account(account_id) do
     Repo.one(from b in Balance,
@@ -75,24 +76,6 @@ defmodule HayaiLedger.Accounts do
   end
 
   @doc """
-  Deletes a Account.
-
-  ## Examples
-
-      iex> delete_account(account)
-      {:ok, %Account{}}
-
-      iex> delete_account(account)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  #  soft delete this
-  # def delete_account(%Account{} = account) do
-  #   Repo.delete(account)
-  # end
-
-
-  @doc """
   Gets a single account.
 
   Raises `Ecto.NoResultsError` if the Account does not exist.
@@ -148,6 +131,13 @@ defmodule HayaiLedger.Accounts do
   def get_balance_by_account(account_id) do
     Repo.get_by(Balance, account_id: account_id)
   end
+
+  def handle_procedure(%Procedure{ action: "create", params: params }, inputs, organization_id) do
+    Account.apply_params(params, inputs, organization_id)
+    |> create_account()
+  end
+
+  def handle_procedure(_procedure, _inputs, _organization_id), do: {:error, "no procedure for that action"}
 
   @doc """
   Returns the list of accounts.

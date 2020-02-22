@@ -20,44 +20,14 @@ defmodule Support.Fixtures.ProcedureFixtures do
     input
   end
 
-  def params_types_attrs() do
-  	%{
-  		"name" => "inputs"
-  	}
-  end
-
-  def params_types_fixture(attrs \\ %{}) do
-    {:ok, params_types} =
-      attrs
-      |> Enum.into(params_types_attrs())
-      |> Procedures.create_params_types()
-
-    params_types
-  end
-
   def procedure_attrs() do
   	%{
   		"description" => "onsite cash sale",
   		"name" => "CashSale",
   		"organization_id" => organization_fixture().id,
-  		"action_id" => procedure_actions_fixture().id,
-  		"type_id" => procedure_types_fixture().id
+  		"action" => "create",
+  		"type" => "Account"
   	}
-  end
-
-  def procedure_actions_attrs() do
-  	%{
-  		"name" => "create"
-  	}
-  end
-
-  def procedure_actions_fixture(attrs \\ %{}) do
-    {:ok, procedure_actions} =
-      attrs
-      |> Enum.into(procedure_actions_attrs())
-      |> Procedures.create_procedure_actions()
-
-    procedure_actions
   end
 
   def procedure_fixture(attrs \\ %{}) do
@@ -69,36 +39,86 @@ defmodule Support.Fixtures.ProcedureFixtures do
     procedure
   end
 
-  def procedure_types_attrs() do
-  	%{
-  		"name" => "Account"
-  	}
-  end
-
-  def procedure_types_fixture(attrs \\ %{}) do
-    {:ok, procedure_types} =
-      attrs
-      |> Enum.into(procedure_types_attrs())
-      |> Procedures.create_procedure_types()
-
-    procedure_types
-  end
-
-  def type_param_attrs() do
+  def param_attrs() do
   	%{
   		"name" => "currency",
-  		"value" => "inputs['currency']",
+  		"value" => "currency",
+      "type" => "inputs",
   		"procedure_id" => procedure_fixture().id,
-  		"type_id" => params_types_fixture().id
   	}
   end
 
-  def type_param_fixture(attrs \\ %{}) do
-    {:ok, type_param} =
+  def param_fixture(attrs \\ %{}) do
+    {:ok, param} =
       attrs
-      |> Enum.into(type_param_attrs())
-      |> Procedures.create_type_param()
+      |> Enum.into(param_attrs())
+      |> Procedures.create_param()
 
-    type_param
+    param
+  end
+
+  def account_create_params() do
+    %{ 
+      "name" => "DefaultBankAccount", 
+      "inputs" => [
+        %{ "object_uid" => "uid_kkjielkjafoie3" },
+        %{ "currency" => "THB"}
+      ],
+    }
+  end
+
+  def account_create_procedure(organization_id) do
+    {:ok, procedure} = Procedures.create_procedure(%{
+      name: "DefaultBankAccount",
+      description: "Create a new cash account",
+      type: "Account",
+      action: "create",
+      organization_id: organization_id,
+      inputs: inputs(),
+      params: params()
+    })
+
+    procedure
+  end
+
+  def inputs() do
+    [
+      %{
+        name: "object_uid"
+      },
+      %{
+        name: "currency"
+      }
+    ]
+  end
+
+  def params() do
+    [
+      %{
+        name: "currency", 
+        value: "currency",
+        type: "inputs"
+      },
+      %{
+        name: "name", 
+        value: "BankAccount",
+        type: "string"
+      },
+      %{
+        name: "object_type", 
+        value: "Site",
+        type: "string"
+      },
+      %{
+        name: "object_uid", 
+        value: "object_uid",
+        type: "inputs"
+      },
+      %{
+        name: "type", 
+        value: "asset",
+        type: "string"
+      }
+    ]
   end
 end

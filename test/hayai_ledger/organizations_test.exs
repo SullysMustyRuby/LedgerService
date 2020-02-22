@@ -84,13 +84,13 @@ defmodule HayaiLedger.OrganizationsTest do
       assert user.email == found_user.email
     end
 
-    test "get_user_and_organizations/1 returns the user and the organizations" do
+    test "list_organizations_for_user/1 returns the user and the organizations" do
       user = user_fixture()
       for _index <- (1..3) do
         membership_fixture()
         membership_fixture(%{ "user_id" => user.id })
       end
-      organizations = Organizations.get_user_organizations(user.id)
+      organizations = Organizations.list_organizations_for_user(user.id)
       assert 3 == length(organizations)
     end
 

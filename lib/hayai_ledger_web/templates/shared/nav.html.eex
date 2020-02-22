@@ -13,6 +13,9 @@
     <%= link "Users", to: Routes.user_path(@conn, :index), class: "nav-link" %>
   </li>
   <li class="nav-item">
+    <%= link "Procedures", to: Routes.procedure_path(@conn, :index), class: "nav-link" %>
+  </li>
+  <li class="nav-item">
     <%= link "Keys", to: Routes.api_key_path(@conn, :index), class: "nav-link" %>
   </li>
 </ul>

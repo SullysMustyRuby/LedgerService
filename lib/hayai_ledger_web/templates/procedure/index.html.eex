@@ -1,0 +1,22 @@
+<h1>Listing Procedures</h1>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Action</th> 
+      <th scope="col">Type</th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= for procedure <- @procedures do %>
+      <tr>
+        <td scope="row"><%= link procedure.name, to: Routes.procedure_path(@conn, :show, procedure.id) %></td>
+        <td scope="row"><%= procedure.action %></td>
+        <td scope="row"><%= procedure.type %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<p><%= link "New Procedure", to: Routes.procedure_path(@conn, :new) %></p>

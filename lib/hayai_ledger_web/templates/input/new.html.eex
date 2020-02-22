@@ -1,0 +1,3 @@
+<h1>New Input</h1>
+
+<%= render "form.html", Map.put(assigns, :action, Routes.input_path(@conn, :create)) %>
