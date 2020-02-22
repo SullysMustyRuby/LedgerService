@@ -10,6 +10,22 @@ defmodule HayaiLedger.Accounts do
   alias HayaiLedger.Ledgers
   alias HayaiLedger.Procedures.Procedure
 
+  def active_accounts_exist?(%{ name: name, object_uid: object_uid }) do
+    Repo.exists?(from a in Account,
+      where: a.name == ^name,
+      where: a.object_uid == ^object_uid,
+      where: a.active == true
+      )
+  end
+
+  def active_accounts_exist?(%{ name: name, organization_id: organization_id }) do
+    Repo.exists?(from a in Account,
+      where: a.name == ^name,
+      where: a.organization_id == ^organization_id,
+      where: a.active == true
+      )
+  end
+
   def balance_amount_subunits_for_account(account_id) do
     Repo.one(from b in Balance,
     where: b.account_id == ^account_id,

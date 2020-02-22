@@ -5,12 +5,13 @@ defmodule Support.Fixtures.AccountFixtures do
 	alias HayaiLedger.Accounts
 
   def account_attrs() do
+    object_uid = :crypto.strong_rand_bytes(12) |> Base.url_encode64
   	%{
   		"currency" => "JPY",
       "meta_data" => %{ "customer" => "id" },
       "name" => "some name",
       "object_type" => "Account",
-      "object_uid" => "originating_sytstem_uid",
+      "object_uid" => object_uid,
   		"type" => "equity",
       "organization_id" => organization_fixture().id,
   	}

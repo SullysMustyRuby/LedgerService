@@ -8,6 +8,21 @@ defmodule HayaiLedger.AccountsTest do
   alias HayaiLedger.Accounts
   alias HayaiLedger.Accounts.{Balance, Account}
 
+  describe "active_accounts_exist?/1" do
+    test "returns true if an account exists within the object_uid" do
+      account_fixture(%{ "name" => "Cash", "object_uid" => "uid_12345678" })
+      assert Accounts.active_accounts_exist?(%{ name: "Cash", object_uid: "uid_12345678" })
+      refute Accounts.active_accounts_exist?(%{ name: "Cash2", object_uid: "uid_12345678" })
+    end
+
+    test "returns true if an account exists within the organization_id" do
+      organization = organization_fixture()
+      account_fixture(%{ "name" => "Cash", "organization_id" => organization.id })
+      assert Accounts.active_accounts_exist?(%{ name: "Cash", organization_id: organization.id })
+      refute Accounts.active_accounts_exist?(%{ name: "Cash2", organization_id: organization.id })
+    end
+  end
+
   describe "balance_amount_subunits_for_account/1" do
     test "returns the amount_subunits" do
       account = account_fixture()

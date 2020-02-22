@@ -35,6 +35,25 @@ defmodule HayaiLedger.Accounts.AccountTest do
   		assert changeset.errors[:name] == {"can't be blank", [validation: :required]}
   	end
 
+    test "returns error if already an active account with same name and object_uid" do
+      account_fixture(%{ "name" => "Cash", "object_uid" => "uid_123456789" })
+      bad_name = Map.put(account_attrs(), "name", "Cash")
+                  |> Map.put("object_uid", "uid_123456789")
+      changeset = Account.changeset(%Account{}, bad_name)
+      assert changeset.valid? == false
+      assert changeset.errors[:name] == {"an active account with this name exists for this object_uid", [validation: :required]}
+    end
+
+    test "returns error if already an active account with same name and organization" do
+      account = account_fixture(%{ "name" => "Cash" })
+      bad_name = Map.put(account_attrs(), "name", "Cash")
+                  |> Map.put("organization_id", account.organization_id)
+                  |> Map.delete("object_uid")
+      changeset = Account.changeset(%Account{}, bad_name)
+      assert changeset.valid? == false
+      assert changeset.errors[:name] == {"an active account with this name exists for this organization", [validation: :required]}
+    end
+
     test "returns invalid with error if no organization_id" do
       no_account = Map.delete(account_attrs(), "organization_id")
       changeset = Account.changeset(%Account{}, no_account)

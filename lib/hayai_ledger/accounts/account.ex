@@ -3,6 +3,7 @@ defmodule HayaiLedger.Accounts.Account do
   import Ecto.Changeset
   import HayaiLedger.Helpers, only: [{:generate_uid, 0}]
 
+  alias HayaiLedger.Accounts
   alias HayaiLedger.Ledgers.Transaction
   alias HayaiLedger.Organizations.Organization
   alias HayaiLedger.Procedures.Param
@@ -13,6 +14,7 @@ defmodule HayaiLedger.Accounts.Account do
   @types @credit_types ++ @debit_types |> Enum.sort()
 
   schema "accounts" do
+    field :active, :boolean, default: true
     field :currency, :string
     field :kind, :string
     field :meta_data, :map
@@ -35,24 +37,16 @@ defmodule HayaiLedger.Accounts.Account do
   @doc false
   def changeset(account, attrs) do
     account
-    |> cast(attrs, [:currency, :meta_data, :name, :object_type, :object_uid, :organization_id, :type])
+    |> cast(attrs, [:active, :currency, :meta_data, :name, :object_type, :object_uid, :organization_id, :type])
     |> put_change(:uid, generate_uid())
     |> validate_required([:currency, :type, :name, :organization_id])
     |> validate_inclusion(:type, @types)
+    |> validate_one_active()
     |> set_kind()
     |> foreign_key_constraint(:organization_id)
   end
 
   def types(), do: @types
-
-  defp set_kind(%Ecto.Changeset{ changes: %{ type: type } } = changeset) do
-    case Enum.member?(@debit_types, type) do
-      true -> put_change(changeset, :kind, "debit")
-      false -> put_change(changeset, :kind, "credit")
-    end
-  end
-
-  defp set_kind(changeset), do: changeset
 
   defp attrs_from_params(params, inputs, attrs \\ %{})
 
@@ -70,4 +64,30 @@ defmodule HayaiLedger.Accounts.Account do
   defp put_attr(%Param{ name: name, value: value}, _inputs, attrs) do
     Map.put(attrs, name, value)
   end
+
+  defp set_kind(%Ecto.Changeset{ changes: %{ type: type } } = changeset) do
+    case Enum.member?(@debit_types, type) do
+      true -> put_change(changeset, :kind, "debit")
+      false -> put_change(changeset, :kind, "credit")
+    end
+  end
+
+  defp set_kind(changeset), do: changeset
+
+  def validate_one_active(%Ecto.Changeset{ changes: %{ object_uid: object_uid, name: name } } = changeset) when is_binary(object_uid) do
+    case Accounts.active_accounts_exist?(%{ name: name, object_uid: object_uid }) do
+      true -> Ecto.Changeset.add_error(changeset, :name, "an active account with this name exists for this object_uid", [validation: :required])
+      _ -> changeset
+    end
+  end
+
+  def validate_one_active(%Ecto.Changeset{ changes: %{ name: name, organization_id: organization_id } } = changeset) do
+    case Accounts.active_accounts_exist?(%{ name: name, organization_id: organization_id }) do
+      true -> Ecto.Changeset.add_error(changeset, :name, "an active account with this name exists for this organization", [validation: :required])
+      _ -> changeset
+    end
+  end
+
+  def validate_one_active(changeset), do: changeset
+
 end
