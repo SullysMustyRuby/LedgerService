@@ -127,6 +127,17 @@ defmodule HayaiLedger.Ledgers do
 
   def get_transaction_by_uid(_), do: {:error, "transaction not found"}
 
+  def handle_entry_procedure(%Procedure{ action: "build", params: params }, inputs, organization_id) do
+    entry = apply_params(params, inputs, organization_id)
+            |> build_entry()
+    case entry.valid? do
+      true -> {:ok, entry}
+      false -> {:error, entry.errors}
+    end
+  end
+
+  def handle_entry_procedure(_procedure, _inputs, _organization_id), do: {:error, "no procedure for that action"}
+
   def handle_transaction_procedure(%Procedure{ action: "build", params: params }, inputs, organization_id) do
     transaction = apply_params(params, inputs, organization_id)
                   |> build_transaction()
@@ -140,16 +151,22 @@ defmodule HayaiLedger.Ledgers do
 
   def journal_entry(_attrs, []), do: {:error, "must have transactions that balance"}
 
-  def journal_entry(entry_attrs, transactions) do
+  def journal_entry(%Ecto.Changeset{ valid?: true } = entry_changeset, transactions) do
     with :ok <- transactions_all_valid?(transactions),
       :ok <- validate_transactions_balance(transactions),
-      %Ecto.Changeset{ valid?: true } = entry <- build_entry(entry_attrs),
-      {:ok, %{ entry: entry, transactions: {_, transactions} }} <- save_journal_entry(entry, transactions),
+      {:ok, %{ entry: entry, transactions: {_, transactions} }} <- save_journal_entry(entry_changeset, transactions),
       :ok <- update_transaction_account_balances(transactions)
     do
       {:ok, entry, transactions}
     end
   end
+
+  def journal_entry(entry_attrs, transactions) when is_map(entry_attrs) do
+    build_entry(entry_attrs)
+    |> journal_entry(transactions)
+  end
+
+  def journal_entry(_entry, _transactions), do: {:error, "journal entry failure"}
 
   @doc """
   Returns the list of entries.

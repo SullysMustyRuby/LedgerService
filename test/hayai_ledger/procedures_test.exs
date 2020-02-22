@@ -227,5 +227,47 @@ defmodule HayaiLedger.ProceduresTest do
       assert "credit" == changeset.changes[:kind]
       assert account.id == changeset.changes[:account_id]
     end
+
+    test "returns an changeset for entry build", %{ organization: organization } do
+      sale_entry_procedure(organization.id)
+
+      assert {:ok, changeset} = Procedures.process(sale_entry_params(), organization.id)
+      assert changeset.valid?
+      assert organization.id == changeset.changes[:organization_id]
+      assert "cash sale" == changeset.changes[:description]
+      assert "uid_123456789" == changeset.changes[:object_uid]
+      assert "Sale" == changeset.changes[:object_type]
+    end
+
+    test "returns an full entry from journal_entry", %{ organization: organization } do
+      asset_account = create_account("Cash", "uid_123456789", "asset", organization.id)
+      create_account("CashSale", "uid_123456789", "revenue", organization.id)
+      tax_account = create_account("SalesTax", "uid_123456789", "liability", organization.id)
+
+      total_sale_procedure(organization.id, asset_account.uid)
+      net_sale_procedure(organization.id)
+      sales_tax_procedure(organization.id, tax_account.uid)
+      sale_entry_procedure(organization.id)
+
+      {:ok, entry, transactions} = Procedures.process(journal_entry_params(), organization.id)
+      assert organization.id == entry.organization_id
+      assert "cash sale" == entry.description
+      assert "uid_123456789" == entry.object_uid
+      assert "Sale" == entry.object_type 
+      assert 3 == length(transactions)
+    end
+  end
+
+  defp create_account(name, object_uid, type, organization_id) do
+    {:ok, account} = Accounts.create_account(%{
+      "currency" => "THB",
+      "name" => name,
+      "object_type" => "Account",
+      "object_uid" => object_uid,
+      "type" => type,
+      "organization_id" => organization_id
+    })
+    
+    account
   end
 end

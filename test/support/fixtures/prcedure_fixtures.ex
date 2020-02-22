@@ -259,4 +259,83 @@ defmodule Support.Fixtures.ProcedureFixtures do
     procedure
   end
 
+  def sale_entry_procedure(organization_id) do
+    {:ok, procedure} = Procedures.create_procedure(%{
+      name: "CashSale",
+      description: "cash sale entry",
+      type: "Entry",
+      action: "build",
+      organization_id: organization_id,
+      inputs: [
+        %{ name: "description" },
+        %{ name: "object_uid" }
+      ],
+      params: [
+        %{
+          name: "description", 
+          value: "description",
+          type: "inputs"
+        },
+        %{
+          name: "object_type", 
+          value: "Sale",
+          type: "string"
+        },
+        %{
+          name: "object_uid", 
+          value: "object_uid",
+          type: "inputs"
+        },
+      ]
+    })
+
+    procedure
+  end
+
+  def sale_entry_params() do
+    %{
+      "name" => "CashSale",
+      "inputs" => [
+        %{ "description" => "cash sale" },
+        %{ "object_uid" => "uid_123456789" },
+      ]
+    }
+  end
+
+  def journal_entry_params() do
+    %{
+      "journal_procedure" => %{
+        "entry" => %{
+          "name" => "CashSale",
+          "inputs" => [
+            %{ "description" => "cash sale" },
+            %{ "object_uid" => "uid_123456789" },
+          ]
+        },
+        "transactions" => [
+          %{
+            "name" => "TotalSale",
+            "inputs" => [
+              %{ "object_uid" => "uid_123456789" },
+              %{ "total_amount" => "10000"},
+            ]
+          },
+          %{
+            "name" => "NetSale",
+            "inputs" => [
+              %{ "object_uid" => "uid_123456789" },
+              %{ "net_amount" => "9300"},
+            ]
+          },
+          %{
+            "name" => "SalesTax",
+            "inputs" => [
+              %{ "object_uid" => "uid_123456789" },
+              %{ "tax_amount" => "700"},
+            ]
+          }
+        ]
+      }
+    }
+  end
 end

@@ -16,11 +16,30 @@ defmodule HayaiLedger.Procedures do
       case procedure.type do
         "Account" -> Accounts.handle_account_procedure(procedure, inputs, organization_id)
         "Transaction" -> Ledgers.handle_transaction_procedure(procedure, inputs, organization_id)
+        "Entry" -> Ledgers.handle_entry_procedure(procedure, inputs, organization_id)
       end
     end
   end
 
+  def process(%{ "journal_procedure" => %{ "entry" => entry_params, "transactions" => transaction_procedures } }, organization_id) do
+    with {:ok, entry} <- process(entry_params, organization_id),
+      {:ok, transactions} = process_procedures(transaction_procedures, organization_id)
+    do
+      Ledgers.journal_entry(entry, transactions)
+    end
+  end
+
   def process(_params, _organization_id), do: {:error, "no process for that procedure"}
+
+  defp process_procedures(procedures, organization_id, processed \\ [])
+
+  defp process_procedures([], _organization_id, processed), do: {:ok, processed}
+
+  defp process_procedures([ procedure | tail ], organization_id, processed) do
+    with {:ok, item} <- process(procedure, organization_id) do
+      process_procedures(tail, organization_id, [ item | processed ])
+    end
+  end
 
   @doc """
   Returns the list of procedures.
