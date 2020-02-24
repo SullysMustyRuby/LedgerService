@@ -21,7 +21,7 @@ defmodule HayaiLedger.Procedures do
     end
   end
 
-  def process(%{ "journal_procedure" => %{ "entry" => entry_params, "transactions" => transaction_procedures } }, organization_id) do
+  def process(%{ "entry" => entry_params, "transactions" => transaction_procedures }, organization_id) do
     with {:ok, entry} <- process(entry_params, organization_id),
       {:ok, transactions} = process_procedures(transaction_procedures, organization_id)
     do
@@ -30,6 +30,19 @@ defmodule HayaiLedger.Procedures do
   end
 
   def process(_params, _organization_id), do: {:error, "no process for that procedure"}
+
+  def process_group(%{ "inputs" => inputs, "procedures" => procedures }, organization_id) do
+    case async_process_group(inputs, procedures, organization_id) do
+      [] -> {:ok, "all processed"}
+      errors -> {:error, errors}
+      _ -> {:error, "process group failed"}
+    end
+  end
+
+  defp async_process_group(inputs, procedures, organization_id) do
+    Task.async_stream(procedures, fn(name) -> process(%{ "name" => name, "inputs" => inputs }, organization_id) end)
+    |> Enum.filter(fn({code, result}) -> code == :error  end)
+  end
 
   defp process_procedures(procedures, organization_id, processed \\ [])
 

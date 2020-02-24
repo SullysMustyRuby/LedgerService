@@ -250,8 +250,8 @@ defmodule Support.Fixtures.ProcedureFixtures do
         },
         %{
           name: "account_uid", 
+          type: "lookup",
           value: "SalesTax",
-          type: "lookup"
         },
       ]
     })
@@ -304,38 +304,36 @@ defmodule Support.Fixtures.ProcedureFixtures do
 
   def journal_entry_params() do
     %{
-      "journal_procedure" => %{
-        "entry" => %{
-          "name" => "CashSale",
+      "entry" => %{
+        "name" => "CashSale",
+        "inputs" => [
+          %{ "description" => "cash sale" },
+          %{ "object_uid" => "uid_123456789" },
+        ]
+      },
+      "transactions" => [
+        %{
+          "name" => "TotalSale",
           "inputs" => [
-            %{ "description" => "cash sale" },
             %{ "object_uid" => "uid_123456789" },
+            %{ "total_amount" => "10000"},
           ]
         },
-        "transactions" => [
-          %{
-            "name" => "TotalSale",
-            "inputs" => [
-              %{ "object_uid" => "uid_123456789" },
-              %{ "total_amount" => "10000"},
-            ]
-          },
-          %{
-            "name" => "NetSale",
-            "inputs" => [
-              %{ "object_uid" => "uid_123456789" },
-              %{ "net_amount" => "9300"},
-            ]
-          },
-          %{
-            "name" => "SalesTax",
-            "inputs" => [
-              %{ "object_uid" => "uid_123456789" },
-              %{ "tax_amount" => "700"},
-            ]
-          }
-        ]
-      }
+        %{
+          "name" => "NetSale",
+          "inputs" => [
+            %{ "object_uid" => "uid_123456789" },
+            %{ "net_amount" => "9300"},
+          ]
+        },
+        %{
+          "name" => "SalesTax",
+          "inputs" => [
+            %{ "object_uid" => "uid_123456789" },
+            %{ "tax_amount" => "700"},
+          ]
+        }
+      ]
     }
   end
 end

@@ -27,16 +27,22 @@ defmodule HayaiLedger.Helpers do
   end
 
   defp put_attr(%Param{ name: "account_uid", type: "lookup", value: value }, inputs, attrs) do
-    %{ "object_uid" => object_uid } = Enum.find(inputs, fn(input) -> find_object_uid(input) end)
+    %{ "object_uid" => object_uid } = Enum.find(inputs, fn(input) -> find_object_attribute(input) end)
     account = Accounts.get_account_by_name(%{ name: value, object_uid: object_uid })
     Map.put(attrs, "account_uid", account.uid)
+  end
+
+  defp put_attr(%Param{ name: "amount_currency", type: "lookup", value: value }, inputs, attrs) do
+    %{ "object_uid" => object_uid } = Enum.find(inputs, fn(input) -> find_object_attribute(input) end)
+    account = Accounts.get_account_by_name(%{ name: value, object_uid: object_uid })
+    Map.put(attrs, "amount_currency", account.currency)
   end
 
   defp put_attr(%Param{ name: name, value: value}, _inputs, attrs) do
     Map.put(attrs, name, value)
   end
 
-  defp find_object_uid(%{ "object_uid" => object_uid }), do: true
+  defp find_object_attribute(%{ "object_uid" => object_uid }), do: true
 
-  defp find_object_uid(_), do: false
+  defp find_object_attribute(_), do: false
 end
