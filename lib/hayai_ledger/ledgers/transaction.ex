@@ -13,6 +13,7 @@ defmodule HayaiLedger.Ledgers.Transaction do
     field :account_uid, :string, virtual: true
     field :amount_currency, :string
     field :amount_subunits, :integer
+    field :date, :utc_datetime
     field :description, :string
     field :kind, :string
     field :type, :string
@@ -26,7 +27,7 @@ defmodule HayaiLedger.Ledgers.Transaction do
   @doc false
   def changeset(transaction, attrs) do
     transaction
-    |> cast(attrs, [:account_uid, :amount_currency, :amount_subunits, :description, :entry_id, :kind, :type])
+    |> cast(attrs, [:account_uid, :amount_currency, :amount_subunits, :date, :description, :entry_id, :kind, :type])
     |> validate_required([:account_uid, :amount_currency, :amount_subunits, :kind])
     |> validate_inclusion(:kind, ["credit", "debit"])
     |> validate_account()

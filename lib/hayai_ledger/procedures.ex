@@ -9,15 +9,11 @@ defmodule HayaiLedger.Procedures do
   alias HayaiLedger.Accounts
   alias HayaiLedger.Accounts.Account
   alias HayaiLedger.Ledgers
-  alias HayaiLedger.Procedures.Procedure
+  alias HayaiLedger.Procedures.{Group, GroupInput, GroupProcedure, Input, Param, Procedure}
 
   def process(%{ "name" => name, "inputs" => inputs }, organization_id) do
     with {:ok, procedure} <- get_procedure_by_name(name, organization_id) do
-      case procedure.type do
-        "Account" -> Accounts.handle_account_procedure(procedure, inputs, organization_id)
-        "Transaction" -> Ledgers.handle_transaction_procedure(procedure, inputs, organization_id)
-        "Entry" -> Ledgers.handle_entry_procedure(procedure, inputs, organization_id)
-      end
+      process_procedure(procedure, inputs, organization_id)
     end
   end
 
@@ -39,9 +35,32 @@ defmodule HayaiLedger.Procedures do
     end
   end
 
+  def process_group(%{ "name" => name, "inputs" => inputs }, organization_id) do
+    with {:ok, group} <- get_group_by_name(name, organization_id) do
+      case async_group_procedures(inputs, group.procedures, organization_id) do
+        [] -> {:ok, "all processed"}
+        errors -> {:error, errors}
+        _ -> {:error, "process group failed"}
+      end
+    end
+  end
+
+  defp async_group_procedures(inputs, procedures, organization_id) do
+    Task.async_stream(procedures, fn(procedure) -> process_procedure(procedure, inputs, organization_id) end)
+    |> Enum.filter(fn({code, result}) -> code == :error  end)
+  end
+ 
   defp async_process_group(inputs, procedures, organization_id) do
     Task.async_stream(procedures, fn(name) -> process(%{ "name" => name, "inputs" => inputs }, organization_id) end)
     |> Enum.filter(fn({code, result}) -> code == :error  end)
+  end
+
+  defp process_procedure(procedure, inputs, organization_id) do
+    case procedure.type do
+      "Account" -> Accounts.handle_account_procedure(procedure, inputs, organization_id)
+      "Transaction" -> Ledgers.handle_transaction_procedure(procedure, inputs, organization_id)
+      "Entry" -> Ledgers.handle_entry_procedure(procedure, inputs, organization_id)
+    end
   end
 
   defp process_procedures(procedures, organization_id, processed \\ [])
@@ -106,6 +125,21 @@ defmodule HayaiLedger.Procedures do
     where: p.organization_id == ^organization_id,
     select: p,
     preload: [:inputs, :params]
+  end
+
+  def get_group_by_name(name, organization_id) do
+    case Repo.one(group_by_name_query(name, organization_id)) do
+      %Group{} = group -> {:ok, group}
+      _ -> {:error, "no process for that group"}
+    end
+  end
+
+  defp group_by_name_query(name, organization_id) do
+    from g in Group,
+    where: g.name == ^name,
+    where: g.organization_id == ^organization_id,
+    select: g,
+    preload: [:inputs, [procedures: :params, procedures: :inputs]]
   end
 
   @doc """
@@ -363,5 +397,287 @@ defmodule HayaiLedger.Procedures do
   """
   def change_param(%Param{} = param) do
     Param.changeset(param, %{})
+  end
+
+  @doc """
+  Returns the list of groups.
+
+  ## Examples
+
+      iex> list_groups()
+      [%Group{}, ...]
+
+  """
+  def list_groups do
+    Repo.all(Group)
+  end
+
+  @doc """
+  Gets a single group.
+
+  Raises `Ecto.NoResultsError` if the Group does not exist.
+
+  ## Examples
+
+      iex> get_group!(123)
+      %Group{}
+
+      iex> get_group!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_group!(id), do: Repo.get!(Group, id)
+
+  @doc """
+  Creates a group.
+
+  ## Examples
+
+      iex> create_group(%{field: value})
+      {:ok, %Group{}}
+
+      iex> create_group(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_group(attrs \\ %{}) do
+    %Group{}
+    |> Group.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a group.
+
+  ## Examples
+
+      iex> update_group(group, %{field: new_value})
+      {:ok, %Group{}}
+
+      iex> update_group(group, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_group(%Group{} = group, attrs) do
+    group
+    |> Group.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a group.
+
+  ## Examples
+
+      iex> delete_group(group)
+      {:ok, %Group{}}
+
+      iex> delete_group(group)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_group(%Group{} = group) do
+    Repo.delete(group)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking group changes.
+
+  ## Examples
+
+      iex> change_group(group)
+      %Ecto.Changeset{source: %Group{}}
+
+  """
+  def change_group(%Group{} = group) do
+    Group.changeset(group, %{})
+  end
+
+  @doc """
+  Returns the list of group_procedures.
+
+  ## Examples
+
+      iex> list_group_procedures()
+      [%GroupProcedure{}, ...]
+
+  """
+  def list_group_procedures do
+    Repo.all(GroupProcedure)
+  end
+
+  @doc """
+  Gets a single group_procedure.
+
+  Raises `Ecto.NoResultsError` if the Group procedure does not exist.
+
+  ## Examples
+
+      iex> get_group_procedure!(123)
+      %GroupProcedure{}
+
+      iex> get_group_procedure!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_group_procedure!(id), do: Repo.get!(GroupProcedure, id)
+
+  @doc """
+  Creates a group_procedure.
+
+  ## Examples
+
+      iex> create_group_procedure(%{field: value})
+      {:ok, %GroupProcedure{}}
+
+      iex> create_group_procedure(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_group_procedure(attrs \\ %{}) do
+    %GroupProcedure{}
+    |> GroupProcedure.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a group_procedure.
+
+  ## Examples
+
+      iex> update_group_procedure(group_procedure, %{field: new_value})
+      {:ok, %GroupProcedure{}}
+
+      iex> update_group_procedure(group_procedure, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_group_procedure(%GroupProcedure{} = group_procedure, attrs) do
+    group_procedure
+    |> GroupProcedure.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a group_procedure.
+
+  ## Examples
+
+      iex> delete_group_procedure(group_procedure)
+      {:ok, %GroupProcedure{}}
+
+      iex> delete_group_procedure(group_procedure)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_group_procedure(%GroupProcedure{} = group_procedure) do
+    Repo.delete(group_procedure)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking group_procedure changes.
+
+  ## Examples
+
+      iex> change_group_procedure(group_procedure)
+      %Ecto.Changeset{source: %GroupProcedure{}}
+
+  """
+  def change_group_procedure(%GroupProcedure{} = group_procedure) do
+    GroupProcedure.changeset(group_procedure, %{})
+  end
+
+  @doc """
+  Returns the list of group_inputs.
+
+  ## Examples
+
+      iex> list_group_inputs()
+      [%GroupInput{}, ...]
+
+  """
+  def list_group_inputs do
+    Repo.all(GroupInput)
+  end
+
+  @doc """
+  Gets a single group_input.
+
+  Raises `Ecto.NoResultsError` if the Group input does not exist.
+
+  ## Examples
+
+      iex> get_group_input!(123)
+      %GroupInput{}
+
+      iex> get_group_input!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_group_input!(id), do: Repo.get!(GroupInput, id)
+
+  @doc """
+  Creates a group_input.
+
+  ## Examples
+
+      iex> create_group_input(%{field: value})
+      {:ok, %GroupInput{}}
+
+      iex> create_group_input(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_group_input(attrs \\ %{}) do
+    %GroupInput{}
+    |> GroupInput.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a group_input.
+
+  ## Examples
+
+      iex> update_group_input(group_input, %{field: new_value})
+      {:ok, %GroupInput{}}
+
+      iex> update_group_input(group_input, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_group_input(%GroupInput{} = group_input, attrs) do
+    group_input
+    |> GroupInput.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a group_input.
+
+  ## Examples
+
+      iex> delete_group_input(group_input)
+      {:ok, %GroupInput{}}
+
+      iex> delete_group_input(group_input)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_group_input(%GroupInput{} = group_input) do
+    Repo.delete(group_input)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking group_input changes.
+
+  ## Examples
+
+      iex> change_group_input(group_input)
+      %Ecto.Changeset{source: %GroupInput{}}
+
+  """
+  def change_group_input(%GroupInput{} = group_input) do
+    GroupInput.changeset(group_input, %{})
   end
 end

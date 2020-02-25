@@ -6,59 +6,147 @@ defmodule HayaiLedger.ProceduresTest do
 
   alias HayaiLedger.Accounts
   alias HayaiLedger.Procedures
-  alias HayaiLedger.Procedures.{Input, Procedure, Param}
+  alias HayaiLedger.Procedures.{Group, GroupInput, GroupProcedure, Input, Param, Procedure}
 
-  describe "procedures" do
+  describe "groups" do
 
-    @update_attrs %{description: "some updated description", name: "some updated name"}
-    @invalid_attrs %{description: nil, name: nil}
+    @update_attrs %{name: "some updated name"}
+    @invalid_attrs %{name: nil}
 
-    test "list_procedures/0 returns all procedures" do
+    test "list_groups/0 returns all groups" do
+      group = group_fixture()
+      assert Procedures.list_groups() == [group]
+    end
+
+    test "get_group!/1 returns the group with given id" do
+      group = group_fixture()
+      assert Procedures.get_group!(group.id) == group
+    end
+
+    test "create_group/1 with valid data creates a group" do
+      assert {:ok, %Group{} = group} = Procedures.create_group(group_attrs())
+      assert group.name == "DefaultAccountSetup"
+    end
+
+    test "create_group/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Procedures.create_group(@invalid_attrs)
+    end
+
+    test "update_group/2 with valid data updates the group" do
+      group = group_fixture()
+      assert {:ok, %Group{} = group} = Procedures.update_group(group, @update_attrs)
+      assert group.name == "some updated name"
+    end
+
+    test "update_group/2 with invalid data returns error changeset" do
+      group = group_fixture()
+      assert {:error, %Ecto.Changeset{}} = Procedures.update_group(group, @invalid_attrs)
+      assert group == Procedures.get_group!(group.id)
+    end
+
+    test "delete_group/1 deletes the group" do
+      group = group_fixture()
+      assert {:ok, %Group{}} = Procedures.delete_group(group)
+      assert_raise Ecto.NoResultsError, fn -> Procedures.get_group!(group.id) end
+    end
+
+    test "change_group/1 returns a group changeset" do
+      group = group_fixture()
+      assert %Ecto.Changeset{} = Procedures.change_group(group)
+    end
+  end
+
+  describe "group_inputs" do
+
+    @update_attrs %{name: "some updated name"}
+    @invalid_attrs %{name: nil}
+
+    test "list_group_inputs/0 returns all group_inputs" do
+      group_input = group_input_fixture()
+      assert Procedures.list_group_inputs() == [group_input]
+    end
+
+    test "get_group_input!/1 returns the group_input with given id" do
+      group_input = group_input_fixture()
+      assert Procedures.get_group_input!(group_input.id) == group_input
+    end
+
+    test "create_group_input/1 with valid data creates a group_input" do
+      assert {:ok, %GroupInput{} = group_input} = Procedures.create_group_input(group_input_attrs())
+      assert group_input.name == "object_uid"
+    end
+
+    test "create_group_input/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Procedures.create_group_input(@invalid_attrs)
+    end
+
+    test "update_group_input/2 with valid data updates the group_input" do
+      group_input = group_input_fixture()
+      assert {:ok, %GroupInput{} = group_input} = Procedures.update_group_input(group_input, @update_attrs)
+      assert group_input.name == "some updated name"
+    end
+
+    test "update_group_input/2 with invalid data returns error changeset" do
+      group_input = group_input_fixture()
+      assert {:error, %Ecto.Changeset{}} = Procedures.update_group_input(group_input, @invalid_attrs)
+      assert group_input == Procedures.get_group_input!(group_input.id)
+    end
+
+    test "delete_group_input/1 deletes the group_input" do
+      group_input = group_input_fixture()
+      assert {:ok, %GroupInput{}} = Procedures.delete_group_input(group_input)
+      assert_raise Ecto.NoResultsError, fn -> Procedures.get_group_input!(group_input.id) end
+    end
+
+    test "change_group_input/1 returns a group_input changeset" do
+      group_input = group_input_fixture()
+      assert %Ecto.Changeset{} = Procedures.change_group_input(group_input)
+    end
+  end
+
+  describe "group_procedures" do
+
+    @invalid_attrs %{ "group_id" => nil, "procedure_id" => nil }
+
+    test "list_group_procedures/0 returns all group_procedures" do
+      group_procedure = group_procedure_fixture()
+      assert Procedures.list_group_procedures() == [group_procedure]
+    end
+
+    test "get_group_procedure!/1 returns the group_procedure with given id" do
+      group_procedure = group_procedure_fixture()
+      assert Procedures.get_group_procedure!(group_procedure.id) == group_procedure
+    end
+
+    test "create_group_procedure/1 with valid data creates a group_procedure" do
+      assert {:ok, %GroupProcedure{} = group_procedure} = Procedures.create_group_procedure(group_procedure_attrs())
+    end
+
+    test "create_group_procedure/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Procedures.create_group_procedure(@invalid_attrs)
+    end
+
+    test "update_group_procedure/2 with valid data updates the group_procedure" do
+      group_procedure = group_procedure_fixture()
       procedure = procedure_fixture()
-      assert Procedures.list_procedures() == [procedure]
+      assert {:ok, %GroupProcedure{} = group_procedure} = Procedures.update_group_procedure(group_procedure, %{ "procedure_id" => procedure.id })
     end
 
-    test "get_procedure!/1 returns the procedure with given id" do
-      procedure = procedure_fixture()
-      found_procedure = Procedures.get_procedure!(procedure.id)
-      assert procedure.organization_id == found_procedure.organization_id
-      assert procedure.name == found_procedure.name
+    test "update_group_procedure/2 with invalid data returns error changeset" do
+      group_procedure = group_procedure_fixture()
+      assert {:error, %Ecto.Changeset{}} = Procedures.update_group_procedure(group_procedure, @invalid_attrs)
+      assert group_procedure == Procedures.get_group_procedure!(group_procedure.id)
     end
 
-    test "create_procedure/1 with valid data creates a procedure" do
-      assert {:ok, %Procedure{} = procedure} = Procedures.create_procedure(procedure_attrs())
-      assert procedure.description == "onsite cash sale"
-      assert procedure.name == "CashSale"
+    test "delete_group_procedure/1 deletes the group_procedure" do
+      group_procedure = group_procedure_fixture()
+      assert {:ok, %GroupProcedure{}} = Procedures.delete_group_procedure(group_procedure)
+      assert_raise Ecto.NoResultsError, fn -> Procedures.get_group_procedure!(group_procedure.id) end
     end
 
-    test "create_procedure/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Procedures.create_procedure(@invalid_attrs)
-    end
-
-    test "update_procedure/2 with valid data updates the procedure" do
-      procedure = procedure_fixture()
-      assert {:ok, %Procedure{} = procedure} = Procedures.update_procedure(procedure, @update_attrs)
-      assert procedure.description == "some updated description"
-      assert procedure.name == "some updated name"
-    end
-
-    test "update_procedure/2 with invalid data returns error changeset" do
-      procedure = procedure_fixture()
-      assert {:error, %Ecto.Changeset{}} = Procedures.update_procedure(procedure, @invalid_attrs)
-      found_procedure = Procedures.get_procedure!(procedure.id)
-      assert procedure.organization_id == found_procedure.organization_id
-      assert procedure.name == found_procedure.name
-    end
-
-    test "delete_procedure/1 deletes the procedure" do
-      procedure = procedure_fixture()
-      assert {:ok, %Procedure{}} = Procedures.delete_procedure(procedure)
-      assert_raise Ecto.NoResultsError, fn -> Procedures.get_procedure!(procedure.id) end
-    end
-
-    test "change_procedure/1 returns a procedure changeset" do
-      procedure = procedure_fixture()
-      assert %Ecto.Changeset{} = Procedures.change_procedure(procedure)
+    test "change_group_procedure/1 returns a group_procedure changeset" do
+      group_procedure = group_procedure_fixture()
+      assert %Ecto.Changeset{} = Procedures.change_group_procedure(group_procedure)
     end
   end
 
@@ -160,6 +248,60 @@ defmodule HayaiLedger.ProceduresTest do
     end
   end
 
+  describe "procedures" do
+
+    @update_attrs %{description: "some updated description", name: "some updated name"}
+    @invalid_attrs %{description: nil, name: nil}
+
+    test "list_procedures/0 returns all procedures" do
+      procedure = procedure_fixture()
+      assert Procedures.list_procedures() == [procedure]
+    end
+
+    test "get_procedure!/1 returns the procedure with given id" do
+      procedure = procedure_fixture()
+      found_procedure = Procedures.get_procedure!(procedure.id)
+      assert procedure.organization_id == found_procedure.organization_id
+      assert procedure.name == found_procedure.name
+    end
+
+    test "create_procedure/1 with valid data creates a procedure" do
+      assert {:ok, %Procedure{} = procedure} = Procedures.create_procedure(procedure_attrs())
+      assert procedure.description == "onsite cash sale"
+      assert procedure.name == "CashSale"
+    end
+
+    test "create_procedure/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Procedures.create_procedure(@invalid_attrs)
+    end
+
+    test "update_procedure/2 with valid data updates the procedure" do
+      procedure = procedure_fixture()
+      assert {:ok, %Procedure{} = procedure} = Procedures.update_procedure(procedure, @update_attrs)
+      assert procedure.description == "some updated description"
+      assert procedure.name == "some updated name"
+    end
+
+    test "update_procedure/2 with invalid data returns error changeset" do
+      procedure = procedure_fixture()
+      assert {:error, %Ecto.Changeset{}} = Procedures.update_procedure(procedure, @invalid_attrs)
+      found_procedure = Procedures.get_procedure!(procedure.id)
+      assert procedure.organization_id == found_procedure.organization_id
+      assert procedure.name == found_procedure.name
+    end
+
+    test "delete_procedure/1 deletes the procedure" do
+      procedure = procedure_fixture()
+      assert {:ok, %Procedure{}} = Procedures.delete_procedure(procedure)
+      assert_raise Ecto.NoResultsError, fn -> Procedures.get_procedure!(procedure.id) end
+    end
+
+    test "change_procedure/1 returns a procedure changeset" do
+      procedure = procedure_fixture()
+      assert %Ecto.Changeset{} = Procedures.change_procedure(procedure)
+    end
+  end
+
   describe "get_procedure_by_name/2" do
     setup do
        %{ organization: organization_fixture() }
@@ -255,6 +397,21 @@ defmodule HayaiLedger.ProceduresTest do
       assert "uid_123456789" == entry.object_uid
       assert "Sale" == entry.object_type 
       assert 3 == length(transactions)
+    end
+  end
+
+  describe "process_group/2" do
+    setup do
+      %{ organization: organization_fixture() }
+    end
+
+    test "process the procedures from the group", %{ organization: organization } do
+      site = "site_123456789"
+      cash_account = create_account("Cash", site, "asset", organization.id )
+      bank_account = create_account("BankAccount", site, "asset", organization.id )
+      group_procedure = bank_deposit_group_procedure(organization.id)
+
+      assert {:ok, "all processed"} = Procedures.process_group(bank_deposit_group_params(), organization.id)
     end
   end
 

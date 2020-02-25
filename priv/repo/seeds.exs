@@ -63,12 +63,12 @@ inputs = [
     %{
       name: "name", 
       value: "BankAccount",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_type", 
       value: "Site",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_uid", 
@@ -78,7 +78,7 @@ inputs = [
     %{
       name: "type", 
       value: "asset",
-      type: "string"
+      type: "default"
     }
   ]
 }
@@ -100,12 +100,12 @@ inputs = [
     %{
       name: "name", 
       value: "Cash",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_type", 
       value: "Site",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_uid", 
@@ -115,7 +115,7 @@ inputs = [
     %{
       name: "type", 
       value: "asset",
-      type: "string"
+      type: "default"
     }
   ]
 }
@@ -137,12 +137,12 @@ inputs = [
     %{
       name: "name", 
       value: "Equipment",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_type", 
       value: "Site",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_uid", 
@@ -152,7 +152,7 @@ inputs = [
     %{
       name: "type", 
       value: "asset",
-      type: "string"
+      type: "default"
     }
   ]
 }
@@ -174,12 +174,12 @@ inputs = [
     %{
       name: "name", 
       value: "FoodInventory",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_type", 
       value: "Site",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_uid", 
@@ -189,7 +189,7 @@ inputs = [
     %{
       name: "type", 
       value: "asset",
-      type: "string"
+      type: "default"
     }
   ]
 }
@@ -211,12 +211,12 @@ inputs = [
     %{
       name: "name", 
       value: "SuppliesInventory",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_type", 
       value: "Site",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_uid", 
@@ -226,7 +226,7 @@ inputs = [
     %{
       name: "type", 
       value: "asset",
-      type: "string"
+      type: "default"
     }
   ]
 }
@@ -250,12 +250,12 @@ inputs = [
     %{
       name: "name", 
       value: "Wages",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_type", 
       value: "Site",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_uid", 
@@ -265,7 +265,7 @@ inputs = [
     %{
       name: "type", 
       value: "expense",
-      type: "string"
+      type: "default"
     }
   ]
 }
@@ -287,12 +287,12 @@ inputs = [
     %{
       name: "name", 
       value: "OtherExpense",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_type", 
       value: "Site",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_uid", 
@@ -302,7 +302,7 @@ inputs = [
     %{
       name: "type", 
       value: "expense",
-      type: "string"
+      type: "default"
     }
   ]
 }
@@ -326,12 +326,12 @@ inputs = [
     %{
       name: "name", 
       value: "EquipmentVendor",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_type", 
       value: "Site",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_uid", 
@@ -341,7 +341,7 @@ inputs = [
     %{
       name: "type", 
       value: "liability",
-      type: "string"
+      type: "default"
     }
   ]
 }
@@ -363,12 +363,12 @@ inputs = [
     %{
       name: "name", 
       value: "FoodVendor",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_type", 
       value: "Site",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_uid", 
@@ -378,7 +378,7 @@ inputs = [
     %{
       name: "type", 
       value: "liability",
-      type: "string"
+      type: "default"
     }
   ]
 }
@@ -400,12 +400,12 @@ inputs = [
     %{
       name: "name", 
       value: "Grosslabor",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_type", 
       value: "Site",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_uid", 
@@ -415,7 +415,7 @@ inputs = [
     %{
       name: "type", 
       value: "liability",
-      type: "string"
+      type: "default"
     }
   ]
 }
@@ -437,12 +437,12 @@ inputs = [
     %{
       name: "name", 
       value: "SalesTax",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_type", 
       value: "Site",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_uid", 
@@ -452,7 +452,7 @@ inputs = [
     %{
       name: "type", 
       value: "liability",
-      type: "string"
+      type: "default"
     }
   ]
 }
@@ -474,12 +474,12 @@ inputs = [
     %{
       name: "name", 
       value: "SupplyVendor",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_type", 
       value: "Site",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_uid", 
@@ -489,7 +489,7 @@ inputs = [
     %{
       name: "type", 
       value: "liability",
-      type: "string"
+      type: "default"
     }
   ]
 }
@@ -513,12 +513,12 @@ inputs = [
     %{
       name: "name", 
       value: "CashSales",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_type", 
       value: "Site",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_uid", 
@@ -528,13 +528,13 @@ inputs = [
     %{
       name: "type", 
       value: "revenue",
-      type: "string"
+      type: "default"
     }
   ]
 }
 |> Procedures.create_procedure()
 
-{:ok, cash_revenue} = %{
+{:ok, credit_card_revenue} = %{
   name: "DefaultCreditCardSalesRevenue",
   description: "Create a new credit card revenue account",
   type: "Account",
@@ -550,12 +550,12 @@ inputs = [
     %{
       name: "name", 
       value: "CreditCardSales",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_type", 
       value: "Site",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_uid", 
@@ -565,7 +565,7 @@ inputs = [
     %{
       name: "type", 
       value: "revenue",
-      type: "string"
+      type: "default"
     }
   ]
 }
@@ -581,12 +581,13 @@ inputs = [
   organization_id: organization.id,
   inputs: [
     %{ name: "object_uid" },
-    %{ name: "cash_amount" }
+    %{ name: "amount_subunits" },
+    %{ name: "date" }
   ],
   params: [
     %{
       name: "amount_subunits",
-      value: "cash_amount",
+      value: "amount_subunits",
       type: "inputs"
     },
     %{
@@ -595,9 +596,14 @@ inputs = [
       type: "lookup"
     },
     %{
+      name: "date",
+      value: "date",
+      type: "inputs"
+    },
+    %{
       name: "kind", 
       value: "credit",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_uid", 
@@ -621,12 +627,13 @@ inputs = [
   organization_id: organization.id,
   inputs: [
     %{ name: "object_uid" },
-    %{ name: "cash_sales_amount" }
+    %{ name: "amount_subunits" },
+    %{ name: "date" }
   ],
   params: [
     %{
       name: "amount_subunits",
-      value: "cash_sales_amount",
+      value: "amount_subunits",
       type: "inputs"
     },
     %{
@@ -635,9 +642,14 @@ inputs = [
       type: "lookup"
     },
     %{
+      name: "date",
+      value: "date",
+      type: "inputs"
+    },
+    %{
       name: "kind", 
       value: "credit",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_uid", 
@@ -653,6 +665,52 @@ inputs = [
 }
 |> Procedures.create_procedure()
 
+{:ok, credit_credit_card_sales} = %{
+  name: "CreditCreditCardSales",
+  description: "credit the revenue credit card account",
+  type: "Transaction",
+  action: "build",
+  organization_id: organization.id,
+  inputs: [
+    %{ name: "object_uid" },
+    %{ name: "amount_subunits" },
+    %{ name: "date" }
+  ],
+  params: [
+    %{
+      name: "amount_subunits",
+      value: "amount_subunits",
+      type: "inputs"
+    },
+    %{
+      name: "amount_currency",
+      value: "CreditCardSales",
+      type: "lookup"
+    },
+    %{
+      name: "date",
+      value: "date",
+      type: "inputs"
+    },
+    %{
+      name: "kind", 
+      value: "credit",
+      type: "default"
+    },
+    %{
+      name: "object_uid", 
+      value: "object_uid",
+      type: "inputs"
+    },
+    %{
+      name: "account_uid", 
+      value: "CreditCardSales",
+      type: "lookup"
+    },
+  ]
+}
+|> Procedures.create_procedure()
+
 {:ok, credit_food_vendor} = %{
   name: "CreditFoodVendor",
   description: "credit the food vendor liability account",
@@ -661,12 +719,13 @@ inputs = [
   organization_id: organization.id,
   inputs: [
     %{ name: "object_uid" },
-    %{ name: "food_vendor_amount" }
+    %{ name: "amount_subunits" },
+    %{ name: "date" }
   ],
   params: [
     %{
       name: "amount_subunits",
-      value: "food_vendor_amount",
+      value: "amount_subunits",
       type: "inputs"
     },
     %{
@@ -675,9 +734,14 @@ inputs = [
       type: "lookup"
     },
     %{
+      name: "date",
+      value: "date",
+      type: "inputs"
+    },
+    %{
       name: "kind", 
       value: "credit",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_uid", 
@@ -701,23 +765,29 @@ inputs = [
   organization_id: organization.id,
   inputs: [
     %{ name: "object_uid" },
-    %{ name: "gross_labor_amount" }
+    %{ name: "amount_subunits" },
+    %{ name: "date" }
   ],
   params: [
     %{
       name: "amount_subunits",
-      value: "gross_labor_amount",
+      value: "amount_subunits",
       type: "inputs"
     },
     %{
       name: "amount_currency",
       value: "Grosslabor",
       type: "lookup"
+    },    
+    %{
+      name: "date",
+      value: "date",
+      type: "inputs"
     },
     %{
       name: "kind", 
       value: "credit",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_uid", 
@@ -741,23 +811,29 @@ inputs = [
   organization_id: organization.id,
   inputs: [
     %{ name: "object_uid" },
-    %{ name: "sales_tax_amount" }
+    %{ name: "amount_subunits" },
+    %{ name: "date" }
   ],
   params: [
     %{
       name: "amount_subunits",
-      value: "sales_tax_amount",
+      value: "amount_subunits",
       type: "inputs"
     },
     %{
       name: "amount_currency",
       value: "SalesTax",
       type: "lookup"
+    },    
+    %{
+      name: "date",
+      value: "date",
+      type: "inputs"
     },
     %{
       name: "kind", 
       value: "credit",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_uid", 
@@ -781,12 +857,13 @@ inputs = [
   organization_id: organization.id,
   inputs: [
     %{ name: "object_uid" },
-    %{ name: "supply_vendor_amount" }
+    %{ name: "amount_subunits" },
+    %{ name: "date" }
   ],
   params: [
     %{
       name: "amount_subunits",
-      value: "supply_vendor_amount",
+      value: "amount_subunits",
       type: "inputs"
     },
     %{
@@ -795,9 +872,14 @@ inputs = [
       type: "lookup"
     },
     %{
+      name: "date",
+      value: "date",
+      type: "inputs"
+    },
+    %{
       name: "kind", 
       value: "credit",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_uid", 
@@ -823,23 +905,29 @@ inputs = [
   organization_id: organization.id,
   inputs: [
     %{ name: "object_uid" },
-    %{ name: "bank_account_amount" }
+    %{ name: "amount_subunits" },
+    %{ name: "date" }
   ],
   params: [
     %{
       name: "amount_subunits",
-      value: "bank_account_amount",
+      value: "amount_subunits",
       type: "inputs"
     },
     %{
       name: "amount_currency",
       value: "BankAccount",
       type: "lookup"
+    },    
+    %{
+      name: "date",
+      value: "date",
+      type: "inputs"
     },
     %{
       name: "kind", 
       value: "debit",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_uid", 
@@ -863,23 +951,29 @@ inputs = [
   organization_id: organization.id,
   inputs: [
     %{ name: "object_uid" },
-    %{ name: "cash_amount" }
+    %{ name: "amount_subunits" },
+    %{ name: "date" }
   ],
   params: [
     %{
       name: "amount_subunits",
-      value: "cash_amount",
+      value: "amount_subunits",
       type: "inputs"
     },
     %{
       name: "amount_currency",
       value: "Cash",
       type: "lookup"
+    },    
+    %{
+      name: "date",
+      value: "date",
+      type: "inputs"
     },
     %{
       name: "kind", 
       value: "debit",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_uid", 
@@ -895,7 +989,7 @@ inputs = [
 }
 |> Procedures.create_procedure()
 
-{:ok, debit_cash_account} = %{
+{:ok, debit_food_inventory_account} = %{
   name: "DebitFoodInventory",
   description: "Debit the asset food inventory account",
   type: "Transaction",
@@ -903,23 +997,29 @@ inputs = [
   organization_id: organization.id,
   inputs: [
     %{ name: "object_uid" },
-    %{ name: "food_amount" }
+    %{ name: "amount_subunits" },
+    %{ name: "date" }
   ],
   params: [
     %{
       name: "amount_subunits",
-      value: "food_amount",
+      value: "amount_subunits",
       type: "inputs"
     },
     %{
       name: "amount_currency",
       value: "FoodInventory",
       type: "lookup"
+    },    
+    %{
+      name: "date",
+      value: "date",
+      type: "inputs"
     },
     %{
       name: "kind", 
       value: "debit",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_uid", 
@@ -943,23 +1043,29 @@ inputs = [
   organization_id: organization.id,
   inputs: [
     %{ name: "object_uid" },
-    %{ name: "supplies_amount" }
+    %{ name: "amount_subunits" },
+    %{ name: "date" }
   ],
   params: [
     %{
       name: "amount_subunits",
-      value: "supplies_amount",
+      value: "amount_subunits",
       type: "inputs"
     },
     %{
       name: "amount_currency",
       value: "SuppliesInventory",
       type: "lookup"
+    },    
+    %{
+      name: "date",
+      value: "date",
+      type: "inputs"
     },
     %{
       name: "kind", 
       value: "debit",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_uid", 
@@ -983,23 +1089,29 @@ inputs = [
   organization_id: organization.id,
   inputs: [
     %{ name: "object_uid" },
-    %{ name: "wages_amount" }
+    %{ name: "amount_subunits" },
+    %{ name: "date" }
   ],
   params: [
     %{
       name: "amount_subunits",
-      value: "wages_amount",
+      value: "amount_subunits",
       type: "inputs"
     },
     %{
       name: "amount_currency",
       value: "Wages",
       type: "lookup"
+    },    
+    %{
+      name: "date",
+      value: "date",
+      type: "inputs"
     },
     %{
       name: "kind", 
       value: "debit",
-      type: "string"
+      type: "default"
     },
     %{
       name: "object_uid", 
@@ -1017,7 +1129,7 @@ inputs = [
 
 ### Entry procedures ###
 
-%{
+{:ok, journal_entry} = %{
   name: "JournalEntry",
   description: "entry for journal entry with transactions",
   type: "Entry",
@@ -1025,8 +1137,8 @@ inputs = [
   organization_id: organization.id,
   inputs: [
     %{ name: "description" },
-    %{ name: "object_type" },
-    %{ name: "object_uid" }
+    %{ name: "entry_object_type" },
+    %{ name: "entry_object_uid" }
   ],
   params: [
     %{
@@ -1047,3 +1159,42 @@ inputs = [
   ]
 }
 |> Procedures.create_procedure()
+
+### Group procedures ###
+
+{:ok, default_account_setup} = %{
+  name: "DefaultAccountsSetup",
+  organization_id: organization.id,
+  inputs: [
+    %{ name: "object_uid" },
+    %{ name: "currency" }
+  ]
+}
+|> Procedures.create_group()
+
+account_procedures = [
+  bank_asset,
+  cash_asset,
+  equimpent_asset,
+  food_asset,
+  supplies_asset,
+  wage_expenses,
+  other_expenses,
+  equimpment_vendor,
+  food_vendor,
+  gross_labor,
+  sales_tax,
+  supply_vendor,
+  cash_revenue,
+  credit_card_revenue
+]
+
+for account_procedure <- account_procedures do
+  %{
+    "group_id" => default_account_setup.id,
+    "procedure_id" => account_procedure.id
+  }
+  |> Procedures.create_group_procedure()
+end
+
+   

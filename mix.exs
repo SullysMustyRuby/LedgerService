@@ -44,7 +44,8 @@ defmodule HayaiLedger.MixProject do
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:argon2_elixir, "~> 2.0"},
-      {:benchee, "~> 1.0", only: [:dev, :test]}
+      {:benchee, "~> 1.0", only: [:dev, :test]},
+      {:tzdata, "~> 1.0.1"}
     ]
   end
 
