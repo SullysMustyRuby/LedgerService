@@ -127,12 +127,12 @@ defmodule Support.Fixtures.ProcedureFixtures do
         %{
           name: "name", 
           value: "BankAccount",
-          type: "string"
+          type: "default"
         },
         %{
           name: "object_type", 
           value: "Site",
-          type: "string"
+          type: "default"
         },
         %{
           name: "object_uid", 
@@ -142,7 +142,7 @@ defmodule Support.Fixtures.ProcedureFixtures do
         %{
           name: "type", 
           value: "asset",
-          type: "string"
+          type: "default"
         }
       ]
     })
@@ -175,7 +175,7 @@ defmodule Support.Fixtures.ProcedureFixtures do
         %{
           name: "kind", 
           value: "credit",
-          type: "string"
+          type: "default"
         },
         %{
           name: "object_uid", 
@@ -218,7 +218,7 @@ defmodule Support.Fixtures.ProcedureFixtures do
         %{
           name: "kind", 
           value: "debit",
-          type: "string"
+          type: "default"
         },
         %{
           name: "object_uid", 
@@ -290,12 +290,12 @@ defmodule Support.Fixtures.ProcedureFixtures do
         %{
           name: "amount_currency",
           value: "THB",
-          type: "string"
+          type: "default"
         },
         %{
           name: "kind", 
           value: "credit",
-          type: "string"
+          type: "default"
         },
         %{
           name: "object_uid", 
@@ -333,7 +333,7 @@ defmodule Support.Fixtures.ProcedureFixtures do
         %{
           name: "object_type", 
           value: "Sale",
-          type: "string"
+          type: "default"
         },
         %{
           name: "object_uid", 
@@ -366,12 +366,12 @@ defmodule Support.Fixtures.ProcedureFixtures do
         %{
           name: "amount_currency",
           value: "THB",
-          type: "string"
+          type: "default"
         },
         %{
           name: "kind", 
           value: "credit",
-          type: "string"
+          type: "default"
         },
         %{
           name: "object_uid", 
@@ -409,12 +409,12 @@ defmodule Support.Fixtures.ProcedureFixtures do
         %{
           name: "amount_currency",
           value: "THB",
-          type: "string"
+          type: "default"
         },
         %{
           name: "kind", 
           value: "debit",
-          type: "string"
+          type: "default"
         },
         %{
           name: "object_uid", 
@@ -424,7 +424,7 @@ defmodule Support.Fixtures.ProcedureFixtures do
         %{
           name: "account_uid", 
           value: account_uid,
-          type: "string"
+          type: "default"
         },
       ]
     })
