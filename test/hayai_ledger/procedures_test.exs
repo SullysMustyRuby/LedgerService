@@ -407,9 +407,9 @@ defmodule HayaiLedger.ProceduresTest do
 
     test "process the procedures from the group", %{ organization: organization } do
       site = "site_123456789"
-      cash_account = create_account("Cash", site, "asset", organization.id )
-      bank_account = create_account("BankAccount", site, "asset", organization.id )
-      group_procedure = bank_deposit_group_procedure(organization.id)
+      create_account("Cash", site, "asset", organization.id )
+      create_account("BankAccount", site, "asset", organization.id )
+      bank_deposit_group_procedure(organization.id)
 
       assert {:ok, "all processed"} = Procedures.process_group(bank_deposit_group_params(), organization.id)
     end

@@ -116,8 +116,15 @@ defmodule HayaiLedger.LedgersTest do
   
   describe "get_transaction!/1" do
     test "returns the transaction with given id" do
-      transaction = transaction_fixture() |> Map.delete(:account_uid)
-      assert transaction == Ledgers.get_transaction!(transaction.id) |> Map.delete(:account_uid)
+      transaction = transaction_fixture() 
+      found_transaction = Ledgers.get_transaction!(transaction.id)
+      assert transaction.id == found_transaction.id
+      assert transaction.account_uid == found_transaction.account_uid
+      assert transaction.amount_currency == found_transaction.amount_currency
+      assert transaction.amount_subunits == found_transaction.amount_subunits
+      assert transaction.kind == found_transaction.kind
+      assert transaction.type == found_transaction.type
+      assert transaction.uid == found_transaction.uid
     end
   end
 
@@ -211,8 +218,15 @@ defmodule HayaiLedger.LedgersTest do
 
   describe "list_transactions/0" do
     test "returns all transactions" do
-      transaction = transaction_fixture() |> Map.delete(:account_uid)
-      assert transaction == Ledgers.list_transactions() |> hd() |> Map.delete(:account_uid)
+      transaction = transaction_fixture()
+      found_transaction =  Ledgers.list_transactions() |> hd() 
+      assert transaction.id == found_transaction.id
+      assert transaction.account_uid == found_transaction.account_uid
+      assert transaction.amount_currency == found_transaction.amount_currency
+      assert transaction.amount_subunits == found_transaction.amount_subunits
+      assert transaction.kind == found_transaction.kind
+      assert transaction.type == found_transaction.type
+      assert transaction.uid == found_transaction.uid
     end
   end
 
