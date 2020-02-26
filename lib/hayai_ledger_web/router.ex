@@ -50,7 +50,6 @@ defmodule HayaiLedgerWeb.Router do
     resources "/api_keys", ApiKeyController, only: [:index, :show]
     resources "/accounts", AccountController, except: [:delete]
     resources "/entries", EntryController, only: [:index, :show]
-    resources "/inputs", InputController, except: [:index, :show]
     resources "/organizations", OrganizationController
     resources "/params", ParamController, except: [:index, :show]
     resources "/procedures", ProcedureController

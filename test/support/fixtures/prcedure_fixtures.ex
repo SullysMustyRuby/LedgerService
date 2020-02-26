@@ -20,22 +20,6 @@ defmodule Support.Fixtures.ProcedureFixtures do
     group
   end
 
-  def group_input_attrs() do
-    %{ 
-      "name" => "object_uid",
-      "group_id" => group_fixture().id
-    }
-  end
-
-  def group_input_fixture(attrs \\ %{}) do
-    {:ok, group_input} =
-      attrs
-      |> Enum.into(group_input_attrs())
-      |> Procedures.create_group_input()
-
-    group_input
-  end
-
   def group_procedure_attrs() do
     %{
       "group_id" => group_fixture().id,
@@ -50,22 +34,6 @@ defmodule Support.Fixtures.ProcedureFixtures do
       |> Procedures.create_group_procedure()
 
     group_procedure
-  end
-
-	def input_attrs() do
-		%{
-			"name" => "key_name",
-			"procedure_id" => procedure_fixture().id
-		}
-	end
-
-  def input_fixture(attrs \\ %{}) do
-    {:ok, input} =
-      attrs
-      |> Enum.into(input_attrs())
-      |> Procedures.create_input()
-
-    input
   end
 
   def procedure_attrs() do
@@ -114,10 +82,6 @@ defmodule Support.Fixtures.ProcedureFixtures do
       type: "Account",
       action: "create",
       organization_id: organization_id,
-      inputs: [
-        %{ name: "object_uid" },
-        %{ name: "currency" }
-        ],
         params: [
         %{
           name: "currency", 
@@ -157,10 +121,6 @@ defmodule Support.Fixtures.ProcedureFixtures do
       type: "Transaction",
       action: "build",
       organization_id: organization_id,
-      inputs: [
-        %{ name: "object_uid" },
-        %{ name: "cash_amount" }
-      ],
       params: [
         %{
           name: "amount_subunits",
@@ -200,10 +160,6 @@ defmodule Support.Fixtures.ProcedureFixtures do
       type: "Transaction",
       action: "build",
       organization_id: organization_id,
-      inputs: [
-        %{ name: "object_uid" },
-        %{ name: "bank_account_amount" }
-      ],
       params: [
         %{
           name: "amount_subunits",
@@ -243,11 +199,6 @@ defmodule Support.Fixtures.ProcedureFixtures do
       type: "Entry",
       action: "build",
       organization_id: organization_id,
-      inputs: [
-        %{ name: "description" },
-        %{ name: "entry_object_type" },
-        %{ name: "entry_object_uid" }
-      ],
       params: [
         %{
           name: "description", 
@@ -277,10 +228,6 @@ defmodule Support.Fixtures.ProcedureFixtures do
       type: "Transaction",
       action: "build",
       organization_id: organization_id,
-      inputs: [
-        %{ name: "object_uid" },
-        %{ name: "net_amount" }
-      ],
       params: [
         %{
           name: "amount_subunits",
@@ -320,10 +267,6 @@ defmodule Support.Fixtures.ProcedureFixtures do
       type: "Entry",
       action: "build",
       organization_id: organization_id,
-      inputs: [
-        %{ name: "description" },
-        %{ name: "object_uid" }
-      ],
       params: [
         %{
           name: "description", 
@@ -353,10 +296,6 @@ defmodule Support.Fixtures.ProcedureFixtures do
       type: "Transaction",
       action: "build",
       organization_id: organization_id,
-      inputs: [
-        %{ name: "object_uid" },
-        %{ name: "tax_amount" }
-      ],
       params: [
         %{
           name: "amount_subunits",
@@ -396,10 +335,6 @@ defmodule Support.Fixtures.ProcedureFixtures do
       type: "Transaction",
       action: "build",
       organization_id: organization_id,
-      inputs: [
-        %{ name: "object_uid" },
-        %{ name: "total_amount" }
-      ],
       params: [
         %{
           name: "amount_subunits", 
@@ -432,37 +367,6 @@ defmodule Support.Fixtures.ProcedureFixtures do
     procedure
   end
 
-  ## group procedures ##
-
-  def bank_deposit_group_procedure(organization_id) do
-    {:ok, group} = Procedures.create_group(%{
-      name: "BankDepostJournalEntry",
-      organization_id: organization_id,
-      inputs: [
-          %{ name: "description" },
-          %{ name: "entry_object_type" },
-          %{ name: "entry_object_uid" },
-          %{ name: "object_uid" },
-          %{ name: "bank_account_amount" },
-          %{ name: "cash_amount" }
-      ]
-    })
-
-    bank_deposit_procedures = [
-      journal_entry_procedure(organization_id),
-      credit_cash_procedure(organization_id),
-      debit_bank_account_procedure(organization_id)
-    ]
-
-    for account_procedure <- bank_deposit_procedures do
-      %{
-        "group_id" => group.id,
-        "procedure_id" => account_procedure.id
-      }
-      |> Procedures.create_group_procedure()
-    end
-  end
-
   ## custom procedure params ##
   
   def account_create_params() do
@@ -472,20 +376,6 @@ defmodule Support.Fixtures.ProcedureFixtures do
         %{ "object_uid" => "uid_kkjielkjafoie3" },
         %{ "currency" => "THB"}
       ],
-    }
-  end
-
-  def bank_deposit_group_params() do
-    %{ 
-      "name" => "BankDepostJournalEntry", 
-      "inputs" => [
-        %{ "description" => "cash bank deposit" },
-        %{ "entry_object_type" => "Deposit" },
-        %{ "entry_object_uid" => "dep_kkjielkjafoie3" },
-        %{ "object_uid" => "site_123456789" },
-        %{ "bank_account_amount" => "1000" },
-        %{ "cash_amount" => "1000" }
-      ]
     }
   end
 

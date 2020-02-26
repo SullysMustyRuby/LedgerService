@@ -42,18 +42,12 @@ alias HayaiLedger.Procedures
 
 ### asset account procedures ###
 
-inputs = [
-      %{ name: "object_uid" },
-      %{ name: "currency" }
-    ]
-
 {:ok, bank_asset} = %{
   name: "DefaultBankAsset",
   description: "Create a new bank account",
   type: "Account",
   action: "create",
   organization_id: organization.id,
-  inputs: inputs,
   params: [
     %{
       name: "currency", 
@@ -90,7 +84,6 @@ inputs = [
   type: "Account",
   action: "create",
   organization_id: organization.id,
-  inputs: inputs,
   params: [
     %{
       name: "currency", 
@@ -127,7 +120,6 @@ inputs = [
   type: "Account",
   action: "create",
   organization_id: organization.id,
-  inputs: inputs,
   params: [
     %{
       name: "currency", 
@@ -164,7 +156,6 @@ inputs = [
   type: "Account",
   action: "create",
   organization_id: organization.id,
-  inputs: inputs,
   params: [
     %{
       name: "currency", 
@@ -201,7 +192,6 @@ inputs = [
   type: "Account",
   action: "create",
   organization_id: organization.id,
-  inputs: inputs,
   params: [
     %{
       name: "currency", 
@@ -240,7 +230,6 @@ inputs = [
   type: "Account",
   action: "create",
   organization_id: organization.id,
-  inputs: inputs,
   params: [
     %{
       name: "currency", 
@@ -277,7 +266,6 @@ inputs = [
   type: "Account",
   action: "create",
   organization_id: organization.id,
-  inputs: inputs,
   params: [
     %{
       name: "currency", 
@@ -316,7 +304,6 @@ inputs = [
   type: "Account",
   action: "create",
   organization_id: organization.id,
-  inputs: inputs,
   params: [
     %{
       name: "currency", 
@@ -353,7 +340,6 @@ inputs = [
   type: "Account",
   action: "create",
   organization_id: organization.id,
-  inputs: inputs,
   params: [
     %{
       name: "currency", 
@@ -390,7 +376,6 @@ inputs = [
   type: "Account",
   action: "create",
   organization_id: organization.id,
-  inputs: inputs,
   params: [
     %{
       name: "currency", 
@@ -427,7 +412,6 @@ inputs = [
   type: "Account",
   action: "create",
   organization_id: organization.id,
-  inputs: inputs,
   params: [
     %{
       name: "currency", 
@@ -464,7 +448,6 @@ inputs = [
   type: "Account",
   action: "create",
   organization_id: organization.id,
-  inputs: inputs,
   params: [
     %{
       name: "currency", 
@@ -503,7 +486,6 @@ inputs = [
   type: "Account",
   action: "create",
   organization_id: organization.id,
-  inputs: inputs,
   params: [
     %{
       name: "currency", 
@@ -540,7 +522,6 @@ inputs = [
   type: "Account",
   action: "create",
   organization_id: organization.id,
-  inputs: inputs,
   params: [
     %{
       name: "currency", 
@@ -579,11 +560,6 @@ inputs = [
   type: "Transaction",
   action: "build",
   organization_id: organization.id,
-  inputs: [
-    %{ name: "object_uid" },
-    %{ name: "amount_subunits" },
-    %{ name: "date" }
-  ],
   params: [
     %{
       name: "amount_subunits",
@@ -625,11 +601,6 @@ inputs = [
   type: "Transaction",
   action: "build",
   organization_id: organization.id,
-  inputs: [
-    %{ name: "object_uid" },
-    %{ name: "amount_subunits" },
-    %{ name: "date" }
-  ],
   params: [
     %{
       name: "amount_subunits",
@@ -671,11 +642,6 @@ inputs = [
   type: "Transaction",
   action: "build",
   organization_id: organization.id,
-  inputs: [
-    %{ name: "object_uid" },
-    %{ name: "amount_subunits" },
-    %{ name: "date" }
-  ],
   params: [
     %{
       name: "amount_subunits",
@@ -717,11 +683,6 @@ inputs = [
   type: "Transaction",
   action: "build",
   organization_id: organization.id,
-  inputs: [
-    %{ name: "object_uid" },
-    %{ name: "amount_subunits" },
-    %{ name: "date" }
-  ],
   params: [
     %{
       name: "amount_subunits",
@@ -763,11 +724,6 @@ inputs = [
   type: "Transaction",
   action: "build",
   organization_id: organization.id,
-  inputs: [
-    %{ name: "object_uid" },
-    %{ name: "amount_subunits" },
-    %{ name: "date" }
-  ],
   params: [
     %{
       name: "amount_subunits",
@@ -809,11 +765,6 @@ inputs = [
   type: "Transaction",
   action: "build",
   organization_id: organization.id,
-  inputs: [
-    %{ name: "object_uid" },
-    %{ name: "amount_subunits" },
-    %{ name: "date" }
-  ],
   params: [
     %{
       name: "amount_subunits",
@@ -855,11 +806,6 @@ inputs = [
   type: "Transaction",
   action: "build",
   organization_id: organization.id,
-  inputs: [
-    %{ name: "object_uid" },
-    %{ name: "amount_subunits" },
-    %{ name: "date" }
-  ],
   params: [
     %{
       name: "amount_subunits",
@@ -903,11 +849,6 @@ inputs = [
   type: "Transaction",
   action: "build",
   organization_id: organization.id,
-  inputs: [
-    %{ name: "object_uid" },
-    %{ name: "amount_subunits" },
-    %{ name: "date" }
-  ],
   params: [
     %{
       name: "amount_subunits",
@@ -949,11 +890,6 @@ inputs = [
   type: "Transaction",
   action: "build",
   organization_id: organization.id,
-  inputs: [
-    %{ name: "object_uid" },
-    %{ name: "amount_subunits" },
-    %{ name: "date" }
-  ],
   params: [
     %{
       name: "amount_subunits",
@@ -995,11 +931,6 @@ inputs = [
   type: "Transaction",
   action: "build",
   organization_id: organization.id,
-  inputs: [
-    %{ name: "object_uid" },
-    %{ name: "amount_subunits" },
-    %{ name: "date" }
-  ],
   params: [
     %{
       name: "amount_subunits",
@@ -1041,11 +972,6 @@ inputs = [
   type: "Transaction",
   action: "build",
   organization_id: organization.id,
-  inputs: [
-    %{ name: "object_uid" },
-    %{ name: "amount_subunits" },
-    %{ name: "date" }
-  ],
   params: [
     %{
       name: "amount_subunits",
@@ -1087,11 +1013,6 @@ inputs = [
   type: "Transaction",
   action: "build",
   organization_id: organization.id,
-  inputs: [
-    %{ name: "object_uid" },
-    %{ name: "amount_subunits" },
-    %{ name: "date" }
-  ],
   params: [
     %{
       name: "amount_subunits",
@@ -1135,11 +1056,6 @@ inputs = [
   type: "Entry",
   action: "build",
   organization_id: organization.id,
-  inputs: [
-    %{ name: "description" },
-    %{ name: "entry_object_type" },
-    %{ name: "entry_object_uid" }
-  ],
   params: [
     %{
       name: "description", 
@@ -1165,10 +1081,6 @@ inputs = [
 {:ok, default_account_setup} = %{
   name: "DefaultAccountsSetup",
   organization_id: organization.id,
-  inputs: [
-    %{ name: "object_uid" },
-    %{ name: "currency" }
-  ]
 }
 |> Procedures.create_group()
 

@@ -3,7 +3,7 @@ defmodule HayaiLedger.Procedures.Procedure do
   import Ecto.Changeset
 
   alias HayaiLedger.Organizations.Organization
-  alias HayaiLedger.Procedures.{Input, Param}
+  alias HayaiLedger.Procedures.Param
 
   @actions ["build", "create"]
   @types ["Account", "Entry", "Transaction"]
@@ -14,7 +14,6 @@ defmodule HayaiLedger.Procedures.Procedure do
     field :name, :string
     field :type, :string
     belongs_to :organization, Organization
-    has_many :inputs, Input
     has_many :params, Param
 
     timestamps()
@@ -24,7 +23,6 @@ defmodule HayaiLedger.Procedures.Procedure do
   def changeset(procedure, attrs) do
     procedure
     |> cast(attrs, [:action, :description, :name, :organization_id, :type])
-    |> cast_assoc(:inputs, with: &Input.changeset/2)
     |> cast_assoc(:params, with: &Param.changeset/2)
     |> validate_required([:action, :description, :name, :organization_id, :type])
     |> validate_inclusion(:action, @actions)

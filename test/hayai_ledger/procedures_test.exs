@@ -6,7 +6,7 @@ defmodule HayaiLedger.ProceduresTest do
 
   alias HayaiLedger.Accounts
   alias HayaiLedger.Procedures
-  alias HayaiLedger.Procedures.{Group, GroupInput, GroupProcedure, Input, Param, Procedure}
+  alias HayaiLedger.Procedures.{Group, GroupProcedure, Param, Procedure}
 
   describe "groups" do
 
@@ -55,55 +55,7 @@ defmodule HayaiLedger.ProceduresTest do
       assert %Ecto.Changeset{} = Procedures.change_group(group)
     end
   end
-
-  describe "group_inputs" do
-
-    @update_attrs %{name: "some updated name"}
-    @invalid_attrs %{name: nil}
-
-    test "list_group_inputs/0 returns all group_inputs" do
-      group_input = group_input_fixture()
-      assert Procedures.list_group_inputs() == [group_input]
-    end
-
-    test "get_group_input!/1 returns the group_input with given id" do
-      group_input = group_input_fixture()
-      assert Procedures.get_group_input!(group_input.id) == group_input
-    end
-
-    test "create_group_input/1 with valid data creates a group_input" do
-      assert {:ok, %GroupInput{} = group_input} = Procedures.create_group_input(group_input_attrs())
-      assert group_input.name == "object_uid"
-    end
-
-    test "create_group_input/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Procedures.create_group_input(@invalid_attrs)
-    end
-
-    test "update_group_input/2 with valid data updates the group_input" do
-      group_input = group_input_fixture()
-      assert {:ok, %GroupInput{} = group_input} = Procedures.update_group_input(group_input, @update_attrs)
-      assert group_input.name == "some updated name"
-    end
-
-    test "update_group_input/2 with invalid data returns error changeset" do
-      group_input = group_input_fixture()
-      assert {:error, %Ecto.Changeset{}} = Procedures.update_group_input(group_input, @invalid_attrs)
-      assert group_input == Procedures.get_group_input!(group_input.id)
-    end
-
-    test "delete_group_input/1 deletes the group_input" do
-      group_input = group_input_fixture()
-      assert {:ok, %GroupInput{}} = Procedures.delete_group_input(group_input)
-      assert_raise Ecto.NoResultsError, fn -> Procedures.get_group_input!(group_input.id) end
-    end
-
-    test "change_group_input/1 returns a group_input changeset" do
-      group_input = group_input_fixture()
-      assert %Ecto.Changeset{} = Procedures.change_group_input(group_input)
-    end
-  end
-
+  
   describe "group_procedures" do
 
     @invalid_attrs %{ "group_id" => nil, "procedure_id" => nil }
@@ -147,54 +99,6 @@ defmodule HayaiLedger.ProceduresTest do
     test "change_group_procedure/1 returns a group_procedure changeset" do
       group_procedure = group_procedure_fixture()
       assert %Ecto.Changeset{} = Procedures.change_group_procedure(group_procedure)
-    end
-  end
-
-  describe "inputs" do
-
-    @update_attrs %{name: "some updated name"}
-    @invalid_attrs %{name: nil}
-
-    test "list_inputs/0 returns all inputs" do
-      input = input_fixture()
-      assert Procedures.list_inputs() == [input]
-    end
-
-    test "get_input!/1 returns the input with given id" do
-      input = input_fixture()
-      assert Procedures.get_input!(input.id) == input
-    end
-
-    test "create_input/1 with valid data creates a input" do
-      assert {:ok, %Input{} = input} = Procedures.create_input(input_attrs())
-      assert input.name ==  "key_name"
-    end
-
-    test "create_input/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Procedures.create_input(@invalid_attrs)
-    end
-
-    test "update_input/2 with valid data updates the input" do
-      input = input_fixture()
-      assert {:ok, %Input{} = input} = Procedures.update_input(input, @update_attrs)
-      assert input.name == "some updated name"
-    end
-
-    test "update_input/2 with invalid data returns error changeset" do
-      input = input_fixture()
-      assert {:error, %Ecto.Changeset{}} = Procedures.update_input(input, @invalid_attrs)
-      assert input == Procedures.get_input!(input.id)
-    end
-
-    test "delete_input/1 deletes the input" do
-      input = input_fixture()
-      assert {:ok, %Input{}} = Procedures.delete_input(input)
-      assert_raise Ecto.NoResultsError, fn -> Procedures.get_input!(input.id) end
-    end
-
-    test "change_input/1 returns a input changeset" do
-      input = input_fixture()
-      assert %Ecto.Changeset{} = Procedures.change_input(input)
     end
   end
 
@@ -313,7 +217,6 @@ defmodule HayaiLedger.ProceduresTest do
 
       assert procedure.name == "DefaultBankAccount"
       assert procedure.organization_id == organization.id
-      assert 2 == length(procedure.inputs)
       assert 5 == length(procedure.params)
     end
 
@@ -397,21 +300,6 @@ defmodule HayaiLedger.ProceduresTest do
       assert "uid_123456789" == entry.object_uid
       assert "Sale" == entry.object_type 
       assert 3 == length(transactions)
-    end
-  end
-
-  describe "process_group/2" do
-    setup do
-      %{ organization: organization_fixture() }
-    end
-
-    test "process the procedures from the group", %{ organization: organization } do
-      site = "site_123456789"
-      create_account("Cash", site, "asset", organization.id )
-      create_account("BankAccount", site, "asset", organization.id )
-      bank_deposit_group_procedure(organization.id)
-
-      assert {:ok, "all processed"} = Procedures.process_group(bank_deposit_group_params(), organization.id)
     end
   end
 

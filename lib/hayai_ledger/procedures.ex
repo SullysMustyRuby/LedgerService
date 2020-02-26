@@ -9,7 +9,7 @@ defmodule HayaiLedger.Procedures do
   alias HayaiLedger.Accounts
   alias HayaiLedger.Accounts.Account
   alias HayaiLedger.Ledgers
-  alias HayaiLedger.Procedures.{Group, GroupInput, GroupProcedure, Input, Param, Procedure}
+  alias HayaiLedger.Procedures.{Group, GroupProcedure, Param, Procedure}
 
   def process(%{ "name" => name, "inputs" => inputs }, organization_id) do
     with {:ok, procedure} <- get_procedure_by_name(name, organization_id) do
@@ -108,7 +108,6 @@ defmodule HayaiLedger.Procedures do
   """
   def get_procedure!(id) do
     Repo.get!(Procedure, id)
-    |> Repo.preload(:inputs)
     |> Repo.preload(:params)
   end
 
@@ -124,7 +123,7 @@ defmodule HayaiLedger.Procedures do
     where: p.name == ^name,
     where: p.organization_id == ^organization_id,
     select: p,
-    preload: [:inputs, :params]
+    preload: [:params]
   end
 
   def get_group_by_name(name, organization_id) do
@@ -139,7 +138,7 @@ defmodule HayaiLedger.Procedures do
     where: g.name == ^name,
     where: g.organization_id == ^organization_id,
     select: g,
-    preload: [:inputs, [procedures: :params, procedures: :inputs]]
+    preload: [procedures: :params]
   end
 
   @doc """
@@ -206,104 +205,6 @@ defmodule HayaiLedger.Procedures do
   def change_procedure(%Procedure{} = procedure) do
     Procedure.changeset(procedure, %{})
   end
-
-  alias HayaiLedger.Procedures.Input
-
-  @doc """
-  Returns the list of inputs.
-
-  ## Examples
-
-      iex> list_inputs()
-      [%Input{}, ...]
-
-  """
-  def list_inputs do
-    Repo.all(Input)
-  end
-
-  @doc """
-  Gets a single input.
-
-  Raises `Ecto.NoResultsError` if the Input does not exist.
-
-  ## Examples
-
-      iex> get_input!(123)
-      %Input{}
-
-      iex> get_input!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_input!(id), do: Repo.get!(Input, id)
-
-  @doc """
-  Creates a input.
-
-  ## Examples
-
-      iex> create_input(%{field: value})
-      {:ok, %Input{}}
-
-      iex> create_input(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_input(attrs \\ %{}) do
-    %Input{}
-    |> Input.changeset(attrs)
-    |> Repo.insert()
-  end
-
-  @doc """
-  Updates a input.
-
-  ## Examples
-
-      iex> update_input(input, %{field: new_value})
-      {:ok, %Input{}}
-
-      iex> update_input(input, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_input(%Input{} = input, attrs) do
-    input
-    |> Input.changeset(attrs)
-    |> Repo.update()
-  end
-
-  @doc """
-  Deletes a input.
-
-  ## Examples
-
-      iex> delete_input(input)
-      {:ok, %Input{}}
-
-      iex> delete_input(input)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_input(%Input{} = input) do
-    Repo.delete(input)
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking input changes.
-
-  ## Examples
-
-      iex> change_input(input)
-      %Ecto.Changeset{source: %Input{}}
-
-  """
-  def change_input(%Input{} = input) do
-    Input.changeset(input, %{})
-  end
-
-  alias HayaiLedger.Procedures.Param
 
   @doc """
   Returns the list of params.
@@ -585,99 +486,5 @@ defmodule HayaiLedger.Procedures do
   """
   def change_group_procedure(%GroupProcedure{} = group_procedure) do
     GroupProcedure.changeset(group_procedure, %{})
-  end
-
-  @doc """
-  Returns the list of group_inputs.
-
-  ## Examples
-
-      iex> list_group_inputs()
-      [%GroupInput{}, ...]
-
-  """
-  def list_group_inputs do
-    Repo.all(GroupInput)
-  end
-
-  @doc """
-  Gets a single group_input.
-
-  Raises `Ecto.NoResultsError` if the Group input does not exist.
-
-  ## Examples
-
-      iex> get_group_input!(123)
-      %GroupInput{}
-
-      iex> get_group_input!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_group_input!(id), do: Repo.get!(GroupInput, id)
-
-  @doc """
-  Creates a group_input.
-
-  ## Examples
-
-      iex> create_group_input(%{field: value})
-      {:ok, %GroupInput{}}
-
-      iex> create_group_input(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_group_input(attrs \\ %{}) do
-    %GroupInput{}
-    |> GroupInput.changeset(attrs)
-    |> Repo.insert()
-  end
-
-  @doc """
-  Updates a group_input.
-
-  ## Examples
-
-      iex> update_group_input(group_input, %{field: new_value})
-      {:ok, %GroupInput{}}
-
-      iex> update_group_input(group_input, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_group_input(%GroupInput{} = group_input, attrs) do
-    group_input
-    |> GroupInput.changeset(attrs)
-    |> Repo.update()
-  end
-
-  @doc """
-  Deletes a group_input.
-
-  ## Examples
-
-      iex> delete_group_input(group_input)
-      {:ok, %GroupInput{}}
-
-      iex> delete_group_input(group_input)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_group_input(%GroupInput{} = group_input) do
-    Repo.delete(group_input)
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking group_input changes.
-
-  ## Examples
-
-      iex> change_group_input(group_input)
-      %Ecto.Changeset{source: %GroupInput{}}
-
-  """
-  def change_group_input(%GroupInput{} = group_input) do
-    GroupInput.changeset(group_input, %{})
   end
 end
