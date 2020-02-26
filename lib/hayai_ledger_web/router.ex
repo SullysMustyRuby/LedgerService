@@ -25,6 +25,11 @@ defmodule HayaiLedgerWeb.Router do
     plug HayaiLedgerWeb.Plugs.ApiAuth
   end
 
+  pipeline :graphiql do
+    plug :accepts, ["json"]
+    plug HayaiLedgerWeb.Plugs.Context
+  end
+
   scope "/", HayaiLedgerWeb do
     pipe_through :public_browser
 
@@ -69,5 +74,14 @@ defmodule HayaiLedgerWeb.Router do
 
     post "procedures/process", HayaiLedgerWeb.Api.ProcedureController, :process
     post "procedures/process_group", HayaiLedgerWeb.Api.ProcedureController, :process_group
+  end
+
+  scope "api" do
+    pipe_through :graphiql
+
+    forward "/graphiql",
+      Absinthe.Plug.GraphiQL,
+      schema: HayaiLedgerWeb.Schema,
+      interface: :advanced
   end
 end

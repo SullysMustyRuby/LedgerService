@@ -20,7 +20,7 @@ defmodule HayaiLedger.MixProject do
   def application do
     [
       mod: {HayaiLedger.Application, []},
-      extra_applications: [:crypto, :logger, :runtime_tools]
+      extra_applications: [:absinthe_plug, :crypto, :logger, :runtime_tools]
     ]
   end
 
@@ -45,7 +45,9 @@ defmodule HayaiLedger.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:argon2_elixir, "~> 2.0"},
       {:benchee, "~> 1.0", only: [:dev, :test]},
-      {:tzdata, "~> 1.0.1"}
+      {:tzdata, "~> 1.0.1"},
+      {:absinthe, "~> 1.4.0"},
+      {:absinthe_plug, "~> 1.4.0"}
     ]
   end
 
