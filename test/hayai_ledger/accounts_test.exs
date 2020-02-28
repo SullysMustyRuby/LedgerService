@@ -156,18 +156,76 @@ defmodule HayaiLedger.AccountsTest do
     end
   end
 
+  describe "list_accounts/0" do
+    test "returns all accounts" do
+      account = account_fixture()
+      assert Accounts.list_accounts() == [account]
+    end
+  end
+
+  describe "list_accounts/1" do
+    test "returns all accounts for the organization_id" do
+      organization = organization_fixture()
+      
+      for _index <- 1..3 do
+        account_fixture(%{ "organization_id" => organization.id})
+        account_fixture()
+      end
+      accounts = Accounts.list_accounts(organization.id)
+      assert 3 == length(accounts)
+      for account <- accounts do
+        assert account.organization_id == organization.id
+      end
+    end
+  end
+
+  describe "list_accounts/2" do
+    setup do
+      %{
+        ars: %{
+          active: true,
+          currency: "THB",
+          name: "Cash",
+          object_type: "Site",
+          object_uid: "site_123456789",
+          type: "asset"
+        },
+        organization: organization_fixture()
+      }
+    end
+
+    test "returns the acounts if one argument provided", %{ organization: organization } do
+      for _index <- 1..2 do
+        account_fixture(%{ "organization_id" => organization.id, "active" => true })
+        account_fixture(%{ "organization_id" => organization.id, "active" => false })
+      end
+      accounts = Accounts.list_accounts(organization.id, %{ active: true })
+      assert 2 == length(accounts)
+      for account <- accounts do
+        assert account.active
+      end
+    end
+
+    test "returns the acounts if two arguments provided", %{ organization: organization } do
+      for _index <- 1..2 do
+        account_fixture(%{ "organization_id" => organization.id, "currency" => "THB", "name" => "Cash" })
+        account_fixture(%{ "organization_id" => organization.id, "currency" => "JPY", "name" => "Cash" })
+        account_fixture(%{ "organization_id" => organization.id, "currency" => "THB", "name" => "CreditCard" })
+      end
+      accounts = Accounts.list_accounts(organization.id, %{ currency: "THB", name: "Cash" })
+      assert 2 == length(accounts)
+      for account <- accounts do
+        assert account.active
+        assert "Cash" == account.name
+      end
+    end
+  end
+
   describe "list_balances/0" do
     test "returns all balances" do
       balance = balance_fixture()
       balances = Accounts.list_balances()
       assert Enum.member?(balances, balance)
-    end
-  end
-
-  describe "list_accounts/0" do
-    test "returns all accounts" do
-      account = account_fixture()
-      assert Accounts.list_accounts() == [account]
     end
   end
 

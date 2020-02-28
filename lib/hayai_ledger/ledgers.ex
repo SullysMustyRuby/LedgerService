@@ -4,7 +4,7 @@ defmodule HayaiLedger.Ledgers do
   """
   import Ecto.Query, warn: false
   import HayaiLedger.LockServer
-  import HayaiLedger.Helpers, only: [{:apply_params, 3}]
+  import HayaiLedger.Helpers, only: [{:add_args, 2}, {:apply_params, 3}, {:base_query, 2}, {:preload_transactions, 1}]
 
   alias HayaiLedger.Accounts
   alias HayaiLedger.Accounts.Account
@@ -187,6 +187,13 @@ defmodule HayaiLedger.Ledgers do
       select: e)
   end
 
+  def list_entries(organization_id, args) do
+    base_query(Entry, organization_id)
+    |> add_args(Map.to_list(args))
+    |> preload_transactions()
+    |> Repo.all()
+  end
+
   @doc """
   Returns the list of transactions.
 
@@ -201,16 +208,48 @@ defmodule HayaiLedger.Ledgers do
   end
 
   def list_transactions(organization_id) do
-    Repo.all(from a in Account,
-      where: a.organization_id == ^organization_id,
-      join: t in Transaction,
-      where: t.account_id == a.id,
-      select: t)
+    base_transaction_query(organization_id)
+    |> Repo.all()
   end
 
-  def list_transactions_for_account(account_id) do
+  def list_transactions(account_id, args) do
+    base_transaction_query(account_id)
+    |> add_args(Map.to_list(args))
+    |> Repo.all()
+  end
+
+  defp base_transaction_query(account_id) do
+    from t in Transaction,
+    where: t.account_id == ^account_id
+  end
+
+  def list_transactions_for_account(account_id, opts \\ nil)
+
+  def list_transactions_for_account(account_id, nil) do
     Repo.all(from t in Transaction,
-      where: t.account_id == ^account_id)
+      where: t.account_id == ^account_id
+      )
+  end
+
+  def list_transactions_for_account(account_id, %{ from_date: from_date, to_date: to_date }) do
+    Repo.all(from t in Transaction,
+      where: t.account_id == ^account_id,
+      where: t.date >= ^from_date and t.date <= ^to_date
+      )
+  end
+
+  def list_transactions_for_account(account_id, %{ from_date: from_date }) do
+    Repo.all(from t in Transaction,
+      where: t.account_id == ^account_id,
+      where: t.date >= ^from_date
+      )
+  end
+
+  def list_transactions_for_account(account_id, %{ to_date: to_date }) do
+    Repo.all(from t in Transaction,
+      where: t.account_id == ^account_id,
+      where: t.date <= ^to_date
+      )
   end
 
   def safe_journal_entry(attrs, transactions, %{ account: account_uid } = check_options) do

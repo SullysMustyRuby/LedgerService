@@ -1,7 +1,6 @@
  defmodule HayaiLedgerWeb.Plugs.ApiAuth do
 
  	import Plug.Conn
-  import Phoenix.Controller
   import HayaiLedger.Organizations.Encryption, only: [{:verify_token, 2}]
 
   alias HayaiLedger.Organizations

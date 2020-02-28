@@ -1,31 +1,33 @@
 defmodule HayaiLedgerWeb.Schema do
-
 	use Absinthe.Schema
 
-	alias HayaiLedgerWeb.Resolvers.ProcedureResolver
+	import_types Absinthe.Type.Custom
 
-	object :procedure do
-		field :action, non_null(:string)
-    field :description, non_null(:string)
-    field :name, non_null(:string)
-    field :type, non_null(:string)
-	end
+	import_types HayaiLedgerWeb.Schema.Mutations.ProcedureMutations
+
+	import_types HayaiLedgerWeb.Schema.Queries.AccountQueries
+	import_types HayaiLedgerWeb.Schema.Queries.EntryQueries
+	import_types HayaiLedgerWeb.Schema.Queries.ProcedureQueries
+	import_types HayaiLedgerWeb.Schema.Queries.TransactionQueries
+
+	import_types HayaiLedgerWeb.Schema.Types.Accounts
+	import_types HayaiLedgerWeb.Schema.Types.Entries
+	import_types HayaiLedgerWeb.Schema.Types.Procedures
+	import_types HayaiLedgerWeb.Schema.Types.Transactions
 
 	query do
-		field :all_procedures, non_null(list_of(non_null(:procedure))) do
-			resolve &ProcedureResolver.all_procedures/3
-		end
+
+		import_fields :account_queries
+		import_fields :entry_queries
+		import_fields :procedure_queries
+		import_fields :transaction_queries
+
 	end
 
 	mutation do
-		field :create_procedure, :procedure do
-			arg :action, non_null(:string)
-	    arg :description, non_null(:string)
-	    arg :name, non_null(:string)
-	    arg :type, non_null(:string)
+		
+		import_fields :procedure_mutations
 
-	    resolve &ProcedureResolver.create_procedure/3
-		end
 	end
-	
+
 end

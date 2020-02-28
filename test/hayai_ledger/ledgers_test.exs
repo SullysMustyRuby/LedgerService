@@ -261,6 +261,54 @@ defmodule HayaiLedger.LedgersTest do
     end
   end
 
+  describe "list_transactions_for_account/2" do
+    test "returns all the transactions with both date options" do
+      asset_account = account_fixture(%{ "type" => "asset" })
+      transaction_fixture(%{ "account_uid" => asset_account.uid, "date" => ~U[2020-01-01 00:00:00Z] })
+      transaction_fixture(%{ "account_uid" => asset_account.uid, "date" => ~U[2020-01-02 00:00:00Z] })
+      transaction_fixture(%{ "account_uid" => asset_account.uid, "date" => ~U[2020-01-03 00:00:00Z] })
+      transaction_fixture(%{ "account_uid" => asset_account.uid, "date" => ~U[2020-01-04 00:00:00Z] })
+      transaction_fixture(%{ "account_uid" => asset_account.uid, "date" => ~U[2020-01-05 00:00:00Z] })
+      options = %{ from_date: ~U[2020-01-02 00:00:00Z], to_date: ~U[2020-01-04 00:00:00Z] }
+      transactions = Ledgers.list_transactions_for_account(asset_account.id, options)
+      assert 3 == length(transactions)
+      for transaction <- transactions do
+        assert transaction.date > ~U[2020-01-01 00:00:00Z]
+        assert transaction.date < ~U[2020-01-05 00:00:00Z]
+      end
+    end
+
+    test "returns all the transactions with from date option" do
+      asset_account = account_fixture(%{ "type" => "asset" })
+      transaction_fixture(%{ "account_uid" => asset_account.uid, "date" => ~U[2020-01-01 00:00:00Z] })
+      transaction_fixture(%{ "account_uid" => asset_account.uid, "date" => ~U[2020-01-02 00:00:00Z] })
+      transaction_fixture(%{ "account_uid" => asset_account.uid, "date" => ~U[2020-01-03 00:00:00Z] })
+      transaction_fixture(%{ "account_uid" => asset_account.uid, "date" => ~U[2020-01-04 00:00:00Z] })
+      transaction_fixture(%{ "account_uid" => asset_account.uid, "date" => ~U[2020-01-05 00:00:00Z] })
+      options = %{ from_date: ~U[2020-01-02 00:00:00Z] }
+      transactions = Ledgers.list_transactions_for_account(asset_account.id, options)
+      assert 4 == length(transactions)
+      for transaction <- transactions do
+        assert transaction.date > ~U[2020-01-01 00:00:00Z]
+      end
+    end
+
+    test "returns all the transactions with to date option" do
+      asset_account = account_fixture(%{ "type" => "asset" })
+      transaction_fixture(%{ "account_uid" => asset_account.uid, "date" => ~U[2020-01-01 00:00:00Z] })
+      transaction_fixture(%{ "account_uid" => asset_account.uid, "date" => ~U[2020-01-02 00:00:00Z] })
+      transaction_fixture(%{ "account_uid" => asset_account.uid, "date" => ~U[2020-01-03 00:00:00Z] })
+      transaction_fixture(%{ "account_uid" => asset_account.uid, "date" => ~U[2020-01-04 00:00:00Z] })
+      transaction_fixture(%{ "account_uid" => asset_account.uid, "date" => ~U[2020-01-05 00:00:00Z] })
+      options = %{ to_date: ~U[2020-01-03 00:00:00Z] }
+      transactions = Ledgers.list_transactions_for_account(asset_account.id, options)
+      assert 3 == length(transactions)
+      for transaction <- transactions do
+        assert transaction.date < ~U[2020-01-04 00:00:00Z]
+      end
+    end
+  end
+
   describe "safe_journal_entry/3" do
     setup do
       asset_account = account_fixture(%{ "type" => "asset" })

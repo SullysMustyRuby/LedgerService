@@ -27,6 +27,8 @@ defmodule HayaiLedgerWeb.Plugs.Context do
 			true <- organization_id == org_id
 		do
 			%{ organization_id: organization_id }
+		else
+			_ -> :error
 		end
   end
 end

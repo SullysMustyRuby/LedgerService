@@ -71,11 +71,11 @@ defmodule HayaiLedgerWeb.Router do
 
     get "/transactions/:uid", HayaiLedgerWeb.Api.TransactionController, :show
 
-    post "procedures/process", HayaiLedgerWeb.Api.ProcedureController, :process
-    post "procedures/process_group", HayaiLedgerWeb.Api.ProcedureController, :process_group
+    post "/procedures/process", HayaiLedgerWeb.Api.ProcedureController, :process
+    post "/procedures/process_group", HayaiLedgerWeb.Api.ProcedureController, :process_group
   end
 
-  scope "api" do
+  scope "/api" do
     pipe_through :graphiql
 
     forward "/graphiql",

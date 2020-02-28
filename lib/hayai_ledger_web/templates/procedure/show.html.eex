@@ -25,15 +25,6 @@
 
 <div class="row">
 	<div class="col-md">
-		<p>Inputs</p>
-		<ul>
-		<%= for input <- @procedure.inputs do %>
-			<li><%= link input.name, to: Routes.input_path(@conn, :edit, input) %></li>
-		<% end %>
-		</ul>
-		<%= link "Add input", to: Routes.input_path(@conn, :new, procedure_id: @procedure.id) %>
-	</div>
-	<div class="col-md">
 		<p>Params</p>
 		<ul>
 		<%= for param <- @procedure.params do %>

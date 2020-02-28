@@ -4,7 +4,7 @@ defmodule HayaiLedger.Accounts do
   """
 
   import Ecto.Query, warn: false
-  import HayaiLedger.Helpers, only: [{:apply_params, 3}]
+  import HayaiLedger.Helpers, only: [{:add_args, 2}, {:apply_params, 3}, {:base_query, 2}, {:preload_transactions, 1}]
 
   alias HayaiLedger.Repo
   alias HayaiLedger.Accounts.{Balance, Account, AccountType}
@@ -12,31 +12,15 @@ defmodule HayaiLedger.Accounts do
   alias HayaiLedger.Procedures.Procedure
 
   def active_accounts_exist?(%{ name: name, object_uid: object_uid }) do
-    Repo.exists?(from a in Account,
-      where: a.name == ^name,
-      where: a.object_uid == ^object_uid,
-      where: a.active == true
-      )
-  end
-
-  def get_account_by_name(%{ name: name, object_uid: object_uid }) do
-    account_name_filter(%{ name: name, object_uid: object_uid })
-    |> Repo.one()
+    base_active_account_name_filter(name)
+    |> object_uid_filter(object_uid)
+    |> Repo.exists?()
   end
 
   def active_accounts_exist?(%{ name: name, organization_id: organization_id }) do
-    Repo.exists?(from a in Account,
-      where: a.name == ^name,
-      where: a.organization_id == ^organization_id,
-      where: a.active == true
-      )
-  end
-
-  defp account_name_filter(%{ name: name, object_uid: object_uid }) do
-    from a in Account,
-    where: a.name == ^name,
-    where: a.object_uid == ^object_uid,
-    where: a.active == true
+    base_active_account_name_filter(name)
+    |> organization_id_filter(organization_id)
+    |> Repo.exists?()
   end
 
   def balance_amount_subunits_for_account(account_id) do
@@ -123,7 +107,9 @@ defmodule HayaiLedger.Accounts do
   def get_account(id), do: Repo.get(Account, id)
 
   def get_account_by_uid!(uid) do
-    Repo.get_by(Account, uid: uid)
+    Repo.one(from a in Account,
+    where: a.uid == ^uid,
+    preload: :transactions)
   end
 
   def get_account_by_uid(uid) do
@@ -182,9 +168,16 @@ defmodule HayaiLedger.Accounts do
   end
 
   def list_accounts(organization_id) do
-    Repo.all(from a in Account,
-      where: a.organization_id == ^organization_id,
-      select: a)
+    (from a in Account)
+    |> organization_id_filter(organization_id)
+    |> Repo.all()
+  end
+
+  def list_accounts(organization_id, args) do
+    base_query(Account, organization_id)
+    |> add_args(Map.to_list(args))
+    |> preload_transactions()
+    |> Repo.all()
   end
 
   @doc """
@@ -224,11 +217,18 @@ defmodule HayaiLedger.Accounts do
   ## Examples
 
   """
+
   def update_balance(account_id, amount_subunits) do
     with %Balance{} = balance <- get_balance_by_account(account_id) do
       Balance.changeset(balance, %{ amount_subunits: amount_subunits })
       |> Repo.update()
     end
+  end
+
+  defp base_active_account_name_filter(name) do
+    from a in Account,
+    where: a.name == ^name,
+    where: a.active == true
   end
   
   defp insert_account(attrs) do
@@ -244,5 +244,15 @@ defmodule HayaiLedger.Accounts do
 
   defp insert_balance(%{ id: account_id, currency: currency }) do
     create_balance(%{ account_id: account_id, amount_currency: currency, amount_subunits: 0 })
+  end
+
+  defp object_uid_filter(query, object_uid) do
+    from a in query,
+    where: a.object_uid == ^object_uid
+  end
+
+  defp organization_id_filter(query, organization_id) do
+    from a in query,
+    where: a.organization_id == ^organization_id
   end
 end

@@ -235,6 +235,13 @@ defmodule HayaiLedger.Procedures do
   """
   def get_param!(id), do: Repo.get!(Param, id)
 
+  def get_param(id) do
+    case Repo.get(Param, id) do
+      nil -> {:error, "no param with that id"}
+      param -> {:ok, param}
+    end
+  end
+
   @doc """
   Creates a param.
 
