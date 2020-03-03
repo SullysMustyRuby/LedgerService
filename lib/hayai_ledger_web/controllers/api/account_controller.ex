@@ -34,7 +34,7 @@ defmodule HayaiLedgerWeb.Api.AccountController do
   # GET
   def transactions(conn, %{ "uid" => uid }) do
     with {:ok, account} <- Accounts.get_account_by_uid(uid),
-      transactions when is_list(transactions) <- Ledgers.list_transactions_for_account(account.id)
+      transactions when is_list(transactions) <- Ledgers.list_transactions(%{ account_id: account.id })
     do
       render(conn, "show.json", %{ account: account, transactions: transactions })
     end

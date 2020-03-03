@@ -151,6 +151,16 @@ defmodule HayaiLedger.Ledgers do
 
   def journal_entry(_attrs, []), do: {:error, "must have transactions that balance"}
 
+  def journal_entry(%{ transactions: transactions } = params) do
+    with %Ecto.Changeset{ valid?: true, changes: %{ transactions: transactions } } = entry_changeset <- build_entry(params),
+      :ok <- validate_transactions_balance(transactions),
+      {:ok, entry} <- Repo.insert(entry_changeset),
+      :ok <- update_transaction_account_balances(entry.transactions)
+    do
+      {:ok, entry}
+    end
+  end
+
   def journal_entry(%Ecto.Changeset{ valid?: true } = entry_changeset, transactions) do
     with :ok <- transactions_all_valid?(transactions),
       :ok <- validate_transactions_balance(transactions),
@@ -207,12 +217,17 @@ defmodule HayaiLedger.Ledgers do
     Repo.all(Transaction)
   end
 
-  def list_transactions(organization_id) do
-    base_transaction_query(organization_id)
+  def list_transactions(%{ organization_id: organization_id } = args) do
+    (from a in Account,
+    where: a.organization_id == ^organization_id,
+    right_join: t in Transaction,
+    where: t.account_id == a.id,
+    select: t)
+    |> add_args(Map.to_list(args))
     |> Repo.all()
   end
 
-  def list_transactions(account_id, args) do
+  def list_transactions(%{ account_id: account_id } = args) do
     base_transaction_query(account_id)
     |> add_args(Map.to_list(args))
     |> Repo.all()
@@ -221,35 +236,6 @@ defmodule HayaiLedger.Ledgers do
   defp base_transaction_query(account_id) do
     from t in Transaction,
     where: t.account_id == ^account_id
-  end
-
-  def list_transactions_for_account(account_id, opts \\ nil)
-
-  def list_transactions_for_account(account_id, nil) do
-    Repo.all(from t in Transaction,
-      where: t.account_id == ^account_id
-      )
-  end
-
-  def list_transactions_for_account(account_id, %{ from_date: from_date, to_date: to_date }) do
-    Repo.all(from t in Transaction,
-      where: t.account_id == ^account_id,
-      where: t.date >= ^from_date and t.date <= ^to_date
-      )
-  end
-
-  def list_transactions_for_account(account_id, %{ from_date: from_date }) do
-    Repo.all(from t in Transaction,
-      where: t.account_id == ^account_id,
-      where: t.date >= ^from_date
-      )
-  end
-
-  def list_transactions_for_account(account_id, %{ to_date: to_date }) do
-    Repo.all(from t in Transaction,
-      where: t.account_id == ^account_id,
-      where: t.date <= ^to_date
-      )
   end
 
   def safe_journal_entry(attrs, transactions, %{ account: account_uid } = check_options) do

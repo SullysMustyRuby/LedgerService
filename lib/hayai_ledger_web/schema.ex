@@ -3,6 +3,7 @@ defmodule HayaiLedgerWeb.Schema do
 
 	import_types Absinthe.Type.Custom
 
+	import_types HayaiLedgerWeb.Schema.Mutations.EntryMutations
 	import_types HayaiLedgerWeb.Schema.Mutations.ProcedureMutations
 
 	import_types HayaiLedgerWeb.Schema.Queries.AccountQueries
@@ -26,6 +27,7 @@ defmodule HayaiLedgerWeb.Schema do
 
 	mutation do
 		
+		import_fields :entry_mutations
 		import_fields :procedure_mutations
 
 	end

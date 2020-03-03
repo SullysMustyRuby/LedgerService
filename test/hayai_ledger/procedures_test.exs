@@ -6,101 +6,7 @@ defmodule HayaiLedger.ProceduresTest do
 
   alias HayaiLedger.Accounts
   alias HayaiLedger.Procedures
-  alias HayaiLedger.Procedures.{Group, GroupProcedure, Param, Procedure}
-
-  describe "groups" do
-
-    @update_attrs %{name: "some updated name"}
-    @invalid_attrs %{name: nil}
-
-    test "list_groups/0 returns all groups" do
-      group = group_fixture()
-      assert Procedures.list_groups() == [group]
-    end
-
-    test "get_group!/1 returns the group with given id" do
-      group = group_fixture()
-      assert Procedures.get_group!(group.id) == group
-    end
-
-    test "create_group/1 with valid data creates a group" do
-      assert {:ok, %Group{} = group} = Procedures.create_group(group_attrs())
-      assert group.name == "DefaultAccountSetup"
-    end
-
-    test "create_group/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Procedures.create_group(@invalid_attrs)
-    end
-
-    test "update_group/2 with valid data updates the group" do
-      group = group_fixture()
-      assert {:ok, %Group{} = group} = Procedures.update_group(group, @update_attrs)
-      assert group.name == "some updated name"
-    end
-
-    test "update_group/2 with invalid data returns error changeset" do
-      group = group_fixture()
-      assert {:error, %Ecto.Changeset{}} = Procedures.update_group(group, @invalid_attrs)
-      assert group == Procedures.get_group!(group.id)
-    end
-
-    test "delete_group/1 deletes the group" do
-      group = group_fixture()
-      assert {:ok, %Group{}} = Procedures.delete_group(group)
-      assert_raise Ecto.NoResultsError, fn -> Procedures.get_group!(group.id) end
-    end
-
-    test "change_group/1 returns a group changeset" do
-      group = group_fixture()
-      assert %Ecto.Changeset{} = Procedures.change_group(group)
-    end
-  end
-  
-  describe "group_procedures" do
-
-    @invalid_attrs %{ "group_id" => nil, "procedure_id" => nil }
-
-    test "list_group_procedures/0 returns all group_procedures" do
-      group_procedure = group_procedure_fixture()
-      assert Procedures.list_group_procedures() == [group_procedure]
-    end
-
-    test "get_group_procedure!/1 returns the group_procedure with given id" do
-      group_procedure = group_procedure_fixture()
-      assert Procedures.get_group_procedure!(group_procedure.id) == group_procedure
-    end
-
-    test "create_group_procedure/1 with valid data creates a group_procedure" do
-      assert {:ok, %GroupProcedure{} = group_procedure} = Procedures.create_group_procedure(group_procedure_attrs())
-    end
-
-    test "create_group_procedure/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Procedures.create_group_procedure(@invalid_attrs)
-    end
-
-    test "update_group_procedure/2 with valid data updates the group_procedure" do
-      group_procedure = group_procedure_fixture()
-      procedure = procedure_fixture()
-      assert {:ok, %GroupProcedure{} = group_procedure} = Procedures.update_group_procedure(group_procedure, %{ "procedure_id" => procedure.id })
-    end
-
-    test "update_group_procedure/2 with invalid data returns error changeset" do
-      group_procedure = group_procedure_fixture()
-      assert {:error, %Ecto.Changeset{}} = Procedures.update_group_procedure(group_procedure, @invalid_attrs)
-      assert group_procedure == Procedures.get_group_procedure!(group_procedure.id)
-    end
-
-    test "delete_group_procedure/1 deletes the group_procedure" do
-      group_procedure = group_procedure_fixture()
-      assert {:ok, %GroupProcedure{}} = Procedures.delete_group_procedure(group_procedure)
-      assert_raise Ecto.NoResultsError, fn -> Procedures.get_group_procedure!(group_procedure.id) end
-    end
-
-    test "change_group_procedure/1 returns a group_procedure changeset" do
-      group_procedure = group_procedure_fixture()
-      assert %Ecto.Changeset{} = Procedures.change_group_procedure(group_procedure)
-    end
-  end
+  alias HayaiLedger.Procedures.{Param, Procedure}
 
   describe "params" do
 
@@ -240,79 +146,18 @@ defmodule HayaiLedger.ProceduresTest do
       assert "Site" == account.object_type
       assert "uid_kkjielkjafoie3" == account.object_uid
     end
-
-    test "returns a changeset for an transaction build", %{ organization: organization } do
-      account_create_procedure(organization.id)
-      {:ok, account} = Procedures.process(account_create_params(), organization.id)
-      total_sale_procedure(organization.id, account.uid)
-
-      assert {:ok, changeset} = Procedures.process(total_sale_params(), organization.id)
-      assert changeset.valid?
-      assert "THB" == changeset.changes[:amount_currency]
-      assert 10000 == changeset.changes[:amount_subunits]
-      assert "debit" == changeset.changes[:kind]
-    end
-
-    test "looks up account for a transaction build", %{ organization: organization } do
-      account_params = %{
-        "currency" => "THB",
-        "name" => "CashSale",
-        "object_type" => "Account",
-        "object_uid" => "uid_123456789",
-        "type" => "revenue",
-        "organization_id" => organization.id
-      }
-      {:ok, account} = Accounts.create_account(account_params)
-      net_sale_procedure(organization.id)
-
-      assert {:ok, changeset} = Procedures.process(net_sale_params(), organization.id)
-      assert changeset.valid?
-      assert "THB" == changeset.changes[:amount_currency]
-      assert 9300 == changeset.changes[:amount_subunits]
-      assert "credit" == changeset.changes[:kind]
-      assert account.id == changeset.changes[:account_id]
-    end
-
-    test "returns an changeset for entry build", %{ organization: organization } do
-      sale_entry_procedure(organization.id)
-
-      assert {:ok, changeset} = Procedures.process(sale_entry_params(), organization.id)
-      assert changeset.valid?
-      assert organization.id == changeset.changes[:organization_id]
-      assert "cash sale" == changeset.changes[:description]
-      assert "uid_123456789" == changeset.changes[:object_uid]
-      assert "Sale" == changeset.changes[:object_type]
-    end
-
-    test "returns an full entry from journal_entry", %{ organization: organization } do
-      asset_account = create_account("Cash", "uid_123456789", "asset", organization.id)
-      create_account("CashSale", "uid_123456789", "revenue", organization.id)
-      tax_account = create_account("SalesTax", "uid_123456789", "liability", organization.id)
-
-      total_sale_procedure(organization.id, asset_account.uid)
-      net_sale_procedure(organization.id)
-      sales_tax_procedure(organization.id, tax_account.uid)
-      sale_entry_procedure(organization.id)
-
-      {:ok, entry, transactions} = Procedures.process(journal_entry_params(), organization.id)
-      assert organization.id == entry.organization_id
-      assert "cash sale" == entry.description
-      assert "uid_123456789" == entry.object_uid
-      assert "Sale" == entry.object_type 
-      assert 3 == length(transactions)
-    end
   end
 
-  defp create_account(name, object_uid, type, organization_id) do
-    {:ok, account} = Accounts.create_account(%{
-      "currency" => "THB",
-      "name" => name,
-      "object_type" => "Account",
-      "object_uid" => object_uid,
-      "type" => type,
-      "organization_id" => organization_id
-    })
+  # defp create_account(name, object_uid, type, organization_id) do
+  #   {:ok, account} = Accounts.create_account(%{
+  #     "currency" => "THB",
+  #     "name" => name,
+  #     "object_type" => "Account",
+  #     "object_uid" => object_uid,
+  #     "type" => type,
+  #     "organization_id" => organization_id
+  #   })
     
-    account
-  end
+  #   account
+  # end
 end

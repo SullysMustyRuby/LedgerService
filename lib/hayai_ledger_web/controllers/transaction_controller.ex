@@ -7,7 +7,7 @@ defmodule HayaiLedgerWeb.TransactionController do
 
   def index(conn, _params) do
     with {:ok, organization_id} <- current_organization_id(conn),
-      transactions <- Ledgers.list_transactions(organization_id)
+      transactions <- Ledgers.list_transactions(%{ organization_id: organization_id })
     do
       render(conn, "index.html", transactions: transactions)
     end

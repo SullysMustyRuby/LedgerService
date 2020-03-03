@@ -567,11 +567,6 @@ alias HayaiLedger.Procedures
       type: "inputs"
     },
     %{
-      name: "amount_currency",
-      value: "Cash",
-      type: "lookup"
-    },
-    %{
       name: "date",
       value: "date",
       type: "inputs"
@@ -585,12 +580,7 @@ alias HayaiLedger.Procedures
       name: "object_uid", 
       value: "object_uid",
       type: "inputs"
-    },
-    %{
-      name: "account_uid", 
-      value: "Cash",
-      type: "lookup"
-    },
+    }
   ]
 }
 |> Procedures.create_procedure()
@@ -608,11 +598,6 @@ alias HayaiLedger.Procedures
       type: "inputs"
     },
     %{
-      name: "amount_currency",
-      value: "CashSales",
-      type: "lookup"
-    },
-    %{
       name: "date",
       value: "date",
       type: "inputs"
@@ -626,12 +611,7 @@ alias HayaiLedger.Procedures
       name: "object_uid", 
       value: "object_uid",
       type: "inputs"
-    },
-    %{
-      name: "account_uid", 
-      value: "CashSales",
-      type: "lookup"
-    },
+    }
   ]
 }
 |> Procedures.create_procedure()
@@ -649,11 +629,6 @@ alias HayaiLedger.Procedures
       type: "inputs"
     },
     %{
-      name: "amount_currency",
-      value: "CreditCardSales",
-      type: "lookup"
-    },
-    %{
       name: "date",
       value: "date",
       type: "inputs"
@@ -667,12 +642,7 @@ alias HayaiLedger.Procedures
       name: "object_uid", 
       value: "object_uid",
       type: "inputs"
-    },
-    %{
-      name: "account_uid", 
-      value: "CreditCardSales",
-      type: "lookup"
-    },
+    }
   ]
 }
 |> Procedures.create_procedure()
@@ -688,12 +658,7 @@ alias HayaiLedger.Procedures
       name: "amount_subunits",
       value: "amount_subunits",
       type: "inputs"
-    },
-    %{
-      name: "amount_currency",
-      value: "FoodVendor",
-      type: "lookup"
-    },
+    }
     %{
       name: "date",
       value: "date",
@@ -708,12 +673,7 @@ alias HayaiLedger.Procedures
       name: "object_uid", 
       value: "object_uid",
       type: "inputs"
-    },
-    %{
-      name: "account_uid", 
-      value: "FoodVendor",
-      type: "lookup"
-    },
+    }
   ]
 }
 |> Procedures.create_procedure()
@@ -729,11 +689,6 @@ alias HayaiLedger.Procedures
       name: "amount_subunits",
       value: "amount_subunits",
       type: "inputs"
-    },
-    %{
-      name: "amount_currency",
-      value: "Grosslabor",
-      type: "lookup"
     },    
     %{
       name: "date",
@@ -749,12 +704,7 @@ alias HayaiLedger.Procedures
       name: "object_uid", 
       value: "object_uid",
       type: "inputs"
-    },
-    %{
-      name: "account_uid", 
-      value: "Grosslabor",
-      type: "lookup"
-    },
+    }
   ]
 }
 |> Procedures.create_procedure()
@@ -770,12 +720,7 @@ alias HayaiLedger.Procedures
       name: "amount_subunits",
       value: "amount_subunits",
       type: "inputs"
-    },
-    %{
-      name: "amount_currency",
-      value: "SalesTax",
-      type: "lookup"
-    },    
+    }    
     %{
       name: "date",
       value: "date",
@@ -790,12 +735,7 @@ alias HayaiLedger.Procedures
       name: "object_uid", 
       value: "object_uid",
       type: "inputs"
-    },
-    %{
-      name: "account_uid", 
-      value: "SalesTax",
-      type: "lookup"
-    },
+    }
   ]
 }
 |> Procedures.create_procedure()
@@ -813,11 +753,6 @@ alias HayaiLedger.Procedures
       type: "inputs"
     },
     %{
-      name: "amount_currency",
-      value: "SupplyVendor",
-      type: "lookup"
-    },
-    %{
       name: "date",
       value: "date",
       type: "inputs"
@@ -831,12 +766,7 @@ alias HayaiLedger.Procedures
       name: "object_uid", 
       value: "object_uid",
       type: "inputs"
-    },
-    %{
-      name: "account_uid", 
-      value: "SupplyVendor",
-      type: "lookup"
-    },
+    }
   ]
 }
 |> Procedures.create_procedure()
@@ -854,11 +784,6 @@ alias HayaiLedger.Procedures
       name: "amount_subunits",
       value: "amount_subunits",
       type: "inputs"
-    },
-    %{
-      name: "amount_currency",
-      value: "BankAccount",
-      type: "lookup"
     },    
     %{
       name: "date",
@@ -874,11 +799,6 @@ alias HayaiLedger.Procedures
       name: "object_uid", 
       value: "object_uid",
       type: "inputs"
-    },
-    %{
-      name: "account_uid", 
-      value: "BankAccount",
-      type: "lookup"
     },
   ]
 }
@@ -895,12 +815,7 @@ alias HayaiLedger.Procedures
       name: "amount_subunits",
       value: "amount_subunits",
       type: "inputs"
-    },
-    %{
-      name: "amount_currency",
-      value: "Cash",
-      type: "lookup"
-    },    
+    },   
     %{
       name: "date",
       value: "date",
@@ -915,11 +830,6 @@ alias HayaiLedger.Procedures
       name: "object_uid", 
       value: "object_uid",
       type: "inputs"
-    },
-    %{
-      name: "account_uid", 
-      value: "Cash",
-      type: "lookup"
     },
   ]
 }
@@ -938,11 +848,6 @@ alias HayaiLedger.Procedures
       type: "inputs"
     },
     %{
-      name: "amount_currency",
-      value: "FoodInventory",
-      type: "lookup"
-    },    
-    %{
       name: "date",
       value: "date",
       type: "inputs"
@@ -956,12 +861,7 @@ alias HayaiLedger.Procedures
       name: "object_uid", 
       value: "object_uid",
       type: "inputs"
-    },
-    %{
-      name: "account_uid", 
-      value: "FoodInventory",
-      type: "lookup"
-    },
+    }
   ]
 }
 |> Procedures.create_procedure()
@@ -977,12 +877,7 @@ alias HayaiLedger.Procedures
       name: "amount_subunits",
       value: "amount_subunits",
       type: "inputs"
-    },
-    %{
-      name: "amount_currency",
-      value: "SuppliesInventory",
-      type: "lookup"
-    },    
+    },  
     %{
       name: "date",
       value: "date",
@@ -997,12 +892,7 @@ alias HayaiLedger.Procedures
       name: "object_uid", 
       value: "object_uid",
       type: "inputs"
-    },
-    %{
-      name: "account_uid", 
-      value: "SuppliesInventory",
-      type: "lookup"
-    },
+    }
   ]
 }
 |> Procedures.create_procedure()
@@ -1020,11 +910,6 @@ alias HayaiLedger.Procedures
       type: "inputs"
     },
     %{
-      name: "amount_currency",
-      value: "Wages",
-      type: "lookup"
-    },    
-    %{
       name: "date",
       value: "date",
       type: "inputs"
@@ -1038,75 +923,10 @@ alias HayaiLedger.Procedures
       name: "object_uid", 
       value: "object_uid",
       type: "inputs"
-    },
-    %{
-      name: "account_uid", 
-      value: "Wages",
-      type: "lookup"
-    },
+    }
   ]
 }
 |> Procedures.create_procedure()
 
-### Entry procedures ###
-
-{:ok, journal_entry} = %{
-  name: "JournalEntry",
-  description: "entry for journal entry with transactions",
-  type: "Entry",
-  action: "build",
-  organization_id: organization.id,
-  params: [
-    %{
-      name: "description", 
-      value: "description",
-      type: "inputs"
-    },
-    %{
-      name: "object_type", 
-      value: "object_type",
-      type: "inputs"
-    },
-    %{
-      name: "object_uid", 
-      value: "object_uid",
-      type: "inputs"
-    },
-  ]
-}
-|> Procedures.create_procedure()
-
-### Group procedures ###
-
-{:ok, default_account_setup} = %{
-  name: "DefaultAccountsSetup",
-  organization_id: organization.id,
-}
-|> Procedures.create_group()
-
-account_procedures = [
-  bank_asset,
-  cash_asset,
-  equimpent_asset,
-  food_asset,
-  supplies_asset,
-  wage_expenses,
-  other_expenses,
-  equimpment_vendor,
-  food_vendor,
-  gross_labor,
-  sales_tax,
-  supply_vendor,
-  cash_revenue,
-  credit_card_revenue
-]
-
-for account_procedure <- account_procedures do
-  %{
-    "group_id" => default_account_setup.id,
-    "procedure_id" => account_procedure.id
-  }
-  |> Procedures.create_group_procedure()
-end
 
    

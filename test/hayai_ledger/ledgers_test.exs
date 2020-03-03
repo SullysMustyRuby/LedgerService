@@ -241,27 +241,23 @@ defmodule HayaiLedger.LedgersTest do
         transaction_fixture(%{ "account_uid" => equity_account.uid })
       end
 
-      transactions = Ledgers.list_transactions(organization.id)
+      transactions = Ledgers.list_transactions(%{ organization_id: organization.id })
       assert 6 == length(transactions)
       for transaction <- transactions do
         assert Enum.member?([asset_account.id, equity_account.id], transaction.account_id)
       end
     end
-  end
 
-  describe "list_transactions_for_account/1" do
     test "returns all transactions for the account_id" do
       asset_account = account_fixture(%{ "type" => "asset" })
       equity_account = account_fixture(%{ "type" => "equity" })
       transaction_fixture(%{ "account_uid" => equity_account.uid })
       transaction_fixture(%{ "account_uid" => asset_account.uid })
 
-      [transaction] = Ledgers.list_transactions_for_account(asset_account.id)
+      [transaction] = Ledgers.list_transactions(%{ account_id: asset_account.id })
       assert asset_account.id == transaction.account_id
     end
-  end
 
-  describe "list_transactions_for_account/2" do
     test "returns all the transactions with both date options" do
       asset_account = account_fixture(%{ "type" => "asset" })
       transaction_fixture(%{ "account_uid" => asset_account.uid, "date" => ~U[2020-01-01 00:00:00Z] })
@@ -269,8 +265,8 @@ defmodule HayaiLedger.LedgersTest do
       transaction_fixture(%{ "account_uid" => asset_account.uid, "date" => ~U[2020-01-03 00:00:00Z] })
       transaction_fixture(%{ "account_uid" => asset_account.uid, "date" => ~U[2020-01-04 00:00:00Z] })
       transaction_fixture(%{ "account_uid" => asset_account.uid, "date" => ~U[2020-01-05 00:00:00Z] })
-      options = %{ from_date: ~U[2020-01-02 00:00:00Z], to_date: ~U[2020-01-04 00:00:00Z] }
-      transactions = Ledgers.list_transactions_for_account(asset_account.id, options)
+      args = %{ account_id: asset_account.id, from_date: ~U[2020-01-02 00:00:00Z], to_date: ~U[2020-01-04 00:00:00Z] }
+      transactions = Ledgers.list_transactions(args)
       assert 3 == length(transactions)
       for transaction <- transactions do
         assert transaction.date > ~U[2020-01-01 00:00:00Z]
@@ -285,8 +281,8 @@ defmodule HayaiLedger.LedgersTest do
       transaction_fixture(%{ "account_uid" => asset_account.uid, "date" => ~U[2020-01-03 00:00:00Z] })
       transaction_fixture(%{ "account_uid" => asset_account.uid, "date" => ~U[2020-01-04 00:00:00Z] })
       transaction_fixture(%{ "account_uid" => asset_account.uid, "date" => ~U[2020-01-05 00:00:00Z] })
-      options = %{ from_date: ~U[2020-01-02 00:00:00Z] }
-      transactions = Ledgers.list_transactions_for_account(asset_account.id, options)
+      args = %{ account_id: asset_account.id, from_date: ~U[2020-01-02 00:00:00Z] }
+      transactions = Ledgers.list_transactions(args)
       assert 4 == length(transactions)
       for transaction <- transactions do
         assert transaction.date > ~U[2020-01-01 00:00:00Z]
@@ -300,8 +296,8 @@ defmodule HayaiLedger.LedgersTest do
       transaction_fixture(%{ "account_uid" => asset_account.uid, "date" => ~U[2020-01-03 00:00:00Z] })
       transaction_fixture(%{ "account_uid" => asset_account.uid, "date" => ~U[2020-01-04 00:00:00Z] })
       transaction_fixture(%{ "account_uid" => asset_account.uid, "date" => ~U[2020-01-05 00:00:00Z] })
-      options = %{ to_date: ~U[2020-01-03 00:00:00Z] }
-      transactions = Ledgers.list_transactions_for_account(asset_account.id, options)
+      args = %{ account_id: asset_account.id, to_date: ~U[2020-01-03 00:00:00Z] }
+      transactions = Ledgers.list_transactions(args)
       assert 3 == length(transactions)
       for transaction <- transactions do
         assert transaction.date < ~U[2020-01-04 00:00:00Z]

@@ -44,14 +44,6 @@ defmodule HayaiLedger.Ledgers.TransactionTest do
   		assert :ok == result
   	end
 
-    test "returns error if no amount_currency", %{ valid_attrs: valid_attrs } do
-      no_currency = Map.delete(valid_attrs, "amount_currency")
-      changeset = Transaction.changeset(%Transaction{}, no_currency)
-      {result, transaction} = Repo.insert(changeset)
-      assert :error == result
-      assert transaction.errors[:amount_currency] == {"can't be blank", [validation: :required]}
-    end
-
     test "returns error if the amount_currency does not match the account currency", %{ valid_attrs: valid_attrs } do
       bad_currency = Map.put(valid_attrs, "amount_currency", "THB")
       changeset = Transaction.changeset(%Transaction{}, bad_currency)

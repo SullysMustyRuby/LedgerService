@@ -21,6 +21,7 @@ defmodule HayaiLedger.Ledgers.Entry do
   def changeset(entry, attrs) do
     entry
     |> cast(attrs, [:description, :object_type, :object_uid, :organization_id])
+    |> cast_assoc(:transactions, with: &Transaction.changeset/2)
     |> put_change(:uid, generate_uid())
     |> validate_required([:uid])
     |> foreign_key_constraint(:organization_id)
