@@ -3,7 +3,7 @@ defmodule Support.Authentication do
   use Plug.Test
 
   import Support.Fixtures.OrganizationFixtures, only: [{:user_fixture, 1}, {:membership_fixture, 1}, {:organization_fixture, 0}]
-  import Support.Fixtures.AccountFixtures, only: [{:account_attrs, 0}, {:account_fixture, 1}]
+  import Support.Fixtures.AccountFixtures, only: [{:account_attrs, 0}]
 
   alias HayaiLedger.Accounts
   alias HayaiLedger.Organizations

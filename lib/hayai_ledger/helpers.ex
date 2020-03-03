@@ -1,7 +1,6 @@
 defmodule HayaiLedger.Helpers do
   import Ecto.Query, warn: false
 
-  alias HayaiLedger.Accounts
 	alias HayaiLedger.Procedures.Param
   
   @spec generate_uid() :: binary
@@ -71,12 +70,6 @@ defmodule HayaiLedger.Helpers do
     |> add_args(tail)
   end
 
-  def add_args(query, [{:type, type} | tail]) do
-    (from o in query,
-      where: o.type == ^type)
-    |> add_args(tail)
-  end
-
   def add_args(query, [{_, _} | tail]), do: add_args(query, tail)
 
   def apply_params(params, inputs, organization_id) do
@@ -110,8 +103,4 @@ defmodule HayaiLedger.Helpers do
   defp put_attr(%Param{ name: name, value: value}, _inputs, attrs) do
     Map.put(attrs, name, value)
   end
-
-  defp find_object_attribute(%{ "object_uid" => object_uid }), do: true
-
-  defp find_object_attribute(_), do: false
 end

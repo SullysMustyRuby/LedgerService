@@ -3,7 +3,6 @@ defmodule HayaiLedgerWeb.AccountController do
 
   alias HayaiLedger.Accounts
   alias HayaiLedger.Accounts.Account
-  alias HayaiLedger.Ledgers
 
   action_fallback HayaiLedgerWeb.FallbackController
 

@@ -6,11 +6,9 @@ defmodule HayaiLedger.Accounts.Account do
   alias HayaiLedger.Accounts
   alias HayaiLedger.Ledgers.Transaction
   alias HayaiLedger.Organizations.Organization
-  alias HayaiLedger.Procedures.Param
 
   @credit_types ["equity", "liability", "revenue"]
   @debit_types ["asset", "expense"]
-  @kinds ["credit", "debit"]
   @types @credit_types ++ @debit_types |> Enum.sort()
 
   schema "accounts" do

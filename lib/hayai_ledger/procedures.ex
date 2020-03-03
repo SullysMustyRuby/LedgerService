@@ -7,9 +7,8 @@ defmodule HayaiLedger.Procedures do
   alias HayaiLedger.Repo
 
   alias HayaiLedger.Accounts
-  alias HayaiLedger.Accounts.Account
   alias HayaiLedger.Ledgers
-  alias HayaiLedger.Procedures.{Group, GroupProcedure, Param, Procedure}
+  alias HayaiLedger.Procedures.{Param, Procedure}
 
   def process(%{ "name" => name, "inputs" => inputs }, organization_id) do
     with {:ok, procedure} <- get_procedure_by_name(name, organization_id) do

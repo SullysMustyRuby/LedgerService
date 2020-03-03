@@ -19,13 +19,5 @@ defmodule HayaiLedgerWeb.Api.ProcedureController do
     do
       render(conn, "show.json", %{ entry: entry, transactions: transactions })
     end
-  end  
-
-  def process_group(conn, %{ "group" => group }) do
-     with {:ok, organization_id} <- organization_id(conn),
-      {:ok, result} <- Procedures.process_group(group, organization_id)
-    do
-      render(conn, "show.json", %{ result: result })
-    end
   end
 end

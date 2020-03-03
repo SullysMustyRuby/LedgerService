@@ -4,7 +4,6 @@ defmodule HayaiLedger.ReportsTest do
   import Support.Fixtures.OrganizationFixtures, only: [{:organization_fixture, 0}]
   import Support.Fixtures.ReportFixtures
 
-  alias HayaiLedger.Accounts
   alias HayaiLedger.Reports
   alias HayaiLedger.Reports.{ReportAccount, TransactionReport}
 
@@ -121,29 +120,29 @@ defmodule HayaiLedger.ReportsTest do
       %{ organization: organization_fixture() }
     end
 
-    test "returns the result data with valid params", %{ organization: organization } do
-      date_from = "2015-01-01T00:00:07Z"
-      date_to = "2020-01-31T23:59:59Z"
-      object_uid = "site_123456789"
-      create_account("CashSales", object_uid, "asset", organization.id)
-      create_account("CreditCardSales", object_uid, "asset", organization.id)
-      report = net_sales_report(organization.id)
-      params = net_sales_report_params(date_from, date_to, object_uid)
+    # test "returns the result data with valid params", %{ organization: organization } do
+    #   # date_from = "2015-01-01T00:00:07Z"
+    #   # date_to = "2020-01-31T23:59:59Z"
+    #   # object_uid = "site_123456789"
+    #   # create_account("CashSales", object_uid, "asset", organization.id)
+    #   # create_account("CreditCardSales", object_uid, "asset", organization.id)
+    #   # report = net_sales_report(organization.id)
+    #   # params = net_sales_report_params(date_from, date_to, object_uid)
 
-      # Reports.generate(params, organization.id)
-    end
+    #   # Reports.generate(params, organization.id)
+    # end
   end
 
-  defp create_account(name, object_uid, type, organization_id) do
-    {:ok, account} = Accounts.create_account(%{
-      "currency" => "THB",
-      "name" => name,
-      "object_type" => "Account",
-      "object_uid" => object_uid,
-      "type" => type,
-      "organization_id" => organization_id
-    })
+  # defp create_account(name, object_uid, type, organization_id) do
+  #   {:ok, account} = Accounts.create_account(%{
+  #     "currency" => "THB",
+  #     "name" => name,
+  #     "object_type" => "Account",
+  #     "object_uid" => object_uid,
+  #     "type" => type,
+  #     "organization_id" => organization_id
+  #   })
     
-    account
-  end
+  #   account
+  # end
 end

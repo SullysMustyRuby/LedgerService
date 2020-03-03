@@ -4,7 +4,6 @@ defmodule HayaiLedger.ProceduresTest do
   import Support.Fixtures.OrganizationFixtures, only: [{:organization_fixture, 0}]
   import Support.Fixtures.ProcedureFixtures
 
-  alias HayaiLedger.Accounts
   alias HayaiLedger.Procedures
   alias HayaiLedger.Procedures.{Param, Procedure}
 

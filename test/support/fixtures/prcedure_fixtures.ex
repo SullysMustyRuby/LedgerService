@@ -11,31 +11,6 @@ defmodule Support.Fixtures.ProcedureFixtures do
     }
   end
 
-  def group_fixture(attrs \\ %{}) do
-    {:ok, group} =
-      attrs
-      |> Enum.into(group_attrs())
-      |> Procedures.create_group()
-
-    group
-  end
-
-  def group_procedure_attrs() do
-    %{
-      "group_id" => group_fixture().id,
-      "procedure_id" => procedure_fixture().id
-    }
-  end
-
-  def group_procedure_fixture(attrs \\ %{}) do
-    {:ok, group_procedure} =
-      attrs
-      |> Enum.into(group_procedure_attrs())
-      |> Procedures.create_group_procedure()
-
-    group_procedure
-  end
-
   def procedure_attrs() do
   	%{
   		"description" => "onsite cash sale",

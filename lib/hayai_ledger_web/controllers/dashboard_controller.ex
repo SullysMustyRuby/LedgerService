@@ -2,7 +2,6 @@ defmodule HayaiLedgerWeb.DashboardController do
   use HayaiLedgerWeb, :controller
 
   alias HayaiLedger.Organizations
-	alias HayaiLedger.Organizations.User
 
   def index(conn, _params) do
   	with {:ok, user_id} <- current_user_id(conn),

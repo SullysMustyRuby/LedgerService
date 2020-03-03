@@ -7,8 +7,7 @@ defmodule HayaiLedger.Accounts do
   import HayaiLedger.Helpers, only: [{:add_args, 2}, {:apply_params, 3}, {:base_query, 2}, {:preload_transactions, 1}]
 
   alias HayaiLedger.Repo
-  alias HayaiLedger.Accounts.{Balance, Account, AccountType}
-  alias HayaiLedger.Ledgers
+  alias HayaiLedger.Accounts.{Balance, Account}
   alias HayaiLedger.Procedures.Procedure
 
   def active_accounts_exist?(%{ name: name, object_uid: object_uid }) do

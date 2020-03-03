@@ -8,11 +8,11 @@ defmodule HayaiLedger.Reports do
   alias HayaiLedger.Repo
   alias HayaiLedger.Reports.{Generator, ReportAccount, TransactionReport}
 
-  def generate(%{ "name" => name, "inputs" => inputs }, organization_id) do
-    with {:ok, report} <- get_report_by_name(name, organization_id) do
-      Generator.run_transaction_report(report, inputs)
-    end
-  end
+  # def generate(%{ "name" => name, "inputs" => inputs }, organization_id) do
+  #   with {:ok, report} <- get_report_by_name(name, organization_id) do
+  #     Generator.run_transaction_report(report, inputs)
+  #   end
+  # end
 
   def get_report_by_name(name, organization_id) do
     case Repo.one(report_by_name_query(name, organization_id)) do

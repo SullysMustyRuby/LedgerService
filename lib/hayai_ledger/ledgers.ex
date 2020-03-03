@@ -148,10 +148,8 @@ defmodule HayaiLedger.Ledgers do
   end
 
   def handle_transaction_procedure(_procedure, _inputs, _organization_id), do: {:error, "no procedure for that action"}
-
-  def journal_entry(_attrs, []), do: {:error, "must have transactions that balance"}
-
-  def journal_entry(%{ transactions: transactions } = params) do
+  
+  def journal_entry(%{ transactions: _transactions } = params) do
     with %Ecto.Changeset{ valid?: true, changes: %{ transactions: transactions } } = entry_changeset <- build_entry(params),
       :ok <- validate_transactions_balance(transactions),
       {:ok, entry} <- Repo.insert(entry_changeset),
@@ -160,6 +158,8 @@ defmodule HayaiLedger.Ledgers do
       {:ok, entry}
     end
   end
+
+  def journal_entry(_attrs, []), do: {:error, "must have transactions that balance"}
 
   def journal_entry(%Ecto.Changeset{ valid?: true } = entry_changeset, transactions) do
     with :ok <- transactions_all_valid?(transactions),
