@@ -57,22 +57,22 @@ defmodule HayaiLedgerWeb.Router do
     resources "/users", UserController, except: [:create, :new]
   end
 
-  scope "/api", as: :api  do
+  scope "/api", HayaiLedgerWeb.Api, as: :api  do
     pipe_through :api
 
-    get "/accounts/:uid", HayaiLedgerWeb.Api.AccountController, :show
-    get "/accounts/balance/:uid", HayaiLedgerWeb.Api.AccountController, :balance
-    get "/accounts/running_balance/:uid", HayaiLedgerWeb.Api.AccountController, :running_balance
-    get "/accounts/transactions/:uid", HayaiLedgerWeb.Api.AccountController, :transactions
-    post "/accounts/create", HayaiLedgerWeb.Api.AccountController, :create
+    get "/accounts/:uid", AccountController, :show
+    get "/accounts/balance/:uid", AccountController, :balance
+    get "/accounts/running_balance/:uid", AccountController, :running_balance
+    get "/accounts/transactions/:uid", AccountController, :transactions
+    post "/accounts/create", AccountController, :create
     
-    get "/entries/:uid", HayaiLedgerWeb.Api.EntryController, :show
-    post "/entries/create", HayaiLedgerWeb.Api.EntryController, :create
+    get "/entries/:uid", EntryController, :show
+    post "/entries/create", EntryController, :create
 
-    get "/transactions/:uid", HayaiLedgerWeb.Api.TransactionController, :show
+    get "/transactions/:uid", TransactionController, :show
 
-    post "/procedures/process", HayaiLedgerWeb.Api.ProcedureController, :process
-    post "/procedures/process_group", HayaiLedgerWeb.Api.ProcedureController, :process_group
+    post "/procedures/process", ProcedureController, :process
+    post "/procedures/process_group", ProcedureController, :process_group
   end
 
   scope "/api" do
