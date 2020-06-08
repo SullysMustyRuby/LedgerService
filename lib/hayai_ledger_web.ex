@@ -44,6 +44,7 @@ defmodule HayaiLedgerWeb do
       use Phoenix.Controller, namespace: HayaiLedgerWeb
 
       import Plug.Conn
+      import Phoenix.LiveView.Controller
       import HayaiLedgerWeb.Gettext
       import HayaiLedgerWeb.Helpers.Auth, only: [{:current_user, 1}, {:current_user_id, 1}, {:current_user_id!, 1}]
       import HayaiLedgerWeb.Helpers.Organization, only: [{:current_organization, 1}, {:current_organization_id, 1}]
@@ -60,6 +61,8 @@ defmodule HayaiLedgerWeb do
 
       # Import convenience functions from controllers
       import Phoenix.Controller, only: [get_flash: 1, get_flash: 2, view_module: 1]
+
+      import Phoenix.LiveView.Helpers
 
       # Use all HTML functionality (forms, tags, etc)
       use Phoenix.HTML
@@ -78,6 +81,7 @@ defmodule HayaiLedgerWeb do
       use Phoenix.Router
       import Plug.Conn
       import Phoenix.Controller
+      import Phoenix.LiveView.Router
     end
   end
 
