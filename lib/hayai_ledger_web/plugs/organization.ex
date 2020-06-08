@@ -1,7 +1,6 @@
 defmodule HayaiLedgerWeb.Plugs.Organization do
   
   import Plug.Conn
-  import Phoenix.Controller
 
   alias HayaiLedger.Organizations
 

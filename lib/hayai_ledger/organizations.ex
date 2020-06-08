@@ -58,7 +58,7 @@ defmodule HayaiLedger.Organizations do
 
   def create_organization(attrs, user_id) do
     with {:ok, %Organization{ id: organization_id } = organization} <- create_organization(attrs),
-      {:ok, membership} <- create_membership(%{ organization_id: organization_id, user_id: user_id }),
+      {:ok, _membership} <- create_membership(%{ organization_id: organization_id, user_id: user_id }),
       :ok <- create_api_keys(organization_id)
     do
       {:ok, organization}

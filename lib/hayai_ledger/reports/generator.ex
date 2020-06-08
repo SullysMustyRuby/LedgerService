@@ -1,9 +1,9 @@
 defmodule HayaiLedger.Reports.Generator do
 
-  import Ecto.Query, warn: false
+  # import Ecto.Query, warn: false
 
-  alias HayaiLedger.Ledgers.Transaction
-  alias HayaiLedger.Reports.TransactionReport
+  # alias HayaiLedger.Ledgers.Transaction
+  # alias HayaiLedger.Reports.TransactionReport
 
 	# def run_transaction_report(report, inputs) do
 	# 	{date_from, date_to} = get_dates(report, inputs)

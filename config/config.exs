@@ -15,7 +15,8 @@ config :hayai_ledger, HayaiLedgerWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "h50b6sO5A2MVlFran2AwjSuS3p3/CXpDPevp+IHO434I3KS/2mSUR+/HGQ8LCVgd",
   render_errors: [view: HayaiLedgerWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: HayaiLedger.PubSub, adapter: Phoenix.PubSub.PG2]
+  pubsub_server: HayaiLedger.PubSub
+  # pubsub: [name: HayaiLedger.PubSub, adapter: Phoenix.PubSub.PG2]
 
 # Configures Elixir's Logger
 config :logger, :console,

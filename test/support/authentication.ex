@@ -1,7 +1,6 @@
 defmodule Support.Authentication do
-  use Phoenix.ConnTest
-  use Plug.Test
-
+  import Plug.Conn
+  import Phoenix.ConnTest
   import Support.Fixtures.OrganizationFixtures, only: [{:user_fixture, 1}, {:membership_fixture, 1}, {:organization_fixture, 0}]
   import Support.Fixtures.AccountFixtures, only: [{:account_attrs, 0}]
 

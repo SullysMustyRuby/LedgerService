@@ -12,6 +12,8 @@ defmodule HayaiLedger.Application do
       HayaiLedger.Repo,
       # Start the endpoint when the application starts
       HayaiLedgerWeb.Endpoint,
+      # Start the pubsub server
+      {Phoenix.PubSub, [name: HayaiLedger.PubSub, adapter: Phoenix.PubSub.PG2]},
       # Starts a worker by calling: HayaiLedger.Worker.start_link(arg)
       # {HayaiLedger.Worker, arg},
       HayaiLedger.LockServer
