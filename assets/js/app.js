@@ -30,6 +30,12 @@ liveSocket.connect()
 // >> liveSocket.disableLatencySim()
 window.liveSocket = liveSocket
 
+// Chartkick
+import Chartkick from "chartkick"
+import Chart from "chart.js"
+ 
+Chartkick.use(Chart)
+
 // Import local files
 //
 // Local files can be imported directly using relative paths, for example:

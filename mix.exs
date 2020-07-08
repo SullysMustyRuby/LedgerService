@@ -49,7 +49,8 @@ defmodule HayaiLedger.MixProject do
       {:benchee, "~> 1.0", only: [:dev, :test]},
       {:tzdata, "~> 1.0.1"},
       {:absinthe, "~> 1.5.0"},
-      {:absinthe_plug, "~> 1.5.0"}
+      {:absinthe_plug, "~> 1.5.0"},
+      {:chartkick, "~>0.4.0"}
     ]
   end
 
