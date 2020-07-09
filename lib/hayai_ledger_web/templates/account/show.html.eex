@@ -38,3 +38,19 @@
 </ul>
 
 <span><%= link "Edit", to: Routes.account_path(@conn, :edit, @account) %></span>
+
+<% data = Poison.encode!(debits_credits(@account)) %>
+<p>Activity</p>
+<%= raw Chartkick.column_chart(data) %>
+
+<p>Balance</p>
+<% area = Poison.encode!(monthly_balances(@account, 2019)) %>
+<%= raw Chartkick.line_chart(area) %>
+
+<p>Transaction Types</p>
+<% data = Poison.encode!([["lender.disburse.borrower", "100"], ["borrower.payment.lender", "50"]]) %>
+<%= raw Chartkick.pie_chart(data) %>
+
+<p>Credit Sources</p>
+<% data = Poison.encode!([["loan 123", "100"], ["loan 456", "50"], ["loan 789", "30"]]) %>
+<%= raw Chartkick.pie_chart(data) %>

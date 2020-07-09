@@ -34,9 +34,9 @@ defmodule HayaiLedger.Helpers do
     |> add_args(tail)
   end
 
-  def add_args(query, [{:offset, offset} | tail]) do
+  def add_args(query, [{:kind, kind} | tail]) do
     (from o in query,
-      offset: ^offset)
+      where: o.kind == ^kind)
     |> add_args(tail)
   end
 
@@ -55,6 +55,12 @@ defmodule HayaiLedger.Helpers do
   def add_args(query, [{:object_type, object_type} | tail]) do
     (from o in query,
       where: o.object_type == ^object_type)
+    |> add_args(tail)
+  end
+
+  def add_args(query, [{:offset, offset} | tail]) do
+    (from o in query,
+      offset: ^offset)
     |> add_args(tail)
   end
 

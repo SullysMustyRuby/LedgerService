@@ -1,6 +1,9 @@
 defmodule HayaiLedger.Accounts do
   @moduledoc """
   The Accounts context.
+  NOTE! fix the account searching features. This was guided by the proceedures
+  however, none of that is practical. 
+  Need to look for object_type & object_uid uniquness only. if at all.
   """
 
   import Ecto.Query, warn: false
@@ -10,15 +13,22 @@ defmodule HayaiLedger.Accounts do
   alias HayaiLedger.Accounts.{Balance, Account}
   alias HayaiLedger.Procedures.Procedure
 
-  def active_accounts_exist?(%{ name: name, object_uid: object_uid }) do
+  def active_accounts_exist?(%{name: name, object_uid: object_uid}) do
     base_active_account_name_filter(name)
     |> object_uid_filter(object_uid)
     |> Repo.exists?()
   end
 
-  def active_accounts_exist?(%{ name: name, organization_id: organization_id }) do
+  def active_accounts_exist?(%{name: name, organization_id: organization_id}) do
     base_active_account_name_filter(name)
     |> organization_id_filter(organization_id)
+    |> Repo.exists?()
+  end
+
+  def active_accounts_exist?(%{object_type: object_type, object_uid: object_uid, organization_id: organization_id}) do
+    base_query(Account, organization_id)
+    |> object_type_filter(object_type)
+    |> object_uid_filter(object_uid)
     |> Repo.exists?()
   end
 
@@ -248,6 +258,11 @@ defmodule HayaiLedger.Accounts do
   defp object_uid_filter(query, object_uid) do
     from a in query,
     where: a.object_uid == ^object_uid
+  end
+
+  defp object_type_filter(query, object_type) do
+    from a in query,
+    where: a.object_type == ^object_type
   end
 
   defp organization_id_filter(query, organization_id) do

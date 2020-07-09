@@ -258,6 +258,16 @@ defmodule HayaiLedger.LedgersTest do
       assert asset_account.id == transaction.account_id
     end
 
+    test "returns all transactions for the kind" do
+      asset_account = account_fixture(%{"type" => "asset"})
+      transaction_fixture(%{"account_uid" => asset_account.uid, "kind" => "credit"})
+      transaction_fixture(%{"account_uid" => asset_account.uid, "kind" => "debit"})
+
+      [transaction] = Ledgers.list_transactions(%{ account_id: asset_account.id, kind: "credit"})
+      assert asset_account.id == transaction.account_id
+      assert "credit" == transaction.kind
+    end
+
     test "returns all the transactions with both date options" do
       asset_account = account_fixture(%{ "type" => "asset" })
       transaction_fixture(%{ "account_uid" => asset_account.uid, "date" => ~U[2020-01-01 00:00:00Z] })
