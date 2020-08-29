@@ -2,7 +2,7 @@ use Mix.Config
 
 # Configure your database
 config :hayai_ledger, HayaiLedger.Repo,
-  username: "erin",
+  username: "postgres",
   password: "postgres",
   database: "hayai_ledger_test",
   hostname: "localhost",

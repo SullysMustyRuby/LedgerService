@@ -1,33 +1,15 @@
 # HayaiLedger
 
-To start your Phoenix server:
+## General Overview
 
-  * Install dependencies with `mix deps.get`
-  * Create and migrate your database with `mix ecto.setup`
-  * Install Node.js dependencies with `cd assets && npm install`
-  * Start Phoenix endpoint with `mix phx.server`
+This application is still a work in progress. The goal is to build a double accounting compliant ledger system with Elixir. Elixir was chosen due to its incredible tools, easy to read and understand syntax, powerful scaling, and overall great community. 
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+There are many features to this approach
+- Once integrated the ledger can ensure an easy accounting export of data
+- The ledger follows strict Accounting principles thus ensuring financial data integrety
+- There is locking/blocking that is non-database dependant allowing much better throughput
+- Scaling and performance were amazing under tests
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+This has been mostly exploratory and new ideas testing for proof of concept and personal knowledge. This app has been integrated into a few other apps (which are private) and the perfomance/reliability has been astounding.
 
-## Learn more
-
-  * Official website: http://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Mailing list: http://groups.google.com/group/phoenix-talk
-  * Source: https://github.com/phoenixframework/phoenix
-
-ease of use
-integrations
-customization of reports 
-customization of use
-easy to understand
-
-mix phx.gen.json Users.Organization organizations name:string description:string
-mix phx.gen.json Users.User users name:string email:string organization_id:references:organizations
-
-mix phx.gen.json Api.Permission permissions name:string description:string
-
-mix phx.gen.schema Ledgers.Ledger ledgers name:string description:string organization_id:references:organizations request_id:references:requests
+Testing and further enhancements on this version are stopped for now due to proprietary use of parts of this on a commercial application, once that is complete may come back to update and open source what was discovered and used here. 

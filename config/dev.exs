@@ -2,7 +2,7 @@ use Mix.Config
 
 # Configure your database
 config :hayai_ledger, HayaiLedger.Repo,
-  username: "erin",
+  username: "postgres",
   password: "postgres",
   database: "hayai_ledger_dev",
   hostname: "localhost",
@@ -16,7 +16,7 @@ config :hayai_ledger, HayaiLedger.Repo,
 # watchers to your application. For example, we use it
 # with webpack to recompile .js and .css sources.
 config :hayai_ledger, HayaiLedgerWeb.Endpoint,
-  http: [port: 4500],
+  http: [port: 4000],
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
