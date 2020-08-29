@@ -34,7 +34,12 @@ defmodule HayaiLedgerWeb.Helpers.ChartHelpersTest do
 	    end 
 	    totals = Ledgers.list_transactions(%{account_id: account.id, kind: "credit"})
 	    					|> ChartHelpers.sum_by_month()
-	    assert totals == [["Jan", 3003], ["Feb", 3006], ["Mar", 3009], ["Apr", 3012], ["May", 3015]]
+			
+	    assert Enum.find(totals, fn [hd | _] -> hd == "Jan" end) == ["Jan", 3003]
+	    assert Enum.find(totals, fn [hd | _] -> hd == "Feb" end) == ["Feb", 3006]
+	    assert Enum.find(totals, fn [hd | _] -> hd == "Mar" end) == ["Mar", 3009]
+	    assert Enum.find(totals, fn [hd | _] -> hd == "Apr" end) == ["Apr", 3012]
+	    assert Enum.find(totals, fn [hd | _] -> hd == "May" end) == ["May", 3015]
 		end
 	end
 
